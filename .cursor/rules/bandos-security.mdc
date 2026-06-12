@@ -1,0 +1,25 @@
+---
+description: BandOS security — RLS, server actions, auth checks
+globs: src/app/actions/**,src/lib/band/**,supabase/migrations/**
+alwaysApply: false
+---
+
+# BandOS Security
+
+Read `.cursor/skills/bandos-security/SKILL.md` when changing auth, RLS, invitations, or public RPCs.
+
+## Server actions (defense in depth)
+
+Band-scoped mutations must call helpers from `src/lib/band/assert-access.ts`:
+
+- `requireBandMember(bandId)` — read/write for any active member
+- `requireBandAdmin(bandId)` — admin-only (profile, invites, public toggles)
+- `requireSetlistMember` / `requireSongMember` / `requireEventMember` / `requireTodoMember` — when only resource id is passed
+- `tryBandAdmin(bandId)` — JSON/error responses without redirect
+
+Use returned `auth.supabase` instead of creating a new client.
+
+## Redirects and URLs
+
+- Post-auth paths: `sanitizeRedirectPath()` from `src/lib/safe-redirect.ts`
+- External links: `sanitizeExternalUrl()` from `src/lib/safe-url.ts`

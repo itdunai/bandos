@@ -1,0 +1,455 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d0f;
+  --bg2:#16161a;
+  --bg3:#1e1e24;
+  --bg4:#26262e;
+  --border:#2e2e38;
+  --text:#f0f0f4;
+  --text2:#9090a8;
+  --text3:#5a5a72;
+  --accent:#a78bfa;
+  --accent2:#7c5fe8;
+  --green:#34d399;
+  --amber:#fbbf24;
+  --red:#f87171;
+  --blue:#60a5fa;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans),system-ui,sans-serif;font-size:14px;min-height:600px}
+.app{display:flex;height:640px;overflow:hidden;border-radius:var(--border-radius-lg);border:0.5px solid var(--border)}
+.sidebar{width:200px;background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:18px 16px 12px;border-bottom:0.5px solid var(--border)}
+.band-name{font-size:15px;font-weight:500;color:var(--text)}
+.band-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;color:var(--text2);font-size:13px;transition:background 0.1s;border-radius:0}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--bg3);color:var(--accent)}
+.nav-item i{font-size:16px;width:18px;text-align:center}
+.nav-section{font-size:10px;color:var(--text3);padding:10px 16px 4px;text-transform:uppercase;letter-spacing:0.08em}
+.sidebar-footer{padding:12px 16px;border-top:0.5px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:8px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--accent)}
+.main{flex:1;background:var(--bg);overflow-y:auto;display:flex;flex-direction:column}
+.topbar{padding:14px 20px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg);flex-shrink:0}
+.page-title{font-size:16px;font-weight:500}
+.topbar-actions{display:flex;gap:8px}
+.btn{background:transparent;border:0.5px solid var(--border);color:var(--text2);padding:5px 12px;border-radius:var(--border-radius-md);cursor:pointer;font-size:12px;display:flex;align-items:center;gap:5px;transition:all 0.1s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-accent{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.btn-accent:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.content{padding:20px;flex:1}
+.page{display:none}
+.page.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:14px}
+.card-title{font-size:12px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em}
+.card-val{font-size:22px;font-weight:500;color:var(--text)}
+.card-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.event-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:12px;display:flex;gap:14px;align-items:flex-start}
+.event-date{background:var(--bg3);border-radius:var(--border-radius-md);padding:8px 12px;text-align:center;min-width:52px}
+.event-day{font-size:20px;font-weight:500;line-height:1;color:var(--text)}
+.event-month{font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:2px}
+.event-info{flex:1}
+.event-title{font-weight:500;font-size:14px;margin-bottom:3px}
+.event-meta{font-size:12px;color:var(--text2)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:30px;font-size:11px;font-weight:500}
+.badge-green{background:rgba(52,211,153,0.12);color:var(--green)}
+.badge-amber{background:rgba(251,191,36,0.12);color:var(--amber)}
+.badge-red{background:rgba(248,113,113,0.12);color:var(--red)}
+.badge-purple{background:rgba(167,139,250,0.12);color:var(--accent)}
+.badge-blue{background:rgba(96,165,250,0.12);color:var(--blue)}
+.section-label{font-size:12px;color:var(--text3);margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em}
+.list-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--border-radius-md);margin-bottom:6px;cursor:pointer;transition:border-color 0.15s}
+.list-item:hover{border-color:var(--accent)}
+.list-item-main{flex:1}
+.list-item-title{font-size:13px;font-weight:500;color:var(--text)}
+.list-item-sub{font-size:11px;color:var(--text2);margin-top:1px}
+.song-icon{width:32px;height:32px;border-radius:var(--border-radius-md);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:15px}
+.member-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:14px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;cursor:pointer;transition:border-color 0.15s}
+.member-card:hover{border-color:var(--accent)}
+.member-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500}
+.member-name{font-size:13px;font-weight:500}
+.member-role{font-size:11px;color:var(--text2)}
+.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.kanban-col{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:10px;min-height:300px}
+.kanban-col-title{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.kanban-count{background:var(--bg3);border-radius:30px;padding:1px 6px;font-size:10px;color:var(--text3)}
+.task-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--border-radius-md);padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:border-color 0.15s}
+.task-card:hover{border-color:var(--accent)}
+.task-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:4px}
+.task-meta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px}
+.setlist{counter-reset:track}
+.setlist-item{display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--border-radius-md);margin-bottom:6px;counter-increment:track;cursor:grab}
+.setlist-item::before{content:counter(track);font-size:12px;color:var(--text3);min-width:18px;text-align:right}
+.setlist-item:hover{border-color:var(--accent)}
+.rehearsal-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:14px;margin-bottom:10px}
+.rehearsal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.rehearsal-title{font-size:14px;font-weight:500}
+.checklist{margin-top:8px}
+.check-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:var(--text2)}
+.check-item.done{color:var(--text3);text-decoration:line-through}
+.check-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0}
+.check-dot.done{background:var(--green);border-color:var(--green)}
+.divider{height:0.5px;background:var(--border);margin:14px 0}
+.tag{display:inline-flex;padding:2px 6px;border-radius:var(--border-radius-md);font-size:11px;background:var(--bg3);color:var(--text2);margin-right:4px}
+.prog-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:2px;background:var(--accent)}
+.bpm-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:30px;font-size:11px;background:var(--bg3);color:var(--text2)}
+.song-detail{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:16px;margin-top:12px}
+.song-detail-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.stat-chip{background:var(--bg3);border-radius:var(--border-radius-md);padding:5px 10px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px}
+.stat-chip span{color:var(--text);font-weight:500}
+.activity-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:12px;color:var(--text2)}
+.activity-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px}
+</style>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:var(--border-radius-md);background:var(--accent2);display:flex;align-items:center;justify-content:center"><i class="ti ti-guitar-pick" style="font-size:14px;color:#fff" aria-hidden="true"></i></div>
+        <div>
+          <div class="band-name">Dead Signals</div>
+          <div class="band-sub">4 участника</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="nav-section">Обзор</div>
+      <div class="nav-item active" onclick="go('dashboard')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</div>
+      <div class="nav-item" onclick="go('members')"><i class="ti ti-users" aria-hidden="true"></i>Состав</div>
+      <div class="nav-section">Музыка</div>
+      <div class="nav-item" onclick="go('songs')"><i class="ti ti-music" aria-hidden="true"></i>Песни</div>
+      <div class="nav-item" onclick="go('setlist')"><i class="ti ti-list-numbers" aria-hidden="true"></i>Сетлист</div>
+      <div class="nav-section">События</div>
+      <div class="nav-item" onclick="go('rehearsals')"><i class="ti ti-microphone-2" aria-hidden="true"></i>Репетиции</div>
+      <div class="nav-item" onclick="go('concerts')"><i class="ti ti-star" aria-hidden="true"></i>Концерты</div>
+      <div class="nav-section">Задачи</div>
+      <div class="nav-item" onclick="go('tasks')"><i class="ti ti-clipboard-list" aria-hidden="true"></i>Задачи</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar">АК</div>
+        <div>
+          <div style="font-size:12px;font-weight:500">Алекс К.</div>
+          <div style="font-size:10px;color:var(--text3)">Гитара / Вокал</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="page-title">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="btn" onclick="sendPrompt('Расскажи подробнее о концепции BandOS и что стоит добавить в MVP')"><i class="ti ti-sparkles" aria-hidden="true"></i> AI совет ↗</button>
+        <button class="btn btn-accent"><i class="ti ti-plus" aria-hidden="true"></i> Добавить</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="grid2">
+          <div class="event-card" style="margin-bottom:0">
+            <div class="event-date">
+              <div class="event-day">14</div>
+              <div class="event-month">Июн</div>
+            </div>
+            <div class="event-info">
+              <div class="event-title"><i class="ti ti-microphone-2" style="font-size:13px;margin-right:4px;color:var(--accent)" aria-hidden="true"></i>Репетиция #43</div>
+              <div class="event-meta">Red Room Studio · 19:00</div>
+              <div style="margin-top:6px"><span class="badge badge-green">Все придут</span></div>
+            </div>
+          </div>
+          <div class="event-card" style="margin-bottom:0">
+            <div class="event-date">
+              <div class="event-day">22</div>
+              <div class="event-month">Июн</div>
+            </div>
+            <div class="event-info">
+              <div class="event-title"><i class="ti ti-star" style="font-size:13px;margin-right:4px;color:var(--amber)" aria-hidden="true"></i>Концерт</div>
+              <div class="event-meta">Клуб Б2 · 21:00</div>
+              <div style="margin-top:6px"><span class="badge badge-amber">Подготовка</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card"><div class="card-title">Песни готовы</div><div class="card-val">12</div><div class="prog-bar"><div class="prog-fill" style="width:75%"></div></div><div class="card-sub" style="margin-top:4px">из 16 в работе</div></div>
+          <div class="card"><div class="card-title">Задачи</div><div class="card-val" style="color:var(--amber)">5</div><div class="card-sub">горят до концерта</div></div>
+          <div class="card"><div class="card-title">Репетиций</div><div class="card-val">43</div><div class="card-sub">этот год</div></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">Последние изменения</div>
+        <div class="activity-item"><div class="activity-dot"></div><div><span style="color:var(--text)">Алекс</span> добавил BPM к «Night Drive» · 2ч назад</div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--green)"></div><div><span style="color:var(--text)">Дима</span> обновил текст «Echoes» · вчера</div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--amber)"></div><div>Создан сетлист на концерт 22 июня · вчера</div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--blue)"></div><div><span style="color:var(--text)">Катя</span> загрузила demo_v4.mp3 для «Dead Signals» · 2 дня назад</div></div>
+      </div>
+
+      <!-- MEMBERS -->
+      <div class="page" id="page-members">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+          <div class="member-card">
+            <div class="member-avatar" style="background:rgba(167,139,250,0.15);color:var(--accent)">АК</div>
+            <div class="member-name">Алекс К.</div>
+            <div class="member-role">Гитара / Вокал</div>
+            <div style="margin-top:4px"><span class="badge badge-purple">Admin</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">Em, Am, Dm</div>
+          </div>
+          <div class="member-card">
+            <div class="member-avatar" style="background:rgba(96,165,250,0.15);color:var(--blue)">ДМ</div>
+            <div class="member-name">Дима М.</div>
+            <div class="member-role">Бас-гитара</div>
+            <div style="margin-top:4px"><span class="badge badge-blue">Member</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">Drop D, C</div>
+          </div>
+          <div class="member-card">
+            <div class="member-avatar" style="background:rgba(52,211,153,0.15);color:var(--green)">КВ</div>
+            <div class="member-name">Катя В.</div>
+            <div class="member-role">Клавиши</div>
+            <div style="margin-top:4px"><span class="badge badge-green">Member</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">C, F, G</div>
+          </div>
+          <div class="member-card">
+            <div class="member-avatar" style="background:rgba(251,191,36,0.15);color:var(--amber)">СП</div>
+            <div class="member-name">Серёга П.</div>
+            <div class="member-role">Ударные</div>
+            <div style="margin-top:4px"><span class="badge badge-amber">Member</span></div>
+            <div style="font-size:11px;color:var(--text3);margin-top:4px">не сдал демки</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="section-label">Участие в песнях</div>
+        <div class="list-item">
+          <div class="song-icon" style="color:var(--accent)"><i class="ti ti-music" aria-hidden="true"></i></div>
+          <div class="list-item-main"><div class="list-item-title">Night Drive</div><div class="list-item-sub">Алекс, Дима, Серёга</div></div>
+          <span class="badge badge-green">Готова</span>
+        </div>
+        <div class="list-item">
+          <div class="song-icon" style="color:var(--blue)"><i class="ti ti-music" aria-hidden="true"></i></div>
+          <div class="list-item-main"><div class="list-item-title">Echoes</div><div class="list-item-sub">Все</div></div>
+          <span class="badge badge-amber">В работе</span>
+        </div>
+        <div class="list-item">
+          <div class="song-icon" style="color:var(--green)"><i class="ti ti-music" aria-hidden="true"></i></div>
+          <div class="list-item-main"><div class="list-item-title">Dead Signals</div><div class="list-item-sub">Алекс, Катя</div></div>
+          <span class="badge badge-purple">Демо</span>
+        </div>
+      </div>
+
+      <!-- SONGS -->
+      <div class="page" id="page-songs">
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <span class="badge badge-green" style="cursor:pointer">Готовы (12)</span>
+          <span class="badge badge-amber" style="cursor:pointer">В работе (3)</span>
+          <span class="badge badge-purple" style="cursor:pointer">Демо (1)</span>
+          <span class="badge badge-red" style="cursor:pointer">Заморожены (2)</span>
+        </div>
+        <div class="list-item" onclick="showSong()">
+          <div class="song-icon" style="color:var(--accent);background:rgba(167,139,250,0.1)"><i class="ti ti-music" aria-hidden="true"></i></div>
+          <div class="list-item-main"><div class="list-item-title">Night Drive</div><div class="list-item-sub">Em · 128 BPM · 4:12 · Авторская</div></div>
+          <span class="badge badge-green">Готова</span>
+        </div>
+        <div class="list-item">
+          <div class="song-icon" style="color:var(--blue);background:rgba(96,165,250,0.1)"><i class="ti ti-music" aria-hidden="true"></i></div>
+          <div class="list-item-main"><div class="list-item-title">Echoes</div><div class="list-item-sub">Am · 94 BPM · 5:30 · Авторская</div></div>
+          <span class="badge badge-amber">В работе</span>
+        </div>
+        <div class="list-item">
+          <div class="song-icon" style="color:var(--green);background:rgba(52,211,153,0.1)"><i class="ti ti-music" aria-hidden="true"></i></div>
+          <div class="list-item-main"><div class="list-item-title">Dead Signals</div><div class="list-item-sub">Dm · 110 BPM · 3:58 · Авторская</div></div>
+          <span class="badge badge-green">Готова</span>
+        </div>
+        <div class="list-item">
+          <div class="song-icon" style="color:var(--amber);background:rgba(251,191,36,0.1)"><i class="ti ti-music" aria-hidden="true"></i></div>
+          <div class="list-item-main"><div class="list-item-title">New Horizon</div><div class="list-item-sub">G · 138 BPM · · Авторская</div></div>
+          <span class="badge badge-purple">Демо</span>
+        </div>
+        <div id="song-detail-block"></div>
+      </div>
+
+      <!-- SETLIST -->
+      <div class="page" id="page-setlist">
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <div class="card" style="flex:1;padding:10px 14px"><div class="card-title">Концерт 22 июня</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Клуб Б2 · ~60 мин</div></div>
+          <div class="card" style="flex:1;padding:10px 14px"><div class="card-title">Длительность</div><div style="font-size:18px;font-weight:500">58:40</div></div>
+          <div class="card" style="flex:1;padding:10px 14px"><div class="card-title">Треков</div><div style="font-size:18px;font-weight:500">9</div></div>
+        </div>
+        <div class="section-label">Порядок выступления</div>
+        <div class="setlist">
+          <div class="setlist-item"><div class="list-item-main"><div class="list-item-title">Intro (инструментал)</div><div class="list-item-sub">Em · 2:00</div></div><span style="font-size:11px;color:var(--text3)"><i class="ti ti-arrows-up-down" aria-hidden="true"></i></span></div>
+          <div class="setlist-item"><div class="list-item-main"><div class="list-item-title">Night Drive</div><div class="list-item-sub">Em · 128 BPM · 4:12</div></div><span class="badge badge-green">Готова</span></div>
+          <div class="setlist-item"><div class="list-item-main"><div class="list-item-title">Dead Signals</div><div class="list-item-sub">Dm · 110 BPM · 3:58</div></div><span class="badge badge-green">Готова</span></div>
+          <div class="setlist-item"><div class="list-item-main"><div class="list-item-title">Echoes</div><div class="list-item-sub">Am · 94 BPM · 5:30</div></div><span class="badge badge-amber">В работе</span></div>
+          <div class="setlist-item"><div class="list-item-main"><div class="list-item-title">Static Mind</div><div class="list-item-sub">Bm · 102 BPM · 4:44</div></div><span class="badge badge-green">Готова</span></div>
+          <div class="setlist-item"><div class="list-item-main"><div class="list-item-title">Voltage</div><div class="list-item-sub">E · 145 BPM · 3:22</div></div><span class="badge badge-green">Готова</span></div>
+          <div class="setlist-item" style="border-color:var(--accent)"><div class="list-item-main"><div class="list-item-title">Encore — Night Drive (reprise)</div><div class="list-item-sub">Em · акустика</div></div><span class="badge badge-purple">Бис</span></div>
+        </div>
+      </div>
+
+      <!-- REHEARSALS -->
+      <div class="page" id="page-rehearsals">
+        <div class="rehearsal-card">
+          <div class="rehearsal-header">
+            <div>
+              <div class="rehearsal-title">Репетиция #43 <span class="badge badge-green" style="margin-left:6px">Сегодня</span></div>
+              <div style="font-size:12px;color:var(--text2);margin-top:3px"><i class="ti ti-map-pin" style="font-size:12px" aria-hidden="true"></i> Red Room Studio · 19:00–22:00</div>
+            </div>
+          </div>
+          <div class="section-label" style="margin-bottom:6px">Программа</div>
+          <div class="checklist">
+            <div class="check-item done"><div class="check-dot done"></div>Night Drive — прогон 3 раза</div>
+            <div class="check-item done"><div class="check-dot done"></div>Echoes — куплет + припев</div>
+            <div class="check-item"><div class="check-dot"></div>New Horizon — первый прогон</div>
+            <div class="check-item"><div class="check-dot"></div>Dead Signals — переход в соло</div>
+          </div>
+          <div class="divider" style="margin:10px 0"></div>
+          <div style="font-size:12px;color:var(--text2)">Заметки: у Серёги новый переход в куплете Echoes. Обсудить тональность припева.</div>
+        </div>
+        <div class="rehearsal-card">
+          <div class="rehearsal-header">
+            <div>
+              <div class="rehearsal-title">Репетиция #42</div>
+              <div style="font-size:12px;color:var(--text2);margin-top:3px"><i class="ti ti-calendar" style="font-size:12px" aria-hidden="true"></i> 10 июня · Red Room Studio</div>
+            </div>
+            <span class="badge badge-blue">Прошла</span>
+          </div>
+          <div class="checklist">
+            <div class="check-item done"><div class="check-dot done"></div>Night Drive ✓</div>
+            <div class="check-item done"><div class="check-dot done"></div>Voltage ✓</div>
+            <div class="check-item done"><div class="check-dot done"></div>Static Mind ✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONCERTS -->
+      <div class="page" id="page-concerts">
+        <div class="event-card" style="border-color:var(--amber)">
+          <div class="event-date" style="background:rgba(251,191,36,0.1)">
+            <div class="event-day" style="color:var(--amber)">22</div>
+            <div class="event-month">Июн</div>
+          </div>
+          <div class="event-info">
+            <div class="event-title">Клуб Б2 · Live</div>
+            <div class="event-meta">Москва, ул. Малая Ордынка · 21:00</div>
+            <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+              <span class="badge badge-amber">Подготовка</span>
+              <span class="tag">9 треков</span>
+              <span class="tag">~60 мин</span>
+            </div>
+          </div>
+        </div>
+        <div class="grid2" style="margin-top:4px">
+          <div class="card"><div class="card-title">Организатор</div><div style="font-size:13px;margin-top:4px;color:var(--text)">Иван Попов</div><div style="font-size:11px;color:var(--text2);margin-top:2px">+7 999 123-45-67</div></div>
+          <div class="card"><div class="card-title">Финансы</div><div style="font-size:13px;margin-top:4px;color:var(--green)">₽ 25 000</div><div style="font-size:11px;color:var(--text2);margin-top:2px">гонорар · 4 чел.</div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="section-label">Райдер</div>
+        <div class="list-item"><div class="list-item-main"><div class="list-item-title">Барабанная установка</div></div><span class="badge badge-green">Есть</span></div>
+        <div class="list-item"><div class="list-item-main"><div class="list-item-title">Комбик гитарный</div></div><span class="badge badge-red">Нет</span></div>
+        <div class="list-item"><div class="list-item-main"><div class="list-item-title">Мониторы на сцене × 4</div></div><span class="badge badge-amber">Уточнить</span></div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="page" id="page-tasks">
+        <div class="kanban">
+          <div class="kanban-col">
+            <div class="kanban-col-title">Ideas <span class="kanban-count">2</span></div>
+            <div class="task-card"><div class="task-title">Клип на Night Drive</div><div class="task-meta"><i class="ti ti-tag" style="font-size:11px" aria-hidden="true"></i> Видео</div></div>
+            <div class="task-card"><div class="task-title">Мерч — принт на футболку</div><div class="task-meta"><i class="ti ti-tag" style="font-size:11px" aria-hidden="true"></i> Мерч</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title">Todo <span class="kanban-count">3</span></div>
+            <div class="task-card" style="border-color:var(--amber)"><div class="task-title">Обложка EP</div><div class="task-meta"><i class="ti ti-user" style="font-size:11px" aria-hidden="true"></i> Дизайнер · 24 июн</div></div>
+            <div class="task-card"><div class="task-title">Фотосессия</div><div class="task-meta"><i class="ti ti-user" style="font-size:11px" aria-hidden="true"></i> Вокалист · 18 июн</div></div>
+            <div class="task-card"><div class="task-title">Соцсети — афиша</div><div class="task-meta"><i class="ti ti-user" style="font-size:11px" aria-hidden="true"></i> Катя · 15 июн</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title" style="color:var(--blue)">In progress <span class="kanban-count">2</span></div>
+            <div class="task-card" style="border-color:var(--blue)"><div class="task-title">Записать бас-партии</div><div class="task-meta"><i class="ti ti-user" style="font-size:11px" aria-hidden="true"></i> Дима · 20 июн</div></div>
+            <div class="task-card"><div class="task-title">Сведение Echoes</div><div class="task-meta"><i class="ti ti-user" style="font-size:11px" aria-hidden="true"></i> Алекс</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title" style="color:var(--amber)">Review <span class="kanban-count">1</span></div>
+            <div class="task-card"><div class="task-title">Мастеринг Night Drive</div><div class="task-meta"><i class="ti ti-user" style="font-size:11px" aria-hidden="true"></i> Студия</div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-title" style="color:var(--green)">Done <span class="kanban-count">4</span></div>
+            <div class="task-card" style="opacity:0.5"><div class="task-title">Аренда студии</div></div>
+            <div class="task-card" style="opacity:0.5"><div class="task-title">Договор с клубом</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const pages = {
+  dashboard: 'Dashboard',
+  members: 'Состав группы',
+  songs: 'Библиотека песен',
+  setlist: 'Сетлист',
+  rehearsals: 'Репетиции',
+  concerts: 'Концерты',
+  tasks: 'Задачи'
+};
+
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const page = document.getElementById('page-'+id);
+  if(page) page.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'")){n.classList.add('active')}
+  });
+  document.getElementById('page-title').textContent = pages[id]||id;
+  if(id==='songs') document.getElementById('song-detail-block').innerHTML='';
+}
+
+let songShown = false;
+function showSong(){
+  if(songShown){return}
+  songShown=true;
+  const el = document.getElementById('song-detail-block');
+  el.innerHTML = `
+    <div class="song-detail">
+      <div class="song-detail-header">
+        <div>
+          <div style="font-size:18px;font-weight:500;margin-bottom:4px">Night Drive</div>
+          <div style="font-size:12px;color:var(--text2)">Авторская · добавлена 3 янв</div>
+        </div>
+        <span class="badge badge-green">Готова</span>
+      </div>
+      <div class="stat-row">
+        <div class="stat-chip"><i class="ti ti-music" style="font-size:13px" aria-hidden="true"></i>BPM: <span>128</span></div>
+        <div class="stat-chip"><i class="ti ti-key" style="font-size:13px" aria-hidden="true"></i>Тональность: <span>Em</span></div>
+        <div class="stat-chip"><i class="ti ti-clock" style="font-size:13px" aria-hidden="true"></i>Длительность: <span>4:12</span></div>
+        <div class="stat-chip"><i class="ti ti-wave-sine" style="font-size:13px" aria-hidden="true"></i>Жанр: <span>Alt-rock</span></div>
+      </div>
+      <div class="divider" style="margin:10px 0"></div>
+      <div class="section-label">Структура</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Intro → Verse → Chorus → Solo → Verse → Chorus → Outro</div>
+      <div class="section-label">Аккорды</div>
+      <div style="font-size:13px;font-family:var(--font-mono);color:var(--accent);margin-bottom:10px">Em — C — G — D</div>
+      <div class="section-label">Комментарии</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">• Ускорить куплет<br>• Убрать лишний перегруз на соло<br>• Переписать бэк-вокал в припеве</div>
+      <div class="divider" style="margin:10px 0"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn"><i class="ti ti-file-music" aria-hidden="true"></i> demo_v4.mp3</button>
+        <button class="btn"><i class="ti ti-file-text" aria-hidden="true"></i> tabs.pdf</button>
+        <button class="btn"><i class="ti ti-file-description" aria-hidden="true"></i> lyrics.docx</button>
+      </div>
+    </div>`;
+}
+</script>

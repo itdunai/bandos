@@ -1,64 +1,183 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { getUserBands } from "@/lib/band/queries";
+import { bandPath } from "@/lib/paths";
+import { createClient } from "@/lib/supabase/server";
+import { Guitar, LogIn, Music, Plus, Users } from "lucide-react";
 
-export default function Home() {
+interface CatalogBand {
+  name: string;
+  slug: string;
+  description: string | null;
+  genre: string | null;
+  tracks_count: number;
+  members_count: number;
+  rider_public: boolean;
+  repertoire_public: boolean;
+}
+
+export default async function HomePage() {
+  const supabaseConfigured =
+    !!process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseConfigured) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-bg p-6 text-center">
+        <Guitar className="h-12 w-12 text-accent" />
+        <h1 className="text-2xl font-medium">BandOS</h1>
+        <p className="max-w-md text-sm text-text-secondary">
+          Скопируйте <code className="text-accent">.env.local.example</code> в{" "}
+          <code className="text-accent">.env.local</code> и укажите ключи Supabase.
+        </p>
+      </div>
+    );
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const [{ data: catalogData, error: catalogError }, userBands] =
+    await Promise.all([
+      supabase.rpc("get_public_bands_catalog"),
+      user ? getUserBands() : Promise.resolve([]),
+    ]);
+
+  const catalog = catalogError
+    ? []
+    : ((catalogData ?? []) as CatalogBand[]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="min-h-screen bg-bg">
+      <header className="border-b border-border bg-bg-2">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6">
+          <div className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-dark">
+              <Guitar className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <div className="text-sm font-medium">BandOS</div>
+              <div className="text-[11px] text-text-muted">
+                Каталог групп
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {user ? (
+              <>
+                {userBands.length > 0 && (
+                  <Link href={bandPath(userBands[0].slug)}>
+                    <Button variant="default" size="sm">
+                      В ЛК
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/new-band">
+                  <Button variant="accent" size="sm">
+                    <Plus className="h-3.5 w-3.5" />
+                    Создать группу
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <Link href="/login">
+                <Button variant="default" size="sm">
+                  <LogIn className="h-3.5 w-3.5" />
+                  Войти
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <div className="mb-8">
+          <h1 className="text-2xl font-medium">Выберите группу</h1>
+          <p className="mt-2 max-w-xl text-sm text-text-secondary">
+            Публичные профили, репертуар и техрайдеры музыкальных коллективов.
+            Для заказа выступления свяжитесь с группой через контакты в профиле.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        {userBands.length > 0 && (
+          <section className="mb-8">
+            <h2 className="mb-3 text-xs uppercase tracking-wider text-text-muted">
+              Мои группы
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {userBands.map((band) => (
+                <Link key={band.id} href={bandPath(band.slug)}>
+                  <Button variant="default" size="sm">
+                    {band.name}
+                  </Button>
+                </Link>
+              ))}
+              <Link href="/new-band">
+                <Button variant="accent" size="sm">
+                  <Plus className="h-3.5 w-3.5" />
+                  Новая группа
+                </Button>
+              </Link>
+            </div>
+          </section>
+        )}
+
+        {catalog.length === 0 ? (
+          <Card className="p-8 text-center">
+            <p className="text-sm text-text-secondary">
+              Пока нет групп с публичным профилем или репертуаром.
+            </p>
+            {!user && (
+              <p className="mt-2 text-xs text-text-muted">
+                Вы музыкант?{" "}
+                <Link href="/register" className="text-accent hover:underline">
+                  Зарегистрируйтесь
+                </Link>{" "}
+                и создайте группу.
+              </p>
+            )}
+          </Card>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {catalog.map((band) => (
+              <Card
+                key={band.slug}
+                className="flex flex-col p-5 transition-colors hover:border-accent/50"
+              >
+                <div className="mb-2">
+                  <h3 className="text-lg font-medium">{band.name}</h3>
+                  {band.genre && (
+                    <p className="text-xs text-accent">{band.genre}</p>
+                  )}
+                </div>
+                {band.description && (
+                  <p className="mb-4 line-clamp-3 text-sm text-text-secondary">
+                    {band.description}
+                  </p>
+                )}
+                <div className="mb-4 flex flex-wrap gap-3 text-xs text-text-muted">
+                  <span className="flex items-center gap-1">
+                    <Music className="h-3 w-3" />
+                    {band.tracks_count} треков
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Users className="h-3 w-3" />
+                    {band.members_count} участников
+                  </span>
+                </div>
+                <div className="mt-auto">
+                  <Link href={`/rider/${band.slug}`}>
+                    <Button variant="default" size="sm">
+                      Открыть профиль
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
