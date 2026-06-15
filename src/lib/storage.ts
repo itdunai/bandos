@@ -13,7 +13,17 @@ const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export function validateImageFile(file: File): string | null {
   if (!file.size) return "Файл пустой";
   if (file.size > MAX_IMAGE_BYTES) return "Максимальный размер — 5 МБ";
-  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+  const mime =
+    file.type ||
+    (() => {
+      const ext = file.name.split(".").pop()?.toLowerCase();
+      if (ext === "png") return "image/png";
+      if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+      if (ext === "webp") return "image/webp";
+      if (ext === "gif") return "image/gif";
+      return "";
+    })();
+  if (!mime || !ALLOWED_IMAGE_TYPES.has(mime)) {
     return "Допустимы JPEG, PNG, WebP или GIF";
   }
   return null;

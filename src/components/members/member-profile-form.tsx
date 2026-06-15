@@ -27,6 +27,7 @@ export function MemberProfileForm({
       <AvatarUpload
         name={member.display_name ?? "?"}
         avatarUrl={avatarUrl}
+        userId={member.user_id}
       />
       <div>
         <Label>Имя в группе</Label>

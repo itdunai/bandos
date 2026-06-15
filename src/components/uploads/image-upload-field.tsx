@@ -17,7 +17,7 @@ export function ImageUploadField({
   label: string;
   hint?: string;
   currentUrl?: string | null;
-  onUpload: (formData: FormData) => Promise<{ error?: string }>;
+  onUpload: (file: File) => Promise<{ error?: string }>;
   onRemove?: () => Promise<{ error?: string }>;
   aspect?: "square" | "wide";
 }) {
@@ -25,25 +25,38 @@ export function ImageUploadField({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const displayUrl = previewUrl ?? currentUrl ?? null;
 
   function handleFile(file: File) {
-    const formData = new FormData();
-    formData.set("file", file);
     setError(null);
+    const localPreview = URL.createObjectURL(file);
+    setPreviewUrl(localPreview);
+
     startTransition(async () => {
-      const result = await onUpload(formData);
-      if (result.error) setError(result.error);
-      else router.refresh();
+      try {
+        const result = await onUpload(file);
+        if (result.error) {
+          setError(result.error);
+          setPreviewUrl(null);
+        } else {
+          setPreviewUrl(null);
+          router.refresh();
+        }
+      } finally {
+        URL.revokeObjectURL(localPreview);
+      }
     });
   }
 
   return (
     <div className="space-y-2">
-      <div className="text-sm font-medium">{label}</div>
+      {label ? <div className="text-sm font-medium">{label}</div> : null}
       {hint && <p className="text-xs text-text-secondary">{hint}</p>}
 
       <div className="flex flex-wrap items-start gap-3">
-        {currentUrl ? (
+        {displayUrl ? (
           <div
             className={
               aspect === "wide"
@@ -52,8 +65,8 @@ export function ImageUploadField({
             }
           >
             <Image
-              src={currentUrl}
-              alt={label}
+              src={displayUrl}
+              alt={label || "preview"}
               fill
               unoptimized
               className="object-cover"
@@ -90,7 +103,7 @@ export function ImageUploadField({
             onClick={() => inputRef.current?.click()}
           >
             <Upload className="h-3.5 w-3.5" />
-            {currentUrl ? "Заменить" : "Загрузить"}
+            {pending ? "Загрузка…" : displayUrl ? "Заменить" : "Загрузить"}
           </Button>
           {currentUrl && onRemove && (
             <Button
@@ -100,6 +113,7 @@ export function ImageUploadField({
               className="text-red hover:border-red hover:text-red"
               onClick={() => {
                 setError(null);
+                setPreviewUrl(null);
                 startTransition(async () => {
                   const result = await onRemove();
                   if (result.error) setError(result.error);

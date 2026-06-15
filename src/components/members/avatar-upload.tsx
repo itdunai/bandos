@@ -1,8 +1,10 @@
 "use client";
 
-import { uploadMemberAvatar } from "@/app/actions/media";
+import { saveMemberAvatarUrl } from "@/app/actions/media";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { clientUploadAvatar } from "@/lib/upload/client-media";
+import { createClient } from "@/lib/supabase/client";
 import { Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
@@ -10,9 +12,11 @@ import { useRef, useState, useTransition } from "react";
 export function AvatarUpload({
   name,
   avatarUrl,
+  userId,
 }: {
   name: string;
   avatarUrl: string | null;
+  userId: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -32,16 +36,30 @@ export function AvatarUpload({
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (!file) return;
-            const formData = new FormData();
-            formData.set("file", file);
             setError(null);
             startTransition(async () => {
-              const result = await uploadMemberAvatar(formData);
-              if (result.error) {
-                setError(result.error);
+              const supabase = createClient();
+              const {
+                data: { user },
+              } = await supabase.auth.getUser();
+              if (!user) {
+                setError("Не авторизован");
                 return;
               }
-              if (result.avatarUrl) setUrl(result.avatarUrl);
+
+              const uploaded = await clientUploadAvatar(userId, file);
+              if (uploaded.error || !uploaded.publicUrl) {
+                setError(uploaded.error ?? "Ошибка загрузки");
+                return;
+              }
+
+              const saved = await saveMemberAvatarUrl(uploaded.publicUrl);
+              if (saved.error) {
+                setError(saved.error);
+                return;
+              }
+
+              setUrl(uploaded.publicUrl);
               router.refresh();
             });
             e.target.value = "";
@@ -54,7 +72,7 @@ export function AvatarUpload({
           onClick={() => inputRef.current?.click()}
         >
           <Upload className="h-3.5 w-3.5" />
-          {url ? "Сменить аватар" : "Загрузить аватар"}
+          {pending ? "Загрузка…" : url ? "Сменить аватар" : "Загрузить аватар"}
         </Button>
         {error && <p className="mt-1 text-xs text-red">{error}</p>}
       </div>

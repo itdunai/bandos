@@ -3,14 +3,18 @@
 import {
   removeBandLogo,
   removeBandPhoto,
-  uploadBandLogo,
-  uploadBandPhoto,
+  saveBandLogoUrl,
+  saveBandPhotoUrl,
 } from "@/app/actions/media";
 import { ImageUploadField } from "@/components/uploads/image-upload-field";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import {
+  clientUploadBandLogo,
+  clientUploadBandPhoto,
+} from "@/lib/upload/client-media";
 
 export function BandMediaSection({
   bandId,
@@ -32,9 +36,15 @@ export function BandMediaSection({
 
       <ImageUploadField
         label="Логотип"
-        hint="JPEG, PNG, WebP или GIF до 5 МБ"
+        hint="JPEG, PNG, WebP или GIF до 5 МБ — перед загрузкой сжимается в WebP"
         currentUrl={logoUrl}
-        onUpload={uploadBandLogo.bind(null, bandId, bandSlug)}
+        onUpload={async (file) => {
+          const uploaded = await clientUploadBandLogo(bandId, file);
+          if (uploaded.error || !uploaded.publicUrl) {
+            return { error: uploaded.error ?? "Ошибка загрузки" };
+          }
+          return saveBandLogoUrl(bandId, bandSlug, uploaded.publicUrl);
+        }}
         onRemove={removeBandLogo.bind(null, bandId, bandSlug)}
         aspect="square"
       />
@@ -81,7 +91,13 @@ export function BandMediaSection({
         <ImageUploadField
           label=""
           currentUrl={null}
-          onUpload={uploadBandPhoto.bind(null, bandId, bandSlug)}
+          onUpload={async (file) => {
+            const uploaded = await clientUploadBandPhoto(bandId, file);
+            if (uploaded.error || !uploaded.publicUrl) {
+              return { error: uploaded.error ?? "Ошибка загрузки" };
+            }
+            return saveBandPhotoUrl(bandId, bandSlug, uploaded.publicUrl);
+          }}
           aspect="square"
         />
       </div>
