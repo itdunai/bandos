@@ -20,7 +20,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
-ENV PORT=3000
+ENV PORT=8080
 
 RUN groupadd --gid 1001 nodejs \
   && useradd --uid 1001 --gid nodejs --system nodejs
@@ -30,5 +30,5 @@ COPY --from=builder --chown=nodejs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nodejs:nodejs /app/.next/static ./.next/static
 
 USER nodejs
-EXPOSE 3000
+EXPOSE 8080
 CMD ["node", "server.js"]
