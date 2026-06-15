@@ -6,6 +6,7 @@ import {
   saveBandLogoUrl,
   saveBandPhotoUrl,
 } from "@/app/actions/media";
+import { useSupabase } from "@/components/providers/supabase-provider";
 import { ImageUploadField } from "@/components/uploads/image-upload-field";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -28,6 +29,7 @@ export function BandMediaSection({
   photos: string[];
 }) {
   const router = useRouter();
+  const supabase = useSupabase();
   const [pending, startTransition] = useTransition();
 
   return (
@@ -39,7 +41,7 @@ export function BandMediaSection({
         hint="JPEG, PNG, WebP или GIF до 5 МБ — перед загрузкой сжимается в WebP"
         currentUrl={logoUrl}
         onUpload={async (file) => {
-          const uploaded = await clientUploadBandLogo(bandId, file);
+          const uploaded = await clientUploadBandLogo(supabase, bandId, file);
           if (uploaded.error || !uploaded.publicUrl) {
             return { error: uploaded.error ?? "Ошибка загрузки" };
           }
@@ -98,7 +100,7 @@ export function BandMediaSection({
           label=""
           currentUrl={null}
           onUpload={async (file) => {
-            const uploaded = await clientUploadBandPhoto(bandId, file);
+            const uploaded = await clientUploadBandPhoto(supabase, bandId, file);
             if (uploaded.error || !uploaded.publicUrl) {
               return { error: uploaded.error ?? "Ошибка загрузки" };
             }

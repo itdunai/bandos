@@ -1,7 +1,7 @@
 "use client";
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { prepareImageFile, resolveImageMime } from "@/lib/image-prepare";
-import { createClient } from "@/lib/supabase/client";
 import {
   BAND_MEDIA_BUCKET,
   avatarStoragePath,
@@ -10,10 +10,10 @@ import {
 } from "@/lib/storage";
 
 async function uploadPrepared(
+  supabase: SupabaseClient,
   path: string,
   file: File
 ): Promise<{ publicUrl?: string; error?: string }> {
-  const supabase = createClient();
   const prepared =
     resolveImageMime(file) === "image/gif" ? file : await prepareImageFile(file);
 
@@ -34,11 +34,19 @@ async function uploadPrepared(
   return { publicUrl: `${publicUrl}?v=${Date.now()}` };
 }
 
-export async function clientUploadBandLogo(bandId: string, file: File) {
+export async function clientUploadBandLogo(
+  supabase: SupabaseClient,
+  bandId: string,
+  file: File
+) {
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
   try {
-    return await uploadPrepared(bandLogoStoragePath(bandId, "webp"), file);
+    return await uploadPrepared(
+      supabase,
+      bandLogoStoragePath(bandId, "webp"),
+      file
+    );
   } catch (err) {
     return {
       error:
@@ -47,11 +55,16 @@ export async function clientUploadBandLogo(bandId: string, file: File) {
   }
 }
 
-export async function clientUploadBandPhoto(bandId: string, file: File) {
+export async function clientUploadBandPhoto(
+  supabase: SupabaseClient,
+  bandId: string,
+  file: File
+) {
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
   try {
     return await uploadPrepared(
+      supabase,
       `bands/${bandId}/photos/${crypto.randomUUID()}.webp`,
       file
     );
@@ -63,11 +76,19 @@ export async function clientUploadBandPhoto(bandId: string, file: File) {
   }
 }
 
-export async function clientUploadAvatar(userId: string, file: File) {
+export async function clientUploadAvatar(
+  supabase: SupabaseClient,
+  userId: string,
+  file: File
+) {
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
   try {
-    return await uploadPrepared(avatarStoragePath(userId, "webp"), file);
+    return await uploadPrepared(
+      supabase,
+      avatarStoragePath(userId, "webp"),
+      file
+    );
   } catch (err) {
     return {
       error:

@@ -48,7 +48,7 @@ export function AvatarUpload({
                   return;
                 }
 
-                const uploaded = await clientUploadAvatar(userId, file);
+                const uploaded = await clientUploadAvatar(supabase, userId, file);
                 if (uploaded.error || !uploaded.publicUrl) {
                   setError(uploaded.error ?? "Ошибка загрузки");
                   return;

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
+import { PublicConfigScript } from "@/components/providers/public-config-script";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
 import { PwaRegister } from "@/components/pwa-register";
 import { ToastProvider } from "@/components/ui/toast-provider";
@@ -42,6 +43,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        <PublicConfigScript config={supabaseConfig} />
         <SupabaseProvider config={supabaseConfig}>
           <PwaRegister />
           <ToastProvider initial={toast}>
