@@ -30,6 +30,8 @@ export interface Band {
   slug: string;
   description: string | null;
   genre: string | null;
+  logo_url: string | null;
+  photos: string[];
   tech_rider: string | null;
   rider_public: boolean;
   repertoire_public: boolean;

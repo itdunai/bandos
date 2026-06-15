@@ -1,10 +1,10 @@
 "use client";
 
 import { createSong, deleteSong, updateSong } from "@/app/actions/songs";
+import { SongMaterialsFields } from "@/components/songs/song-materials-fields";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { formatDurationInput } from "@/lib/utils";
 import {
   SONG_STATUS_LABELS,
@@ -116,32 +116,11 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
 
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
         <h2 className="text-sm font-medium">Материалы</h2>
-        <div>
-          <Label>Аккорды</Label>
-          <Textarea
-            name="chords"
-            defaultValue={song?.chords ?? ""}
-            placeholder="Em — C — G — D"
-            className="font-mono"
-          />
-        </div>
-        <div>
-          <Label>Табы (бас)</Label>
-          <Textarea
-            name="tabs"
-            defaultValue={song?.tabs ?? ""}
-            placeholder="G|----------------|"
-            className="font-mono text-xs"
-          />
-        </div>
-        <div>
-          <Label>Текст</Label>
-          <Textarea
-            name="lyrics"
-            defaultValue={song?.lyrics ?? ""}
-            placeholder="[Куплет]&#10;Текст песни..."
-          />
-        </div>
+        <SongMaterialsFields
+          chords={song?.chords}
+          tabs={song?.tabs}
+          lyrics={song?.lyrics}
+        />
       </section>
 
       <div className="flex gap-2">

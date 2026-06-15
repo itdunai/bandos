@@ -1,6 +1,7 @@
 "use client";
 
 import { updateBandProfile } from "@/app/actions/band";
+import { BandMediaSection } from "@/components/band/band-media-section";
 import { ShareLinkButton } from "@/components/band/share-link-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +27,15 @@ export function BandProfileForm({
   const links = (band.social_links ?? {}) as SocialLinks;
 
   return (
-    <form action={action} className="space-y-5">
+    <div className="space-y-5">
+      <BandMediaSection
+        bandId={band.id}
+        bandSlug={band.slug}
+        logoUrl={band.logo_url ?? null}
+        photos={Array.isArray(band.photos) ? band.photos : []}
+      />
+
+      <form action={action} className="space-y-5">
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
         <h2 className="text-sm font-medium">Основное</h2>
         <div>
@@ -100,5 +109,6 @@ export function BandProfileForm({
         Сохранить
       </Button>
     </form>
+    </div>
   );
 }

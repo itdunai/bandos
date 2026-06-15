@@ -99,3 +99,50 @@ export async function updateMemberProfile(
   revalidatePath(bandPath(bandSlug, "members"));
   redirect(bandPath(bandSlug, "members"));
 }
+
+export async function excludeMember(
+  memberId: string,
+  bandId: string,
+  bandSlug: string
+): Promise<{ error?: string }> {
+  const { supabase, member: self } = await requireBandAdmin(bandId);
+
+  const { data: target } = await supabase
+    .from("band_members")
+    .select("id, role, user_id, is_active")
+    .eq("id", memberId)
+    .eq("band_id", bandId)
+    .maybeSingle();
+
+  if (!target || !target.is_active) {
+    return { error: "Участник не найден" };
+  }
+
+  if (target.user_id === self.user_id) {
+    return { error: "Нельзя исключить себя" };
+  }
+
+  if (target.role === "admin") {
+    const { count } = await supabase
+      .from("band_members")
+      .select("*", { count: "exact", head: true })
+      .eq("band_id", bandId)
+      .eq("role", "admin")
+      .eq("is_active", true);
+
+    if ((count ?? 0) <= 1) {
+      return { error: "Нельзя исключить последнего администратора" };
+    }
+  }
+
+  const { error } = await supabase
+    .from("band_members")
+    .update({ is_active: false })
+    .eq("id", memberId)
+    .eq("band_id", bandId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath(bandPath(bandSlug, "members"));
+  return {};
+}

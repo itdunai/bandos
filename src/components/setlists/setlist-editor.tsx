@@ -3,6 +3,7 @@
 import {
   addSetlistCustomItem,
   addSetlistSong,
+  deleteSetlist,
   removeSetlistItem,
   reorderSetlistItems,
   updateSetlistName,
@@ -176,14 +177,29 @@ export function SetlistEditor({
     }
   }
 
+  function handleDeleteSetlist() {
+    if (!confirm(`Удалить сет-лист «${name}»?`)) return;
+    startTransition(() => deleteSetlist(setlistId, bandSlug));
+  }
+
   return (
     <div className={pending ? "opacity-70 pointer-events-none" : ""}>
-      <Input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onBlur={handleNameBlur}
-        className="mb-4 text-base font-medium"
-      />
+      <div className="mb-4 flex items-center gap-2">
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onBlur={handleNameBlur}
+          className="flex-1 text-base font-medium"
+        />
+        <Button
+          type="button"
+          variant="default"
+          className="text-red hover:border-red hover:text-red"
+          onClick={handleDeleteSetlist}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>

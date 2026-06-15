@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
+import { ExcludeMemberButton } from "@/components/members/exclude-member-button";
 import { InviteForm } from "@/components/members/invite-form";
 import { MemberPermissionsEditor } from "@/components/members/member-permissions-editor";
 import { MemberProfileForm } from "@/components/members/member-profile-form";
@@ -45,15 +46,26 @@ export default async function MembersPage({
     createClient(),
   ]);
 
-  const { data: members } = await supabase
-    .from("band_members")
-    .select("*")
-    .eq("band_id", band.id)
-    .eq("is_active", true)
-    .order("created_at");
+  const [{ data: members }, profileResult] = await Promise.all([
+    supabase
+      .from("band_members")
+      .select("*, profiles(avatar_url)")
+      .eq("band_id", band.id)
+      .eq("is_active", true)
+      .order("created_at"),
+    member
+      ? supabase
+          .from("profiles")
+          .select("avatar_url")
+          .eq("id", member.user_id)
+          .single()
+      : Promise.resolve({ data: null }),
+  ]);
 
   const showInvite = member ? canInviteMembers(member) : false;
   const showPermissions = member ? canManagePermissions(member) : false;
+  const isAdmin = member?.role === "admin";
+  const myAvatarUrl = profileResult.data?.avatar_url ?? null;
 
   return (
     <AppShell
@@ -71,7 +83,11 @@ export default async function MembersPage({
       {member && (
         <Card className="mb-6">
           <h3 className="mb-3 text-sm font-medium">Мой профиль</h3>
-          <MemberProfileForm member={member} bandSlug={band.slug} />
+          <MemberProfileForm
+            member={member}
+            bandSlug={band.slug}
+            avatarUrl={myAvatarUrl}
+          />
         </Card>
       )}
 
@@ -83,13 +99,18 @@ export default async function MembersPage({
 
       <h3 className="mb-3 text-xs uppercase tracking-wider text-text-muted">Состав</h3>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {members?.map((m, i) => (
+        {members?.map((m, i) => {
+          const profile = m.profiles as { avatar_url: string | null } | null;
+          const avatarUrl = profile?.avatar_url ?? null;
+
+          return (
           <div
             key={m.id}
             className="flex flex-col items-center rounded-xl border border-border bg-bg-2 p-4 text-center transition-colors hover:border-accent/50"
           >
             <Avatar
               name={m.display_name ?? "?"}
+              src={avatarUrl}
               color={AVATAR_COLORS[i % AVATAR_COLORS.length]}
               className="mb-2 h-12 w-12 text-base"
             />
@@ -149,8 +170,18 @@ export default async function MembersPage({
                 bandSlug={band.slug}
               />
             )}
+
+            {isAdmin && m.user_id !== member?.user_id && (
+              <ExcludeMemberButton
+                memberId={m.id}
+                memberName={m.display_name ?? "участника"}
+                bandId={band.id}
+                bandSlug={band.slug}
+              />
+            )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </AppShell>
   );

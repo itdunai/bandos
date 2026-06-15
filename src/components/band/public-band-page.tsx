@@ -3,6 +3,7 @@ import { sanitizeHref } from "@/lib/safe-url";
 import { formatDuration } from "@/lib/utils";
 import { SOCIAL_LABELS, SONG_TYPE_LABELS, type SocialLinks, type SongType } from "@/types/database";
 import { ExternalLink, Guitar, ListMusic, Music, Users } from "lucide-react";
+import Image from "next/image";
 
 interface PublicSong {
   title: string;
@@ -15,6 +16,8 @@ export interface PublicBandPageData {
   slug: string;
   description: string | null;
   genre: string | null;
+  logo_url: string | null;
+  photos: string[];
   rider_public: boolean;
   repertoire_public: boolean;
   tech_rider: string | null;
@@ -29,6 +32,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
     .map(([key, url]) => [key, sanitizeHref(url)] as const)
     .filter((entry): entry is [string, string] => Boolean(entry[1]));
   const songs = band.songs ?? [];
+  const photos = Array.isArray(band.photos) ? band.photos : [];
   const showRider = band.rider_public;
   const showRepertoire = band.repertoire_public;
 
@@ -37,9 +41,21 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
       <ScrollToHash />
       <div className="mx-auto max-w-3xl px-4 py-10">
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-dark">
-            <Guitar className="h-5 w-5 text-white" />
-          </div>
+          {band.logo_url ? (
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+              <Image
+                src={band.logo_url}
+                alt={band.name}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-dark">
+              <Guitar className="h-5 w-5 text-white" />
+            </div>
+          )}
           <div>
             <div className="text-xs uppercase tracking-wider text-text-muted">
               BandOS
@@ -68,6 +84,25 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
             {band.members_count} участников
           </span>
         </div>
+
+        {photos.length > 0 && (
+          <div className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {photos.map((url) => (
+              <div
+                key={url}
+                className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border"
+              >
+                <Image
+                  src={url}
+                  alt=""
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {showRider && (
           <section className="mb-8">

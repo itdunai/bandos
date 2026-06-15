@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
+import { DeleteSongButton } from "@/components/songs/delete-song-button";
+import { SongMaterialsView } from "@/components/songs/song-materials-view";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +17,16 @@ import { formatDuration } from "@/lib/utils";
 import { SONG_STATUS_LABELS, type SongStatus } from "@/types/database";
 import { ExternalLink, Pencil } from "lucide-react";
 import { notFound } from "next/navigation";
+
+const STATUS_VARIANT: Record<
+  SongStatus,
+  "green" | "amber" | "purple" | "red"
+> = {
+  ready: "green",
+  in_progress: "amber",
+  demo: "purple",
+  frozen: "red",
+};
 
 export default async function SongDetailPage({
   params,
@@ -59,12 +71,19 @@ export default async function SongDetailPage({
       title={song.title}
       actions={
         canEditSongs ? (
-          <Link href={bandPath(band.slug, "songs", id, "edit")}>
-            <Button variant="accent">
-              <Pencil className="h-3.5 w-3.5" />
-              Редактировать
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href={bandPath(band.slug, "songs", id, "edit")}>
+              <Button variant="accent">
+                <Pencil className="h-3.5 w-3.5" />
+                Редактировать
+              </Button>
+            </Link>
+            <DeleteSongButton
+              songId={id}
+              bandSlug={band.slug}
+              title={song.title}
+            />
+          </div>
         ) : undefined
       }
     >
@@ -76,7 +95,7 @@ export default async function SongDetailPage({
               {song.song_type === "original" ? "Авторская" : "Кавер"}
             </p>
           </div>
-          <Badge variant="green">
+          <Badge variant={STATUS_VARIANT[song.status as SongStatus]}>
             {SONG_STATUS_LABELS[song.status as SongStatus]}
           </Badge>
         </div>
@@ -135,26 +154,11 @@ export default async function SongDetailPage({
           </>
         )}
 
-        {chords?.body && (
-          <>
-            <h3 className="mb-1 text-xs uppercase tracking-wider text-text-muted">Аккорды</h3>
-            <pre className="mb-4 font-mono text-sm text-accent whitespace-pre-wrap">{chords.body}</pre>
-          </>
-        )}
-
-        {tabs?.body && (
-          <>
-            <h3 className="mb-1 text-xs uppercase tracking-wider text-text-muted">Табы</h3>
-            <pre className="mb-4 font-mono text-sm text-text-secondary whitespace-pre-wrap">{tabs.body}</pre>
-          </>
-        )}
-
-        {lyrics?.body && (
-          <>
-            <h3 className="mb-1 text-xs uppercase tracking-wider text-text-muted">Текст</h3>
-            <pre className="mb-4 text-sm text-text-secondary whitespace-pre-wrap">{lyrics.body}</pre>
-          </>
-        )}
+        <SongMaterialsView
+          chords={chords?.body}
+          tabs={tabs?.body}
+          lyrics={lyrics?.body}
+        />
       </div>
     </AppShell>
   );

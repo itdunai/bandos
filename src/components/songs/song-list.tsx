@@ -139,36 +139,26 @@ export function SongList({
             ))}
           </ul>
 
-          {/* Десктоп: плитка */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {/* Десктоп: плитка 5 колонок */}
+          <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
             {filtered.map((song) => (
               <Link
                 key={song.id}
                 href={bandPath(bandSlug, "songs", song.id)}
-                className="flex flex-col rounded-xl border border-border bg-bg-2 p-4 transition-colors hover:border-accent"
+                className="flex flex-col rounded-lg border border-border bg-bg-2 p-2.5 transition-colors hover:border-accent"
               >
-                <div className="mb-3 flex items-start justify-between gap-2">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-bg-3 text-accent">
-                    <Music className="h-4 w-4" />
+                <div className="mb-2 flex items-start justify-between gap-1">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-bg-3 text-accent">
+                    <Music className="h-3.5 w-3.5" />
                   </div>
-                  <Badge variant={STATUS_VARIANT[song.status]}>
+                  <Badge variant={STATUS_VARIANT[song.status]} className="text-[10px]">
                     {SONG_STATUS_LABELS[song.status]}
                   </Badge>
                 </div>
-                <div className="font-medium leading-snug">{song.title}</div>
+                <div className="text-sm font-medium leading-snug line-clamp-2">{song.title}</div>
                 {meta(song) && (
-                  <div className="mt-1 text-xs text-text-secondary">{meta(song)}</div>
+                  <div className="mt-1 text-[10px] text-text-secondary line-clamp-1">{meta(song)}</div>
                 )}
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  <span className="rounded-md bg-bg-3 px-2 py-0.5 text-[10px] text-text-muted">
-                    {SONG_TYPE_LABELS[song.song_type]}
-                  </span>
-                  {song.genre && (
-                    <span className="rounded-md bg-bg-3 px-2 py-0.5 text-[10px] text-text-muted">
-                      {song.genre}
-                    </span>
-                  )}
-                </div>
               </Link>
             ))}
           </div>

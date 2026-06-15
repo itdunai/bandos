@@ -3,6 +3,7 @@ import { sanitizeHref } from "@/lib/safe-url";
 import type { Band, SocialLinks } from "@/types/database";
 import { SOCIAL_LABELS } from "@/types/database";
 import { ExternalLink, Music, Users } from "lucide-react";
+import Image from "next/image";
 
 export function BandProfileView({
   band,
@@ -20,13 +21,30 @@ export function BandProfileView({
     .map(([key, url]) => [key, sanitizeHref(url)] as const)
     .filter((entry): entry is [string, string] => Boolean(entry[1]));
 
+  const photos = Array.isArray(band.photos) ? band.photos : [];
+
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-border bg-bg-2 p-4">
-        <h2 className="text-lg font-medium">{band.name}</h2>
-        {band.genre && (
-          <p className="mt-1 text-sm text-accent">{band.genre}</p>
-        )}
+        <div className="flex items-start gap-4">
+          {band.logo_url ? (
+            <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-border">
+              <Image
+                src={band.logo_url}
+                alt={band.name}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            </div>
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <h2 className="text-lg font-medium">{band.name}</h2>
+            {band.genre && (
+              <p className="mt-1 text-sm text-accent">{band.genre}</p>
+            )}
+          </div>
+        </div>
         {band.description && (
           <p className="mt-3 text-sm text-text-secondary whitespace-pre-wrap">
             {band.description}
@@ -43,6 +61,28 @@ export function BandProfileView({
           </div>
         </div>
       </div>
+
+      {photos.length > 0 && (
+        <div className="rounded-xl border border-border bg-bg-2 p-4">
+          <h3 className="mb-3 text-sm font-medium">Фото</h3>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {photos.map((url) => (
+              <div
+                key={url}
+                className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border"
+              >
+                <Image
+                  src={url}
+                  alt=""
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {band.tech_rider && (
         <div className="rounded-xl border border-border bg-bg-2 p-4">

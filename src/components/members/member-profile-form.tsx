@@ -1,6 +1,7 @@
 "use client";
 
 import { updateMemberProfile } from "@/app/actions/members";
+import { AvatarUpload } from "@/components/members/avatar-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,14 +14,20 @@ const selectClass =
 export function MemberProfileForm({
   member,
   bandSlug,
+  avatarUrl,
 }: {
   member: BandMember;
   bandSlug: string;
+  avatarUrl: string | null;
 }) {
   const action = updateMemberProfile.bind(null, member.id, bandSlug);
 
   return (
     <form action={action} className="space-y-3">
+      <AvatarUpload
+        name={member.display_name ?? "?"}
+        avatarUrl={avatarUrl}
+      />
       <div>
         <Label>Имя в группе</Label>
         <Input name="display_name" defaultValue={member.display_name ?? ""} placeholder="Алекс К." />

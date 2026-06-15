@@ -1,11 +1,14 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export function Avatar({
   name,
+  src,
   className,
   color = "accent",
 }: {
   name: string;
+  src?: string | null;
   className?: string;
   color?: "accent" | "blue" | "green" | "amber";
 }) {
@@ -22,6 +25,19 @@ export function Avatar({
     green: "bg-green/15 text-green",
     amber: "bg-amber/15 text-amber",
   };
+
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt={name}
+        width={48}
+        height={48}
+        unoptimized
+        className={cn("rounded-full object-cover", className)}
+      />
+    );
+  }
 
   return (
     <div

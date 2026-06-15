@@ -66,6 +66,8 @@ export async function BandHome({
         <BandProfileForm
           band={{
             ...bandFull,
+            logo_url: bandFull.logo_url ?? null,
+            photos: Array.isArray(bandFull.photos) ? bandFull.photos : [],
             description: bandFull.description ?? null,
             genre: bandFull.genre ?? null,
             tech_rider: bandFull.tech_rider ?? null,
@@ -80,6 +82,8 @@ export async function BandHome({
         <BandProfileView
           band={{
             ...bandFull,
+            logo_url: bandFull.logo_url ?? null,
+            photos: Array.isArray(bandFull.photos) ? bandFull.photos : [],
             description: bandFull.description ?? null,
             genre: bandFull.genre ?? null,
             tech_rider: bandFull.tech_rider ?? null,
