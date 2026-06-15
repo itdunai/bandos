@@ -3,7 +3,6 @@
 import { saveMemberAvatarUrl } from "@/app/actions/media";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { useSupabase } from "@/components/providers/supabase-provider";
 import { clientUploadAvatar } from "@/lib/upload/client-media";
 import { Upload } from "lucide-react";
 import { useRef, useState, useTransition } from "react";
@@ -18,7 +17,6 @@ export function AvatarUpload({
   userId: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const supabase = useSupabase();
   const [pending, startTransition] = useTransition();
   const [url, setUrl] = useState(avatarUrl);
   const [error, setError] = useState<string | null>(null);
@@ -38,15 +36,7 @@ export function AvatarUpload({
             setError(null);
             startTransition(async () => {
               try {
-                const {
-                  data: { user },
-                } = await supabase.auth.getUser();
-                if (!user) {
-                  setError("Не авторизован");
-                  return;
-                }
-
-                const uploaded = await clientUploadAvatar(supabase, userId, file);
+                const uploaded = await clientUploadAvatar(userId, file);
                 if (uploaded.error || !uploaded.publicUrl) {
                   setError(uploaded.error ?? "Ошибка загрузки");
                   return;
