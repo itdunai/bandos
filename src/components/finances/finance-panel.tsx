@@ -221,8 +221,8 @@ export function FinancePanel({
                 required
               />
             </div>
-            <Button type="submit" variant="accent" disabled={pending}>
-              Сохранить
+            <Button type="submit" variant="accent" loading={pending} disabled={pending}>
+              {pending ? "Сохранение…" : "Сохранить"}
             </Button>
           </form>
         </Card>
@@ -331,8 +331,8 @@ export function FinancePanel({
               <Input name="notes" placeholder="Необязательно" />
             </div>
             <div className="flex gap-2">
-              <Button type="submit" variant="accent" disabled={pending}>
-                Сохранить
+              <Button type="submit" variant="accent" loading={pending} disabled={pending}>
+                {pending ? "Сохранение…" : "Сохранить"}
               </Button>
               <Button
                 type="button"

@@ -62,8 +62,8 @@ function TodoItem({
         >
           <TodoFormFields todo={todo} />
           <div className="flex gap-2">
-            <Button type="submit" variant="accent" size="sm" disabled={pending}>
-              Сохранить
+            <Button type="submit" variant="accent" size="sm" loading={pending} disabled={pending}>
+              {pending ? "Сохранение…" : "Сохранить"}
             </Button>
             <Button
               type="button"

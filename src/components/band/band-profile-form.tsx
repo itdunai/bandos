@@ -3,9 +3,10 @@
 import { updateBandProfile } from "@/app/actions/band";
 import { BandMediaSection } from "@/components/band/band-media-section";
 import { ShareLinkButton } from "@/components/band/share-link-button";
-import { Button } from "@/components/ui/button";
+import { FormPending } from "@/components/ui/form-pending";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Band, SocialLinks } from "@/types/database";
 import { SOCIAL_LABELS } from "@/types/database";
@@ -36,6 +37,7 @@ export function BandProfileForm({
       />
 
       <form action={action} className="space-y-5">
+      <FormPending label="Сохранение…">
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
         <h2 className="text-sm font-medium">Основное</h2>
         <div>
@@ -105,9 +107,10 @@ export function BandProfileForm({
         ))}
       </section>
 
-      <Button type="submit" variant="accent" className="px-6 py-2">
+      <SubmitButton type="submit" variant="accent" className="px-6 py-2" loadingLabel="Сохранение…">
         Сохранить
-      </Button>
+      </SubmitButton>
+      </FormPending>
     </form>
     </div>
   );

@@ -28,7 +28,7 @@ export async function updateMemberPermissions(
 
   if (!target) return { error: "Участник не найден" };
   if (target.role === "admin") {
-    return { error: "Права администратора нельзя изменить" };
+    return { error: "Права создателя группы нельзя изменить" };
   }
 
   const preset = parsePresetInput(formData.get("permission_preset") as string);
@@ -123,16 +123,7 @@ export async function excludeMember(
   }
 
   if (target.role === "admin") {
-    const { count } = await supabase
-      .from("band_members")
-      .select("*", { count: "exact", head: true })
-      .eq("band_id", bandId)
-      .eq("role", "admin")
-      .eq("is_active", true);
-
-    if ((count ?? 0) <= 1) {
-      return { error: "Нельзя исключить последнего администратора" };
-    }
+    return { error: "Создателя группы нельзя исключить" };
   }
 
   const { error } = await supabase

@@ -12,7 +12,12 @@ export const BAND_PERMISSIONS = [
 
 export type BandPermission = (typeof BAND_PERMISSIONS)[number];
 
-export type PermissionPreset = "musician" | "editor" | "manager" | "custom";
+export type PermissionPreset =
+  | "musician"
+  | "editor"
+  | "manager"
+  | "administrator"
+  | "custom";
 
 export type BandPermissions = Partial<Record<BandPermission, boolean>>;
 
@@ -39,7 +44,12 @@ export const PRESET_META: Record<
   },
   manager: {
     label: "Менеджер",
-    description: "Редактор + график, дела и профиль группы",
+    description: "Редактор + график, дела, профиль и просмотр финансов",
+  },
+  administrator: {
+    label: "Администратор",
+    description:
+      "Полный доступ: треки, сет-листы, график, дела, профиль, финансы, участники",
   },
 };
 
@@ -50,6 +60,14 @@ const PRESET_PERMISSIONS: Record<
   musician: {},
   editor: { songs: true, setlists: true },
   manager: {
+    songs: true,
+    setlists: true,
+    schedule: true,
+    todos: true,
+    band_profile: true,
+    finances: true,
+  },
+  administrator: {
     songs: true,
     setlists: true,
     schedule: true,
@@ -76,6 +94,13 @@ export function normalizePermissions(
 }
 
 export function isBandAdmin(member: BandMember): boolean {
+  return (
+    member.role === "admin" || member.permission_preset === "administrator"
+  );
+}
+
+/** Создатель группы (роль admin в БД) — нельзя менять права / исключить. */
+export function isBandOwner(member: BandMember): boolean {
   return member.role === "admin";
 }
 
@@ -107,6 +132,7 @@ export function parsePresetInput(value: string | null): PermissionPreset {
     value === "musician" ||
     value === "editor" ||
     value === "manager" ||
+    value === "administrator" ||
     value === "custom"
   ) {
     return value;
@@ -137,7 +163,7 @@ export function parsePermissionsPayload(
 export function presetBadgeLabel(
   member: BandMember
 ): string {
-  if (isBandAdmin(member)) return "Admin";
+  if (member.role === "admin") return "Создатель";
   const preset = member.permission_preset as PermissionPreset | null;
   if (preset && preset !== "custom") {
     return PRESET_META[preset].label;

@@ -20,6 +20,7 @@ export function DeleteSongButton({
     <Button
       type="button"
       variant="default"
+      loading={pending}
       disabled={pending}
       className="text-red hover:border-red hover:text-red"
       onClick={() => {
@@ -30,7 +31,7 @@ export function DeleteSongButton({
       }}
     >
       <Trash2 className="h-3.5 w-3.5" />
-      Удалить
+      {pending ? "Удаление…" : "Удалить"}
     </Button>
   );
 }

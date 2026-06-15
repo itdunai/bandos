@@ -64,7 +64,6 @@ export default async function MembersPage({
 
   const showInvite = member ? canInviteMembers(member) : false;
   const showPermissions = member ? canManagePermissions(member) : false;
-  const isAdmin = member?.role === "admin";
   const myAvatarUrl = profileResult.data?.avatar_url ?? null;
 
   return (
@@ -123,7 +122,9 @@ export default async function MembersPage({
                 variant={
                   m.role === "admin"
                     ? "purple"
-                    : m.permission_preset === "manager"
+                    : m.permission_preset === "administrator"
+                      ? "purple"
+                      : m.permission_preset === "manager"
                       ? "amber"
                       : "blue"
                 }
@@ -171,7 +172,7 @@ export default async function MembersPage({
               />
             )}
 
-            {isAdmin && m.user_id !== member?.user_id && (
+            {showPermissions && m.role !== "admin" && m.user_id !== member?.user_id && (
               <ExcludeMemberButton
                 memberId={m.id}
                 memberName={m.display_name ?? "участника"}

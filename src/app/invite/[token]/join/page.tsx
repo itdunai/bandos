@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { signUpFromInvite } from "@/app/actions/auth";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
 import { fetchInvitationByToken } from "@/lib/invitation";
 import { createClient } from "@/lib/supabase/server";
@@ -64,6 +64,17 @@ export default async function InviteJoinPage({
         {error && (
           <div className="mb-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-xs text-red">
             {decodeURIComponent(error)}
+            {decodeURIComponent(error).toLowerCase().includes("лимит") && (
+              <p className="mt-2 text-text-secondary">
+                Уже есть аккаунт?{" "}
+                <Link
+                  href={`/login?next=/invite/${token}`}
+                  className="text-accent hover:underline"
+                >
+                  Войти
+                </Link>
+              </p>
+            )}
           </div>
         )}
 
@@ -92,9 +103,9 @@ export default async function InviteJoinPage({
               autoComplete="new-password"
             />
           </div>
-          <Button type="submit" variant="accent" className="w-full py-2.5">
+          <SubmitButton type="submit" variant="accent" className="w-full py-2.5" loadingLabel="Регистрация…">
             Зарегистрироваться и вступить
-          </Button>
+          </SubmitButton>
         </form>
 
         <p className="mt-4 text-center text-xs text-text-secondary">

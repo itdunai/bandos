@@ -1,8 +1,9 @@
 import { createSetlist } from "@/app/actions/setlists";
 import { AppShell } from "@/components/layout/app-shell";
-import { Button } from "@/components/ui/button";
+import { FormPending } from "@/components/ui/form-pending";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SubmitButton } from "@/components/ui/submit-button";
 import {
   getBandBySlug,
   getBandMemberCount,
@@ -37,13 +38,15 @@ export default async function NewSetlistPage({
         </div>
       )}
       <form action={action} className="max-w-md space-y-4 rounded-xl border border-border bg-bg-2 p-4">
+        <FormPending label="Создание…">
         <div>
           <Label>Название *</Label>
           <Input name="name" required placeholder="Концерт 22 июня" />
         </div>
-        <Button type="submit" variant="accent" className="w-full py-2.5">
+        <SubmitButton type="submit" variant="accent" className="w-full py-2.5" loadingLabel="Создание…">
           Создать и настроить
-        </Button>
+        </SubmitButton>
+        </FormPending>
       </form>
     </AppShell>
   );

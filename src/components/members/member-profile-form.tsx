@@ -2,9 +2,10 @@
 
 import { updateMemberProfile } from "@/app/actions/members";
 import { AvatarUpload } from "@/components/members/avatar-upload";
-import { Button } from "@/components/ui/button";
+import { FormPending } from "@/components/ui/form-pending";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { INSTRUMENT_LABELS, type BandMember, type Instrument } from "@/types/database";
 const INSTRUMENTS = Object.entries(INSTRUMENT_LABELS) as [Instrument, string][];
 
@@ -24,6 +25,7 @@ export function MemberProfileForm({
 
   return (
     <form action={action} className="space-y-3">
+      <FormPending label="Сохранение…">
       <AvatarUpload
         name={member.display_name ?? "?"}
         avatarUrl={avatarUrl}
@@ -51,9 +53,10 @@ export function MemberProfileForm({
           <Input name="telegram" defaultValue={member.telegram ?? ""} placeholder="username" />
         </div>
       </div>
-      <Button type="submit" variant="accent" className="w-full py-2">
+      <SubmitButton type="submit" variant="accent" className="w-full py-2" loadingLabel="Сохранение…">
         Сохранить профиль
-      </Button>
+      </SubmitButton>
+      </FormPending>
     </form>
   );
 }

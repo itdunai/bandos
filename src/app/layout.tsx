@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { PwaRegister } from "@/components/pwa-register";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { consumeToast } from "@/lib/redirect-with-toast";
@@ -39,8 +40,10 @@ export default async function RootLayout({
     >
       <body className="min-h-full">
         <PwaRegister />
-        <ToastProvider initial={toast} />
-        {children}
+        <ToastProvider initial={toast}>
+          <NavigationProgress />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

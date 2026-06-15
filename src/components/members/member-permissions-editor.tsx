@@ -3,6 +3,7 @@
 import { updateMemberPermissions } from "@/app/actions/members";
 import { PermissionPresetFields } from "@/components/members/permission-preset-fields";
 import { Button } from "@/components/ui/button";
+import { PendingOverlay } from "@/components/ui/pending-overlay";
 import {
   presetBadgeLabel,
   type BandPermissions,
@@ -64,6 +65,7 @@ export function MemberPermissionsEditor({
 
       {open && (
         <form onSubmit={handleSubmit} className="mt-3 space-y-3">
+          <PendingOverlay pending={pending} label="Сохранение…">
           <PermissionPresetFields
             defaultPreset={preset}
             defaultPermissions={permissions}
@@ -76,10 +78,12 @@ export function MemberPermissionsEditor({
             type="submit"
             variant="accent"
             className="w-full py-2 text-xs"
+            loading={pending}
             disabled={pending}
           >
-            Сохранить права
+            {pending ? "Сохранение…" : "Сохранить права"}
           </Button>
+          </PendingOverlay>
         </form>
       )}
     </div>

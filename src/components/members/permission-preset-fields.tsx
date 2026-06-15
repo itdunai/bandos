@@ -9,7 +9,13 @@ import {
 } from "@/lib/band/permissions";
 import { cn } from "@/lib/utils";
 
-const PRESETS = ["musician", "editor", "manager", "custom"] as const;
+const PRESETS = [
+  "musician",
+  "editor",
+  "manager",
+  "administrator",
+  "custom",
+] as const;
 
 export function PermissionPresetFields({
   namePrefix = "",

@@ -10,6 +10,7 @@ import {
 } from "@/app/actions/setlists";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PendingOverlay } from "@/components/ui/pending-overlay";
 import {
   DndContext,
   closestCenter,
@@ -183,7 +184,7 @@ export function SetlistEditor({
   }
 
   return (
-    <div className={pending ? "opacity-70 pointer-events-none" : ""}>
+    <PendingOverlay pending={pending} label="Сохранение…">
       <div className="mb-4 flex items-center gap-2">
         <Input
           value={name}
@@ -194,6 +195,8 @@ export function SetlistEditor({
         <Button
           type="button"
           variant="default"
+          loading={pending}
+          disabled={pending}
           className="text-red hover:border-red hover:text-red"
           onClick={handleDeleteSetlist}
         >
@@ -250,6 +253,6 @@ export function SetlistEditor({
           </Button>
         </div>
       </div>
-    </div>
+    </PendingOverlay>
   );
 }

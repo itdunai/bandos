@@ -64,7 +64,12 @@ export const SOCIAL_LABELS: Record<keyof SocialLinks, string> = {
   website: "Сайт",
 };
 
-export type PermissionPreset = "musician" | "editor" | "manager" | "custom";
+export type PermissionPreset =
+  | "musician"
+  | "editor"
+  | "manager"
+  | "administrator"
+  | "custom";
 
 export type BandPermissions = Partial<
   Record<

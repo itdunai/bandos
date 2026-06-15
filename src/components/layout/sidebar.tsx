@@ -4,6 +4,7 @@ import { signOut } from "@/app/actions/auth";
 import { canViewFinances } from "@/lib/band/permissions";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SubmitButton } from "@/components/ui/submit-button";
 import {
   Calendar,
   ClipboardList,
@@ -132,13 +133,15 @@ export function Sidebar({
           Создать группу
         </Link>
         <form action={signOut}>
-          <button
+          <SubmitButton
             type="submit"
-            className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
+            variant="ghost"
+            loadingLabel="Выход…"
+            className="flex h-auto w-full items-center gap-2 rounded-lg px-2 py-1.5 text-xs text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
           >
             <LogOut className="h-3.5 w-3.5 shrink-0" />
             Выйти
-          </button>
+          </SubmitButton>
         </form>
         {member && (
           <div className="flex items-center gap-2">

@@ -3,8 +3,10 @@
 import { createSong, deleteSong, updateSong } from "@/app/actions/songs";
 import { SongMaterialsFields } from "@/components/songs/song-materials-fields";
 import { Button } from "@/components/ui/button";
+import { FormPending } from "@/components/ui/form-pending";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { formatDurationInput } from "@/lib/utils";
 import {
   SONG_STATUS_LABELS,
@@ -41,6 +43,7 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
 
   return (
     <form action={action} className="space-y-5">
+      <FormPending label={isEdit ? "Сохранение…" : "Создание…"}>
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
         <h2 className="text-sm font-medium">Основное</h2>
         <div>
@@ -124,13 +127,14 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
       </section>
 
       <div className="flex gap-2">
-        <Button type="submit" variant="accent" disabled={pending} className="px-6 py-2">
+        <SubmitButton type="submit" variant="accent" className="px-6 py-2" loadingLabel={isEdit ? "Сохранение…" : "Создание…"}>
           {isEdit ? "Сохранить" : "Создать трек"}
-        </Button>
+        </SubmitButton>
         {isEdit && (
           <Button
             type="button"
             variant="default"
+            loading={pending}
             disabled={pending}
             className="text-red hover:border-red hover:text-red"
             onClick={() => {
@@ -140,10 +144,11 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
             }}
           >
             <Trash2 className="h-3.5 w-3.5" />
-            Удалить
+            {pending ? "Удаление…" : "Удалить"}
           </Button>
         )}
       </div>
+      </FormPending>
     </form>
   );
 }

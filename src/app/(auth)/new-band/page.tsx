@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createBand } from "@/app/actions/auth";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { Guitar } from "lucide-react";
@@ -78,9 +78,9 @@ export default async function NewBandPage({
             ))}
           </select>
         </div>
-        <Button type="submit" variant="accent" className="w-full py-2.5">
+        <SubmitButton type="submit" variant="accent" className="w-full py-2.5" loadingLabel="Создание…">
           Создать группу
-        </Button>
+        </SubmitButton>
       </form>
 
       <p className="mt-4 text-center text-xs text-text-secondary">

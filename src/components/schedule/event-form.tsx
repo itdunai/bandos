@@ -2,8 +2,10 @@
 
 import { createEvent, deleteEvent, updateEvent } from "@/app/actions/events";
 import { Button } from "@/components/ui/button";
+import { FormPending } from "@/components/ui/form-pending";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Event, EventType } from "@/types/database";
 import { Trash2 } from "lucide-react";
@@ -53,6 +55,7 @@ export function EventForm({
 
   return (
     <form action={action} className="space-y-4">
+      <FormPending label={isEdit ? "Сохранение…" : "Создание…"}>
       <div>
         <Label>Тип</Label>
         <select name="event_type" className={selectClass} defaultValue={type}>
@@ -139,14 +142,15 @@ export function EventForm({
       </div>
 
       <div className="flex gap-2">
-        <Button type="submit" variant="accent" disabled={pending} className="px-6 py-2">
+        <SubmitButton type="submit" variant="accent" className="px-6 py-2" loadingLabel={isEdit ? "Сохранение…" : "Создание…"}>
           {isEdit ? "Сохранить" : "Создать"}
-        </Button>
+        </SubmitButton>
         {isEdit && (
           <Button
             type="button"
             variant="default"
             className="text-red hover:border-red"
+            loading={pending}
             disabled={pending}
             onClick={() => {
               if (confirm("Удалить событие?")) {
@@ -155,10 +159,11 @@ export function EventForm({
             }}
           >
             <Trash2 className="h-3.5 w-3.5" />
-            Удалить
+            {pending ? "Удаление…" : "Удалить"}
           </Button>
         )}
       </div>
+      </FormPending>
     </form>
   );
 }

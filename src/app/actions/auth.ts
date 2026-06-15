@@ -7,6 +7,7 @@ import {
 } from "@/lib/band/permissions";
 import { createClient } from "@/lib/supabase/server";
 import { fetchInvitationByToken } from "@/lib/invitation";
+import { formatAuthError, isAlreadyRegisteredError } from "@/lib/auth-errors";
 import { bandPath } from "@/lib/paths";
 import { sanitizeRedirectPath } from "@/lib/safe-redirect";
 import { getSiteUrl } from "@/lib/site-url";
@@ -38,7 +39,9 @@ export async function signUpAccount(formData: FormData) {
   });
 
   if (signUpError) {
-    redirect(`/register?error=${encodeURIComponent(signUpError.message)}`);
+    redirect(
+      `/register?error=${encodeURIComponent(formatAuthError(signUpError.message))}`
+    );
   }
 
   if (!authData.user) {
@@ -76,7 +79,13 @@ export async function signUpFromInvite(token: string, formData: FormData) {
   });
 
   if (signUpError) {
-    redirect(`/invite/${token}/join?error=${encodeURIComponent(signUpError.message)}`);
+    const msg = formatAuthError(signUpError.message);
+    if (isAlreadyRegisteredError(signUpError.message)) {
+      redirect(
+        `/login?next=${encodeURIComponent(`/invite/${token}`)}&error=${encodeURIComponent(msg)}`
+      );
+    }
+    redirect(`/invite/${token}/join?error=${encodeURIComponent(msg)}`);
   }
 
   if (!authData.user) {
@@ -147,7 +156,9 @@ export async function signIn(formData: FormData) {
   });
 
   if (error) {
-    const params = new URLSearchParams({ error: error.message });
+    const params = new URLSearchParams({
+      error: formatAuthError(error.message),
+    });
     if (next) params.set("next", next);
     redirect(`/login?${params.toString()}`);
   }

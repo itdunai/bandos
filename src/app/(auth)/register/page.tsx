@@ -2,6 +2,7 @@ import Link from "next/link";
 import { signUpAccount } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
 import { Guitar, Mail } from "lucide-react";
 
@@ -73,9 +74,9 @@ export default async function RegisterPage({
             autoComplete="new-password"
           />
         </div>
-        <Button type="submit" variant="accent" className="w-full py-2.5">
+        <SubmitButton type="submit" variant="accent" className="w-full py-2.5" loadingLabel="Регистрация…">
           Зарегистрироваться
-        </Button>
+        </SubmitButton>
       </form>
 
       <p className="mt-4 text-center text-xs text-text-secondary">

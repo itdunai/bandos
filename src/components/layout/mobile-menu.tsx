@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
 import { canViewFinances } from "@/lib/band/permissions";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { cn } from "@/lib/utils";
 import type { BandMember } from "@/types/database";
 import { bandPath } from "@/lib/paths";
@@ -124,13 +125,15 @@ export function MobileMenu({
             Создать группу
           </Link>
           <form action={signOut}>
-            <button
+            <SubmitButton
               type="submit"
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
+              variant="ghost"
+              loadingLabel="Выход…"
+              className="flex h-auto w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
             >
               <LogOut className="h-4 w-4 shrink-0" />
               Выйти
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </aside>

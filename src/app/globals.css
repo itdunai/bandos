@@ -43,6 +43,15 @@ body {
   font-size: 14px;
 }
 
+html.navigating {
+  cursor: wait;
+}
+
+html.navigating a,
+html.navigating button:not(:disabled) {
+  cursor: wait;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -1,5 +1,10 @@
+"use client";
+
 import type { Instrument } from "@/types/database";
 import { Metronome } from "@/components/metronome/metronome";
+import { cn } from "@/lib/utils";
+import { FileText } from "lucide-react";
+import { useState } from "react";
 
 interface SongContent {
   content_type: string;
@@ -30,6 +35,10 @@ export function InstrumentView({
   );
   const lyrics = track.contents.find((c) => c.content_type === "lyrics");
 
+  const canToggleLyrics =
+    (instrument === "guitar" || instrument === "bass") && !!lyrics?.body;
+  const [showLyrics, setShowLyrics] = useState(false);
+
   return (
     <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
       <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-text-secondary">
@@ -54,6 +63,24 @@ export function InstrumentView({
           </span>
         )}
       </div>
+
+      {canToggleLyrics && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShowLyrics((v) => !v)}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-colors",
+              showLyrics
+                ? "border-accent bg-accent/15 text-accent"
+                : "border-border bg-bg-3 text-text-secondary hover:text-text-primary"
+            )}
+          >
+            <FileText className="h-3.5 w-3.5" />
+            {showLyrics ? "Скрыть текст" : "Показать текст"}
+          </button>
+        </div>
+      )}
 
       {track.structure && (instrument === "drums" || instrument === "other") && (
         <section>
@@ -97,6 +124,17 @@ export function InstrumentView({
         </section>
       )}
 
+      {showLyrics && canToggleLyrics && lyrics?.body && (
+        <section className="flex-1 border-t border-border pt-4">
+          <h3 className="mb-3 text-center text-[10px] uppercase tracking-widest text-text-muted">
+            Текст
+          </h3>
+          <pre className="text-center text-base leading-relaxed text-text-primary whitespace-pre-wrap sm:text-lg">
+            {lyrics.body}
+          </pre>
+        </section>
+      )}
+
       {instrument === "drums" && (
         <section className="flex flex-1 flex-col items-center justify-center">
           <Metronome
@@ -112,7 +150,7 @@ export function InstrumentView({
         <p className="text-center text-xs text-amber">{track.notes}</p>
       )}
 
-      {!hasContent(track, instrument) && (
+      {!hasContent(track, instrument, showLyrics) && (
         <p className="py-8 text-center text-sm text-text-muted">
           Нет материалов для вашего инструмента
         </p>
@@ -121,12 +159,24 @@ export function InstrumentView({
   );
 }
 
-function hasContent(track: TrackData, instrument: Instrument): boolean {
+function hasContent(
+  track: TrackData,
+  instrument: Instrument,
+  showLyrics: boolean
+): boolean {
   if (instrument === "guitar" || instrument === "keys") {
-    return !!track.contents.find((c) => c.content_type === "chords")?.body;
+    const hasChords = !!track.contents.find((c) => c.content_type === "chords")?.body;
+    const hasLyrics =
+      showLyrics &&
+      !!track.contents.find((c) => c.content_type === "lyrics")?.body;
+    return hasChords || hasLyrics;
   }
   if (instrument === "bass") {
-    return !!track.contents.find((c) => c.content_type === "tabs")?.body;
+    const hasTabs = !!track.contents.find((c) => c.content_type === "tabs")?.body;
+    const hasLyrics =
+      showLyrics &&
+      !!track.contents.find((c) => c.content_type === "lyrics")?.body;
+    return hasTabs || hasLyrics;
   }
   if (instrument === "vocals") {
     return !!track.contents.find((c) => c.content_type === "lyrics")?.body;

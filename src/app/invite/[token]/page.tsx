@@ -2,6 +2,7 @@ import Link from "next/link";
 import { acceptInvitation } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SubmitButton } from "@/components/ui/submit-button";
 import { fetchInvitationByToken } from "@/lib/invitation";
 import { createClient } from "@/lib/supabase/server";
 import { INSTRUMENT_LABELS } from "@/types/database";
@@ -122,9 +123,9 @@ export default async function InvitePage({
         )}
 
         <form action={acceptInvitation.bind(null, token)} className="mt-4">
-          <Button type="submit" variant="accent" className="w-full py-2.5">
+          <SubmitButton type="submit" variant="accent" className="w-full py-2.5" loadingLabel="Вступление…">
             Принять приглашение
-          </Button>
+          </SubmitButton>
         </form>
       </Card>
     </div>

@@ -23,6 +23,7 @@ export function RecordEventFeeButton({
       type="button"
       variant="default"
       size="sm"
+      loading={pending}
       disabled={pending}
       className={compact ? "h-6 px-2 text-[10px]" : "text-xs"}
       onClick={(e) => {
@@ -34,7 +35,7 @@ export function RecordEventFeeButton({
       }}
     >
       <Wallet className="h-3 w-3" />
-      {compact ? "В финансы" : "Учесть гонорар"}
+      {compact ? (pending ? "…" : "В финансы") : pending ? "Учёт…" : "Учесть гонорар"}
     </Button>
   );
 }

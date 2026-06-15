@@ -68,6 +68,7 @@ export function AvatarUpload({
         <Button
           type="button"
           variant="default"
+          loading={pending}
           disabled={pending}
           onClick={() => inputRef.current?.click()}
         >
