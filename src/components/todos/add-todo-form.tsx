@@ -3,7 +3,6 @@
 import { createTodo } from "@/app/actions/todos";
 import { TodoFormFields } from "@/components/todos/todo-form-fields";
 import { Button } from "@/components/ui/button";
-import { PendingOverlay } from "@/components/ui/pending-overlay";
 import { Plus } from "lucide-react";
 import { useRef, useState, useTransition } from "react";
 
@@ -47,7 +46,6 @@ export function AddTodoForm({
       action={handleSubmit}
       className="rounded-xl border border-border bg-bg-2 p-4 space-y-3"
     >
-      <PendingOverlay pending={pending} label="Добавление…">
       <TodoFormFields />
       <div className="flex gap-2 pt-1">
         <Button type="submit" variant="accent" loading={pending} disabled={pending}>
@@ -62,7 +60,6 @@ export function AddTodoForm({
           Отмена
         </Button>
       </div>
-      </PendingOverlay>
     </form>
   );
 }

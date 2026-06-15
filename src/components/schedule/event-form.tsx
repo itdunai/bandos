@@ -2,7 +2,6 @@
 
 import { createEvent, deleteEvent, updateEvent } from "@/app/actions/events";
 import { Button } from "@/components/ui/button";
-import { FormPending } from "@/components/ui/form-pending";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -55,7 +54,6 @@ export function EventForm({
 
   return (
     <form action={action} className="space-y-4">
-      <FormPending label={isEdit ? "Сохранение…" : "Создание…"}>
       <div>
         <Label>Тип</Label>
         <select name="event_type" className={selectClass} defaultValue={type}>
@@ -163,7 +161,6 @@ export function EventForm({
           </Button>
         )}
       </div>
-      </FormPending>
     </form>
   );
 }

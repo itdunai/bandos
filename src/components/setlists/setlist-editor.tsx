@@ -10,7 +10,7 @@ import {
 } from "@/app/actions/setlists";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PendingOverlay } from "@/components/ui/pending-overlay";
+import { cn } from "@/lib/utils";
 import {
   DndContext,
   closestCenter,
@@ -184,7 +184,7 @@ export function SetlistEditor({
   }
 
   return (
-    <PendingOverlay pending={pending} label="Сохранение…">
+    <div className={cn(pending && "pointer-events-none opacity-70")}>
       <div className="mb-4 flex items-center gap-2">
         <Input
           value={name}
@@ -253,6 +253,6 @@ export function SetlistEditor({
           </Button>
         </div>
       </div>
-    </PendingOverlay>
+    </div>
   );
 }

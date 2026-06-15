@@ -3,7 +3,6 @@
 import { createSong, deleteSong, updateSong } from "@/app/actions/songs";
 import { SongMaterialsFields } from "@/components/songs/song-materials-fields";
 import { Button } from "@/components/ui/button";
-import { FormPending } from "@/components/ui/form-pending";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -43,7 +42,6 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
 
   return (
     <form action={action} className="space-y-5">
-      <FormPending label={isEdit ? "Сохранение…" : "Создание…"}>
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
         <h2 className="text-sm font-medium">Основное</h2>
         <div>
@@ -148,7 +146,6 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
           </Button>
         )}
       </div>
-      </FormPending>
     </form>
   );
 }

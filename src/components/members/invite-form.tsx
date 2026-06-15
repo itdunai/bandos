@@ -4,7 +4,6 @@ import { createInvitation } from "@/app/actions/auth";
 import { PermissionPresetFields } from "@/components/members/permission-preset-fields";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PendingOverlay } from "@/components/ui/pending-overlay";
 import { INSTRUMENT_LABELS, type Instrument } from "@/types/database";
 import { Link2 } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -40,7 +39,6 @@ export function InviteForm({ bandId }: { bandId: string }) {
         Только администратор может приглашать и назначать права
       </p>
       <form onSubmit={handleSubmit} className="space-y-3">
-        <PendingOverlay pending={pending} label="Создание ссылки…">
         <Input name="email" type="email" placeholder="Email (опционально)" />
         <select
           name="instrument"
@@ -58,7 +56,6 @@ export function InviteForm({ bandId }: { bandId: string }) {
           <Link2 className="h-3.5 w-3.5" />
           {pending ? "Создание…" : "Создать ссылку"}
         </Button>
-        </PendingOverlay>
       </form>
       {error && <p className="mt-2 text-xs text-red">{error}</p>}
       {inviteUrl && (

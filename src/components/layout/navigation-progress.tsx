@@ -7,6 +7,7 @@ export function NavigationProgress() {
   const pathname = usePathname();
   const [active, setActive] = useState(false);
   const [progress, setProgress] = useState(0);
+  const activeRef = useRef(false);
   const creepTimer = useRef<number | null>(null);
   const completeTimer = useRef<number | null>(null);
 
@@ -23,6 +24,7 @@ export function NavigationProgress() {
 
   const start = useCallback(() => {
     clearTimers();
+    activeRef.current = true;
     setActive(true);
     setProgress(12);
     document.documentElement.classList.add("navigating");
@@ -33,9 +35,12 @@ export function NavigationProgress() {
   }, [clearTimers]);
 
   const complete = useCallback(() => {
+    if (!activeRef.current) return;
+
     clearTimers();
     setProgress(100);
     completeTimer.current = window.setTimeout(() => {
+      activeRef.current = false;
       setActive(false);
       setProgress(0);
       document.documentElement.classList.remove("navigating");
@@ -79,19 +84,11 @@ export function NavigationProgress() {
       if (next !== current) start();
     }
 
-    function onSubmit(e: Event) {
-      const form = e.target;
-      if (!(form instanceof HTMLFormElement)) return;
-      if (form.getAttribute("target") === "_blank") return;
-      start();
-    }
-
     document.addEventListener("click", onClick, true);
-    document.addEventListener("submit", onSubmit, true);
     return () => {
       document.removeEventListener("click", onClick, true);
-      document.removeEventListener("submit", onSubmit, true);
       clearTimers();
+      activeRef.current = false;
       document.documentElement.classList.remove("navigating");
     };
   }, [start, clearTimers]);
