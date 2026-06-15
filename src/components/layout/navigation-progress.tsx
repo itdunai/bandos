@@ -75,13 +75,18 @@ export function NavigationProgress() {
       const href = anchor.getAttribute("href");
       if (!href || !isInternalNav(href)) return;
 
-      const current = `${window.location.pathname}${window.location.search}`;
-      const next = href.startsWith("/")
-        ? href
-        : new URL(href, window.location.origin).pathname +
-          new URL(href, window.location.origin).search;
+      const nextPath = (() => {
+        try {
+          const url = href.startsWith("/")
+            ? new URL(href, window.location.origin)
+            : new URL(href);
+          return url.pathname;
+        } catch {
+          return href.split("?")[0] ?? href;
+        }
+      })();
 
-      if (next !== current) start();
+      if (nextPath !== window.location.pathname) start();
     }
 
     document.addEventListener("click", onClick, true);
