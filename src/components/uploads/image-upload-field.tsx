@@ -1,10 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ImagePlus, Trash2, Upload } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+
+function isBlobUrl(url: string) {
+  return url.startsWith("blob:");
+}
 
 export function ImageUploadField({
   label,
@@ -17,7 +22,7 @@ export function ImageUploadField({
   label: string;
   hint?: string;
   currentUrl?: string | null;
-  onUpload: (file: File) => Promise<{ error?: string }>;
+  onUpload: (file: File) => Promise<{ error?: string; url?: string }>;
   onRemove?: () => Promise<{ error?: string }>;
   aspect?: "square" | "wide";
 }) {
@@ -26,8 +31,23 @@ export function ImageUploadField({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [savedUrl, setSavedUrl] = useState<string | null>(null);
 
-  const displayUrl = previewUrl ?? currentUrl ?? null;
+  useEffect(() => {
+    setSavedUrl(null);
+  }, [currentUrl]);
+
+  const displayUrl = previewUrl ?? savedUrl ?? currentUrl ?? null;
+
+  const frameClass =
+    aspect === "wide"
+      ? "relative h-24 w-40 overflow-hidden rounded-lg border border-border"
+      : "relative h-20 w-20 overflow-hidden rounded-lg border border-border";
+
+  const placeholderClass =
+    aspect === "wide"
+      ? "flex h-24 w-40 items-center justify-center rounded-lg border border-dashed border-border bg-bg-3 text-text-muted"
+      : "flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-border bg-bg-3 text-text-muted";
 
   function handleFile(file: File) {
     setError(null);
@@ -40,10 +60,19 @@ export function ImageUploadField({
         if (result.error) {
           setError(result.error);
           setPreviewUrl(null);
-        } else {
-          setPreviewUrl(null);
-          router.refresh();
+          return;
         }
+
+        setPreviewUrl(null);
+        if (result.url) {
+          setSavedUrl(result.url);
+        }
+        router.refresh();
+      } catch (err) {
+        setPreviewUrl(null);
+        setError(
+          err instanceof Error ? err.message : "Не удалось загрузить изображение"
+        );
       } finally {
         URL.revokeObjectURL(localPreview);
       }
@@ -57,29 +86,27 @@ export function ImageUploadField({
 
       <div className="flex flex-wrap items-start gap-3">
         {displayUrl ? (
-          <div
-            className={
-              aspect === "wide"
-                ? "relative h-24 w-40 overflow-hidden rounded-lg border border-border"
-                : "relative h-20 w-20 overflow-hidden rounded-lg border border-border"
-            }
-          >
-            <Image
-              src={displayUrl}
-              alt={label || "preview"}
-              fill
-              unoptimized
-              className="object-cover"
-            />
+          <div className={frameClass}>
+            {isBlobUrl(displayUrl) ? (
+              // next/image не поддерживает blob: — ломает страницу при выборе файла
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={displayUrl}
+                alt={label || "preview"}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <Image
+                src={displayUrl}
+                alt={label || "preview"}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            )}
           </div>
         ) : (
-          <div
-            className={
-              aspect === "wide"
-                ? "flex h-24 w-40 items-center justify-center rounded-lg border border-dashed border-border bg-bg-3 text-text-muted"
-                : "flex h-20 w-20 items-center justify-center rounded-lg border border-dashed border-border bg-bg-3 text-text-muted"
-            }
-          >
+          <div className={placeholderClass}>
             <ImagePlus className="h-6 w-6" />
           </div>
         )}
@@ -111,14 +138,23 @@ export function ImageUploadField({
               type="button"
               variant="default"
               disabled={pending}
-              className="text-red hover:border-red hover:text-red"
+              className={cn("text-red hover:border-red hover:text-red")}
               onClick={() => {
                 setError(null);
                 setPreviewUrl(null);
+                setSavedUrl(null);
                 startTransition(async () => {
-                  const result = await onRemove();
-                  if (result.error) setError(result.error);
-                  else router.refresh();
+                  try {
+                    const result = await onRemove();
+                    if (result.error) setError(result.error);
+                    else router.refresh();
+                  } catch (err) {
+                    setError(
+                      err instanceof Error
+                        ? err.message
+                        : "Не удалось удалить изображение"
+                    );
+                  }
                 });
               }}
             >

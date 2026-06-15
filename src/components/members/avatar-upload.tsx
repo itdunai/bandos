@@ -38,29 +38,37 @@ export function AvatarUpload({
             if (!file) return;
             setError(null);
             startTransition(async () => {
-              const supabase = createClient();
-              const {
-                data: { user },
-              } = await supabase.auth.getUser();
-              if (!user) {
-                setError("Не авторизован");
-                return;
-              }
+              try {
+                const supabase = createClient();
+                const {
+                  data: { user },
+                } = await supabase.auth.getUser();
+                if (!user) {
+                  setError("Не авторизован");
+                  return;
+                }
 
-              const uploaded = await clientUploadAvatar(userId, file);
-              if (uploaded.error || !uploaded.publicUrl) {
-                setError(uploaded.error ?? "Ошибка загрузки");
-                return;
-              }
+                const uploaded = await clientUploadAvatar(userId, file);
+                if (uploaded.error || !uploaded.publicUrl) {
+                  setError(uploaded.error ?? "Ошибка загрузки");
+                  return;
+                }
 
-              const saved = await saveMemberAvatarUrl(uploaded.publicUrl);
-              if (saved.error) {
-                setError(saved.error);
-                return;
-              }
+                const saved = await saveMemberAvatarUrl(uploaded.publicUrl);
+                if (saved.error) {
+                  setError(saved.error);
+                  return;
+                }
 
-              setUrl(uploaded.publicUrl);
-              router.refresh();
+                setUrl(uploaded.publicUrl);
+                router.refresh();
+              } catch (err) {
+                setError(
+                  err instanceof Error
+                    ? err.message
+                    : "Не удалось загрузить аватар"
+                );
+              }
             });
             e.target.value = "";
           }}

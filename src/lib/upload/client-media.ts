@@ -37,20 +37,41 @@ async function uploadPrepared(
 export async function clientUploadBandLogo(bandId: string, file: File) {
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
-  return uploadPrepared(bandLogoStoragePath(bandId, "webp"), file);
+  try {
+    return await uploadPrepared(bandLogoStoragePath(bandId, "webp"), file);
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error ? err.message : "Не удалось обработать изображение",
+    };
+  }
 }
 
 export async function clientUploadBandPhoto(bandId: string, file: File) {
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
-  return uploadPrepared(
-    `bands/${bandId}/photos/${crypto.randomUUID()}.webp`,
-    file
-  );
+  try {
+    return await uploadPrepared(
+      `bands/${bandId}/photos/${crypto.randomUUID()}.webp`,
+      file
+    );
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error ? err.message : "Не удалось обработать изображение",
+    };
+  }
 }
 
 export async function clientUploadAvatar(userId: string, file: File) {
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
-  return uploadPrepared(avatarStoragePath(userId, "webp"), file);
+  try {
+    return await uploadPrepared(avatarStoragePath(userId, "webp"), file);
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error ? err.message : "Не удалось обработать изображение",
+    };
+  }
 }

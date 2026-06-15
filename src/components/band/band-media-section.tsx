@@ -43,7 +43,13 @@ export function BandMediaSection({
           if (uploaded.error || !uploaded.publicUrl) {
             return { error: uploaded.error ?? "Ошибка загрузки" };
           }
-          return saveBandLogoUrl(bandId, bandSlug, uploaded.publicUrl);
+          const saved = await saveBandLogoUrl(
+            bandId,
+            bandSlug,
+            uploaded.publicUrl
+          );
+          if (saved.error) return saved;
+          return { url: uploaded.publicUrl };
         }}
         onRemove={removeBandLogo.bind(null, bandId, bandSlug)}
         aspect="square"
@@ -96,7 +102,13 @@ export function BandMediaSection({
             if (uploaded.error || !uploaded.publicUrl) {
               return { error: uploaded.error ?? "Ошибка загрузки" };
             }
-            return saveBandPhotoUrl(bandId, bandSlug, uploaded.publicUrl);
+            const saved = await saveBandPhotoUrl(
+              bandId,
+              bandSlug,
+              uploaded.publicUrl
+            );
+            if (saved.error) return saved;
+            return { url: uploaded.publicUrl };
           }}
           aspect="square"
         />
