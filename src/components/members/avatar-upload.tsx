@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/components/providers/supabase-provider";
 import { clientUploadAvatar } from "@/lib/upload/client-media";
 import { Upload } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
 export function AvatarUpload({
@@ -19,7 +18,6 @@ export function AvatarUpload({
   userId: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const supabase = useSupabase();
   const [pending, startTransition] = useTransition();
   const [url, setUrl] = useState(avatarUrl);
@@ -60,8 +58,7 @@ export function AvatarUpload({
                   return;
                 }
 
-                setUrl(uploaded.publicUrl);
-                router.refresh();
+                setUrl(saved.url ?? uploaded.publicUrl);
               } catch (err) {
                 setError(
                   err instanceof Error

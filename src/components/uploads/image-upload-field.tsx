@@ -4,11 +4,20 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ImagePlus, Trash2, Upload } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
 function isBlobUrl(url: string) {
   return url.startsWith("blob:");
+}
+
+function formatUploadError(err: unknown) {
+  if (err instanceof Error) {
+    if (err.message === "Failed to fetch" || err.name === "TypeError") {
+      return "Сервер не ответил. Проверьте соединение и попробуйте снова.";
+    }
+    return err.message;
+  }
+  return "Не удалось загрузить изображение";
 }
 
 export function ImageUploadField({
@@ -27,7 +36,6 @@ export function ImageUploadField({
   aspect?: "square" | "wide";
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -67,12 +75,9 @@ export function ImageUploadField({
         if (result.url) {
           setSavedUrl(result.url);
         }
-        router.refresh();
       } catch (err) {
         setPreviewUrl(null);
-        setError(
-          err instanceof Error ? err.message : "Не удалось загрузить изображение"
-        );
+        setError(formatUploadError(err));
       } finally {
         URL.revokeObjectURL(localPreview);
       }
@@ -147,13 +152,8 @@ export function ImageUploadField({
                   try {
                     const result = await onRemove();
                     if (result.error) setError(result.error);
-                    else router.refresh();
                   } catch (err) {
-                    setError(
-                      err instanceof Error
-                        ? err.message
-                        : "Не удалось удалить изображение"
-                    );
+                    setError(formatUploadError(err));
                   }
                 });
               }}

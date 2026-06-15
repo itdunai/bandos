@@ -10,8 +10,7 @@ import { useSupabase } from "@/components/providers/supabase-provider";
 import { ImageUploadField } from "@/components/uploads/image-upload-field";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import {
   clientUploadBandLogo,
   clientUploadBandPhoto,
@@ -28,9 +27,18 @@ export function BandMediaSection({
   logoUrl: string | null;
   photos: string[];
 }) {
-  const router = useRouter();
   const supabase = useSupabase();
   const [pending, startTransition] = useTransition();
+  const [localLogoUrl, setLocalLogoUrl] = useState(logoUrl);
+  const [localPhotos, setLocalPhotos] = useState(photos);
+
+  useEffect(() => {
+    setLocalLogoUrl(logoUrl);
+  }, [logoUrl]);
+
+  useEffect(() => {
+    setLocalPhotos(photos);
+  }, [photos]);
 
   return (
     <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-4">
@@ -39,21 +47,29 @@ export function BandMediaSection({
       <ImageUploadField
         label="Логотип"
         hint="JPEG, PNG, WebP или GIF до 5 МБ — перед загрузкой сжимается в WebP"
-        currentUrl={logoUrl}
+        currentUrl={localLogoUrl}
         onUpload={async (file) => {
           const uploaded = await clientUploadBandLogo(supabase, bandId, file);
           if (uploaded.error || !uploaded.publicUrl) {
-            return { error: uploaded.error ?? "Ошибка загрузки" };
+            return { error: uploaded.error ?? "Ошибка загрузки в хранилище" };
           }
+
           const saved = await saveBandLogoUrl(
             bandId,
             bandSlug,
             uploaded.publicUrl
           );
-          if (saved.error) return saved;
-          return { url: uploaded.publicUrl };
+          if (saved.error) return { error: saved.error };
+
+          const url = saved.url ?? uploaded.publicUrl;
+          setLocalLogoUrl(url);
+          return { url };
         }}
-        onRemove={removeBandLogo.bind(null, bandId, bandSlug)}
+        onRemove={async () => {
+          const result = await removeBandLogo(bandId, bandSlug);
+          if (!result.error) setLocalLogoUrl(null);
+          return result;
+        }}
         aspect="square"
       />
 
@@ -63,9 +79,9 @@ export function BandMediaSection({
           До 12 фото — показываются на публичной странице
         </p>
 
-        {photos.length > 0 && (
+        {localPhotos.length > 0 && (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-            {photos.map((url) => (
+            {localPhotos.map((url) => (
               <div
                 key={url}
                 className="group relative aspect-square overflow-hidden rounded-lg border border-border"
@@ -83,7 +99,9 @@ export function BandMediaSection({
                   onClick={() => {
                     startTransition(async () => {
                       const result = await removeBandPhoto(bandId, bandSlug, url);
-                      if (!result.error) router.refresh();
+                      if (!result.error) {
+                        setLocalPhotos((prev) => prev.filter((item) => item !== url));
+                      }
                     });
                   }}
                   className="absolute right-1 top-1 rounded-md bg-bg/80 p-1 text-red opacity-0 transition-opacity group-hover:opacity-100"
@@ -102,15 +120,21 @@ export function BandMediaSection({
           onUpload={async (file) => {
             const uploaded = await clientUploadBandPhoto(supabase, bandId, file);
             if (uploaded.error || !uploaded.publicUrl) {
-              return { error: uploaded.error ?? "Ошибка загрузки" };
+              return { error: uploaded.error ?? "Ошибка загрузки в хранилище" };
             }
+
             const saved = await saveBandPhotoUrl(
               bandId,
               bandSlug,
               uploaded.publicUrl
             );
-            if (saved.error) return saved;
-            return { url: uploaded.publicUrl };
+            if (saved.error) return { error: saved.error };
+
+            const url = saved.url ?? uploaded.publicUrl;
+            setLocalPhotos((prev) =>
+              prev.includes(url) ? prev : [...prev, url]
+            );
+            return { url };
           }}
           aspect="square"
         />

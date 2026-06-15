@@ -100,6 +100,22 @@ export function requireTodoMember(todoId: string) {
 }
 
 /** For actions that return `{ error }` instead of redirecting. */
+export async function tryBandPermission(
+  bandId: string,
+  permission: BandPermission
+): Promise<{ auth: BandAuth } | { error: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Не авторизован" };
+
+  const member = await loadMember(supabase, user, bandId);
+  if (!member) return { error: "Нет доступа" };
+  if (!hasPermission(member, permission)) return { error: "Нет прав" };
+  return { auth: { supabase, user, member, bandId } };
+}
+
 export async function tryBandAdmin(
   bandId: string
 ): Promise<{ auth: BandAuth } | { error: string }> {
