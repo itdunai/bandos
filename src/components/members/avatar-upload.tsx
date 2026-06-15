@@ -3,8 +3,8 @@
 import { saveMemberAvatarUrl } from "@/app/actions/media";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useSupabase } from "@/components/providers/supabase-provider";
 import { clientUploadAvatar } from "@/lib/upload/client-media";
-import { createClient } from "@/lib/supabase/client";
 import { Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
@@ -20,6 +20,7 @@ export function AvatarUpload({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const supabase = useSupabase();
   const [pending, startTransition] = useTransition();
   const [url, setUrl] = useState(avatarUrl);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +40,6 @@ export function AvatarUpload({
             setError(null);
             startTransition(async () => {
               try {
-                const supabase = createClient();
                 const {
                   data: { user },
                 } = await supabase.auth.getUser();
