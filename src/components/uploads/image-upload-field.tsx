@@ -1,14 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { SafeMediaImage } from "@/components/ui/safe-media-image";
 import { cn } from "@/lib/utils";
 import { ImagePlus, Trash2, Upload } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useRef, useState, useTransition } from "react";
-
-function isBlobUrl(url: string) {
-  return url.startsWith("blob:");
-}
 
 function formatUploadError(err: unknown) {
   if (err instanceof Error) {
@@ -92,23 +88,12 @@ export function ImageUploadField({
       <div className="flex flex-wrap items-start gap-3">
         {displayUrl ? (
           <div className={frameClass}>
-            {isBlobUrl(displayUrl) ? (
-              // next/image не поддерживает blob: — ломает страницу при выборе файла
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={displayUrl}
-                alt={label || "preview"}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <Image
-                src={displayUrl}
-                alt={label || "preview"}
-                fill
-                unoptimized
-                className="object-cover"
-              />
-            )}
+            <SafeMediaImage
+              src={displayUrl}
+              alt={label || "preview"}
+              fill
+              className="object-cover"
+            />
           </div>
         ) : (
           <div className={placeholderClass}>

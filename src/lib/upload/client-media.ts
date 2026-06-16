@@ -13,9 +13,14 @@ async function prepareForUpload(file: File): Promise<File> {
   return prepareImageFile(file);
 }
 
-async function uploadViaServer<T extends (bandId: string, formData: FormData) => Promise<{ publicUrl?: string; error?: string }>>(
-  uploadAction: T,
+async function uploadViaServer(
+  uploadAction: (
+    id: string,
+    bandSlug: string,
+    formData: FormData
+  ) => Promise<{ publicUrl?: string; error?: string }>,
   id: string,
+  bandSlug: string,
   file: File
 ) {
   const validation = validateImageFile(file);
@@ -25,7 +30,7 @@ async function uploadViaServer<T extends (bandId: string, formData: FormData) =>
     const prepared = await prepareForUpload(file);
     const formData = new FormData();
     formData.append("file", prepared, prepared.name);
-    return await uploadAction(id, formData);
+    return await uploadAction(id, bandSlug, formData);
   } catch (err) {
     return {
       error:
@@ -34,12 +39,20 @@ async function uploadViaServer<T extends (bandId: string, formData: FormData) =>
   }
 }
 
-export async function clientUploadBandLogo(bandId: string, file: File) {
-  return uploadViaServer(uploadBandLogoFile, bandId, file);
+export async function clientUploadBandLogo(
+  bandId: string,
+  bandSlug: string,
+  file: File
+) {
+  return uploadViaServer(uploadBandLogoFile, bandId, bandSlug, file);
 }
 
-export async function clientUploadBandPhoto(bandId: string, file: File) {
-  return uploadViaServer(uploadBandPhotoFile, bandId, file);
+export async function clientUploadBandPhoto(
+  bandId: string,
+  bandSlug: string,
+  file: File
+) {
+  return uploadViaServer(uploadBandPhotoFile, bandId, bandSlug, file);
 }
 
 export async function clientUploadAvatar(userId: string, file: File) {

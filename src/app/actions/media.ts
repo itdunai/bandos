@@ -2,8 +2,11 @@
 
 import { tryBandPermission } from "@/lib/band/assert-access";
 import { bandPath } from "@/lib/paths";
-import { deleteLocalMediaUrl } from "@/lib/upload/local-storage";
 import { createClient } from "@/lib/supabase/server";
+import {
+  deleteMediaByUrl,
+  stripCacheParam,
+} from "@/lib/upload/supabase-storage";
 import { revalidatePath } from "next/cache";
 
 function normalizePhotos(value: unknown): string[] {
@@ -13,41 +16,9 @@ function normalizePhotos(value: unknown): string[] {
   return [];
 }
 
-function stripCacheParam(url: string) {
-  return url.split("?")[0] ?? url;
-}
-
-export async function saveBandLogoUrl(
-  bandId: string,
-  bandSlug: string,
-  logoUrl: string
-): Promise<{ error?: string; url?: string }> {
-  const access = await tryBandPermission(bandId, "band_profile");
-  if ("error" in access) return { error: access.error };
-
-  const { supabase } = access.auth;
-  const cleanUrl = stripCacheParam(logoUrl);
-
-  const { data: band } = await supabase
-    .from("bands")
-    .select("logo_url")
-    .eq("id", bandId)
-    .single();
-
-  const { error } = await supabase
-    .from("bands")
-    .update({ logo_url: cleanUrl })
-    .eq("id", bandId);
-
-  if (error) return { error: error.message };
-
-  if (band?.logo_url && band.logo_url !== cleanUrl) {
-    await deleteLocalMediaUrl(band.logo_url);
-  }
-
+function revalidateBandMedia(bandSlug: string) {
   revalidatePath(bandPath(bandSlug));
   revalidatePath(`/rider/${bandSlug}`);
-  return { url: cleanUrl };
 }
 
 export async function removeBandLogo(
@@ -73,47 +44,11 @@ export async function removeBandLogo(
   if (error) return { error: error.message };
 
   if (band?.logo_url) {
-    await deleteLocalMediaUrl(band.logo_url);
+    await deleteMediaByUrl(supabase, band.logo_url);
   }
 
-  revalidatePath(bandPath(bandSlug));
-  revalidatePath(`/rider/${bandSlug}`);
+  revalidateBandMedia(bandSlug);
   return {};
-}
-
-export async function saveBandPhotoUrl(
-  bandId: string,
-  bandSlug: string,
-  photoUrl: string
-): Promise<{ error?: string; url?: string }> {
-  const access = await tryBandPermission(bandId, "band_profile");
-  if ("error" in access) return { error: access.error };
-
-  const { supabase } = access.auth;
-  const cleanUrl = stripCacheParam(photoUrl);
-
-  const { data: band, error: readError } = await supabase
-    .from("bands")
-    .select("photos")
-    .eq("id", bandId)
-    .single();
-
-  if (readError) return { error: readError.message };
-
-  const photos = normalizePhotos(band?.photos);
-  if (photos.length >= 12) return { error: "Максимум 12 фото" };
-  if (photos.includes(cleanUrl)) return { url: cleanUrl };
-
-  const { error } = await supabase
-    .from("bands")
-    .update({ photos: [...photos, cleanUrl] })
-    .eq("id", bandId);
-
-  if (error) return { error: error.message };
-
-  revalidatePath(bandPath(bandSlug));
-  revalidatePath(`/rider/${bandSlug}`);
-  return { url: cleanUrl };
 }
 
 export async function removeBandPhoto(
@@ -135,7 +70,9 @@ export async function removeBandPhoto(
 
   if (readError) return { error: readError.message };
 
-  const photos = normalizePhotos(band?.photos).filter((url) => url !== cleanUrl);
+  const photos = normalizePhotos(band?.photos).filter(
+    (url) => stripCacheParam(url) !== cleanUrl
+  );
 
   const { error } = await supabase
     .from("bands")
@@ -144,41 +81,8 @@ export async function removeBandPhoto(
 
   if (error) return { error: error.message };
 
-  await deleteLocalMediaUrl(cleanUrl);
+  await deleteMediaByUrl(supabase, cleanUrl);
 
-  revalidatePath(bandPath(bandSlug));
-  revalidatePath(`/rider/${bandSlug}`);
+  revalidateBandMedia(bandSlug);
   return {};
-}
-
-export async function saveMemberAvatarUrl(
-  avatarUrl: string
-): Promise<{ error?: string; url?: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Не авторизован" };
-
-  const cleanUrl = stripCacheParam(avatarUrl);
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("avatar_url")
-    .eq("id", user.id)
-    .single();
-
-  const { error } = await supabase
-    .from("profiles")
-    .update({ avatar_url: cleanUrl })
-    .eq("id", user.id);
-
-  if (error) return { error: error.message };
-
-  if (profile?.avatar_url && profile.avatar_url !== cleanUrl) {
-    await deleteLocalMediaUrl(profile.avatar_url);
-  }
-
-  revalidatePath("/", "layout");
-  return { url: cleanUrl };
 }

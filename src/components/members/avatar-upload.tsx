@@ -1,6 +1,5 @@
 "use client";
 
-import { saveMemberAvatarUrl } from "@/app/actions/media";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { clientUploadAvatar } from "@/lib/upload/client-media";
@@ -36,19 +35,12 @@ export function AvatarUpload({
             setError(null);
             startTransition(async () => {
               try {
-                const uploaded = await clientUploadAvatar(userId, file);
-                if (uploaded.error || !uploaded.publicUrl) {
-                  setError(uploaded.error ?? "Ошибка загрузки");
+                const result = await clientUploadAvatar(userId, file);
+                if (result.error || !result.publicUrl) {
+                  setError(result.error ?? "Ошибка загрузки");
                   return;
                 }
-
-                const saved = await saveMemberAvatarUrl(uploaded.publicUrl);
-                if (saved.error) {
-                  setError(saved.error);
-                  return;
-                }
-
-                setUrl(saved.url ?? uploaded.publicUrl);
+                setUrl(result.publicUrl);
               } catch (err) {
                 setError(
                   err instanceof Error

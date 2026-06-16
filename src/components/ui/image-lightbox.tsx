@@ -1,8 +1,9 @@
 "use client";
 
+import { SafeMediaImage } from "@/components/ui/safe-media-image";
 import { cn } from "@/lib/utils";
+import { stripCacheParam } from "@/lib/upload/media-url";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
 export function ImageLightbox({
@@ -93,14 +94,12 @@ export function ImageLightbox({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative aspect-[4/3] w-full sm:aspect-auto sm:h-[min(85vh,720px)]">
-          <Image
+          <SafeMediaImage
             src={images[index]}
             alt=""
             fill
-            unoptimized
-            className="object-contain"
-            sizes="(max-width: 768px) 100vw, 896px"
             priority
+            className="object-contain"
           />
         </div>
         {images.length > 1 && (
@@ -135,7 +134,7 @@ export function PhotoGrid({
     >
       {photos.map((url, i) => (
         <button
-          key={url}
+          key={stripCacheParam(url)}
           type="button"
           onClick={() => onPhotoClick?.(i)}
           className={cn(
@@ -144,13 +143,12 @@ export function PhotoGrid({
             tileClassName
           )}
         >
-          <Image
+          <SafeMediaImage
             src={url}
             alt=""
             fill
-            unoptimized
-            className="object-cover"
             sizes="120px"
+            className="object-cover"
           />
         </button>
       ))}

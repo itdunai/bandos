@@ -1,3 +1,5 @@
+export const BAND_MEDIA_BUCKET = "band-media";
+
 const ALLOWED_IMAGE_TYPES = new Set([
   "image/jpeg",
   "image/jpg",

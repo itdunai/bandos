@@ -3,18 +3,17 @@
 import {
   removeBandLogo,
   removeBandPhoto,
-  saveBandLogoUrl,
-  saveBandPhotoUrl,
 } from "@/app/actions/media";
 import { ImageUploadField } from "@/components/uploads/image-upload-field";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
-import { Trash2 } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState, useTransition } from "react";
+import { SafeMediaImage } from "@/components/ui/safe-media-image";
 import {
   clientUploadBandLogo,
   clientUploadBandPhoto,
 } from "@/lib/upload/client-media";
+import { stripCacheParam } from "@/lib/upload/media-url";
+import { Trash2 } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
 
 export function BandMediaSection({
   bandId,
@@ -46,24 +45,15 @@ export function BandMediaSection({
 
       <ImageUploadField
         label="Логотип"
-        hint="JPEG, PNG, WebP или GIF до 5 МБ — перед загрузкой сжимается в WebP"
+        hint="JPEG, PNG, WebP или GIF до 5 МБ — сжимается и сохраняется в Supabase Storage"
         currentUrl={localLogoUrl}
         onUpload={async (file) => {
-          const uploaded = await clientUploadBandLogo(bandId, file);
-          if (uploaded.error || !uploaded.publicUrl) {
-            return { error: uploaded.error ?? "Ошибка загрузки в хранилище" };
+          const result = await clientUploadBandLogo(bandId, bandSlug, file);
+          if (result.error || !result.publicUrl) {
+            return { error: result.error ?? "Ошибка загрузки" };
           }
-
-          const saved = await saveBandLogoUrl(
-            bandId,
-            bandSlug,
-            uploaded.publicUrl
-          );
-          if (saved.error) return { error: saved.error };
-
-          const url = saved.url ?? uploaded.publicUrl;
-          setLocalLogoUrl(url);
-          return { url };
+          setLocalLogoUrl(result.publicUrl);
+          return { url: result.publicUrl };
         }}
         onRemove={async () => {
           const result = await removeBandLogo(bandId, bandSlug);
@@ -83,7 +73,7 @@ export function BandMediaSection({
           <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 lg:grid-cols-8">
             {localPhotos.map((url, index) => (
               <div
-                key={url}
+                key={stripCacheParam(url)}
                 className="group relative aspect-square overflow-hidden rounded-md border border-border"
               >
                 <button
@@ -92,13 +82,12 @@ export function BandMediaSection({
                   className="absolute inset-0 cursor-zoom-in"
                   aria-label="Открыть фото"
                 >
-                  <Image
+                  <SafeMediaImage
                     src={url}
                     alt=""
                     fill
-                    unoptimized
-                    className="object-cover"
                     sizes="80px"
+                    className="object-cover"
                   />
                 </button>
                 <button
@@ -108,7 +97,9 @@ export function BandMediaSection({
                     startTransition(async () => {
                       const result = await removeBandPhoto(bandId, bandSlug, url);
                       if (!result.error) {
-                        setLocalPhotos((prev) => prev.filter((item) => item !== url));
+                        setLocalPhotos((prev) =>
+                          prev.filter((item) => stripCacheParam(item) !== stripCacheParam(url))
+                        );
                       }
                     });
                   }}
@@ -126,22 +117,16 @@ export function BandMediaSection({
           label=""
           currentUrl={null}
           onUpload={async (file) => {
-            const uploaded = await clientUploadBandPhoto(bandId, file);
-            if (uploaded.error || !uploaded.publicUrl) {
-              return { error: uploaded.error ?? "Ошибка загрузки в хранилище" };
+            const result = await clientUploadBandPhoto(bandId, bandSlug, file);
+            if (result.error || !result.publicUrl) {
+              return { error: result.error ?? "Ошибка загрузки" };
             }
-
-            const saved = await saveBandPhotoUrl(
-              bandId,
-              bandSlug,
-              uploaded.publicUrl
-            );
-            if (saved.error) return { error: saved.error };
-
-            const url = saved.url ?? uploaded.publicUrl;
-            setLocalPhotos((prev) =>
-              prev.includes(url) ? prev : [...prev, url]
-            );
+            const url = result.publicUrl;
+            setLocalPhotos((prev) => {
+              const clean = stripCacheParam(url);
+              if (prev.some((item) => stripCacheParam(item) === clean)) return prev;
+              return [...prev, url];
+            });
             return { url };
           }}
           aspect="square"

@@ -1,11 +1,11 @@
 import { ShareLinkButton } from "@/components/band/share-link-button";
-import { FormattedText } from "@/components/ui/minimal-editor";
 import { PhotoGallery } from "@/components/ui/image-lightbox";
+import { FormattedText } from "@/components/ui/minimal-editor";
+import { SafeMediaImage } from "@/components/ui/safe-media-image";
 import { sanitizeHref } from "@/lib/safe-url";
 import type { Band, SocialLinks } from "@/types/database";
 import { SOCIAL_LABELS } from "@/types/database";
 import { ExternalLink, MapPin, Music, Users } from "lucide-react";
-import Image from "next/image";
 
 export function BandProfileView({
   band,
@@ -31,11 +31,10 @@ export function BandProfileView({
         <div className="flex items-start gap-4">
           {band.logo_url ? (
             <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-border">
-              <Image
+              <SafeMediaImage
                 src={band.logo_url}
                 alt={band.name}
                 fill
-                unoptimized
                 className="object-cover"
               />
             </div>

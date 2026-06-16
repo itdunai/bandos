@@ -3,6 +3,7 @@ import {
   bandLogoStoragePath,
   bandPhotoStoragePath,
 } from "@/lib/storage";
+import { isLocalMediaUrl } from "@/lib/upload/media-url";
 import { mkdir, readFile, unlink, writeFile } from "fs/promises";
 import path from "path";
 
@@ -13,10 +14,6 @@ export function getUploadRoot() {
   return configured
     ? path.resolve(configured)
     : path.join(process.cwd(), "data", "uploads");
-}
-
-export function isLocalMediaUrl(url: string) {
-  return url.startsWith(PUBLIC_PREFIX);
 }
 
 export function publicUrlForStoragePath(storagePath: string) {

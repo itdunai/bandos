@@ -1,14 +1,21 @@
 "use server";
 
 import { tryBandPermission } from "@/lib/band/assert-access";
+import { bandPath } from "@/lib/paths";
+import {
+  avatarStoragePath,
+  bandLogoStoragePath,
+  bandPhotoStoragePath,
+  validateImageFile,
+} from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import {
-  avatarPath,
-  bandLogoPath,
-  bandPhotoPath,
-  writeLocalMedia,
-} from "@/lib/upload/local-storage";
-import { validateImageFile } from "@/lib/storage";
+  deleteMediaByUrl,
+  displayUrlWithCacheBust,
+  stripCacheParam,
+  uploadBandMedia,
+} from "@/lib/upload/supabase-storage";
+import { revalidatePath } from "next/cache";
 
 function fileFromFormData(formData: FormData): File | null {
   const file = formData.get("file");
@@ -16,8 +23,29 @@ function fileFromFormData(formData: FormData): File | null {
   return file;
 }
 
+function contentTypeForFile(file: File) {
+  return file.type === "image/gif" ? "image/gif" : "image/webp";
+}
+
+function extensionForFile(file: File) {
+  return file.type === "image/gif" ? "gif" : "webp";
+}
+
+function normalizePhotos(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+  return [];
+}
+
+function revalidateBandMedia(bandSlug: string) {
+  revalidatePath(bandPath(bandSlug));
+  revalidatePath(`/rider/${bandSlug}`);
+}
+
 export async function uploadBandLogoFile(
   bandId: string,
+  bandSlug: string,
   formData: FormData
 ): Promise<{ publicUrl?: string; error?: string }> {
   const access = await tryBandPermission(bandId, "band_profile");
@@ -29,16 +57,48 @@ export async function uploadBandLogoFile(
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
 
+  const { supabase } = access.auth;
   const buffer = Buffer.from(await file.arrayBuffer());
-  const ext = file.type === "image/gif" ? "gif" : "webp";
+  const ext = extensionForFile(file);
+  const storagePath = bandLogoStoragePath(bandId, ext);
 
-  const saved = await writeLocalMedia(bandLogoPath(bandId, ext), buffer);
-  if ("error" in saved) return saved;
-  return { publicUrl: saved.publicUrl };
+  const { data: band } = await supabase
+    .from("bands")
+    .select("logo_url")
+    .eq("id", bandId)
+    .single();
+
+  const uploaded = await uploadBandMedia(
+    supabase,
+    storagePath,
+    buffer,
+    contentTypeForFile(file),
+    true
+  );
+  if ("error" in uploaded) return uploaded;
+
+  const cleanUrl = stripCacheParam(uploaded.publicUrl);
+  const { error } = await supabase
+    .from("bands")
+    .update({ logo_url: cleanUrl })
+    .eq("id", bandId);
+
+  if (error) {
+    await deleteMediaByUrl(supabase, cleanUrl);
+    return { error: error.message };
+  }
+
+  if (band?.logo_url && stripCacheParam(band.logo_url) !== cleanUrl) {
+    await deleteMediaByUrl(supabase, band.logo_url);
+  }
+
+  revalidateBandMedia(bandSlug);
+  return { publicUrl: displayUrlWithCacheBust(cleanUrl) };
 }
 
 export async function uploadBandPhotoFile(
   bandId: string,
+  bandSlug: string,
   formData: FormData
 ): Promise<{ publicUrl?: string; error?: string }> {
   const access = await tryBandPermission(bandId, "band_profile");
@@ -50,12 +110,48 @@ export async function uploadBandPhotoFile(
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const ext = file.type === "image/gif" ? "gif" : "webp";
+  const { supabase } = access.auth;
+  const { data: band, error: readError } = await supabase
+    .from("bands")
+    .select("photos")
+    .eq("id", bandId)
+    .single();
 
-  const saved = await writeLocalMedia(bandPhotoPath(bandId, ext), buffer);
-  if ("error" in saved) return saved;
-  return { publicUrl: saved.publicUrl };
+  if (readError) return { error: readError.message };
+
+  const photos = normalizePhotos(band?.photos);
+  if (photos.length >= 12) return { error: "Максимум 12 фото" };
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const ext = extensionForFile(file);
+  const storagePath = bandPhotoStoragePath(bandId, ext);
+
+  const uploaded = await uploadBandMedia(
+    supabase,
+    storagePath,
+    buffer,
+    contentTypeForFile(file),
+    false
+  );
+  if ("error" in uploaded) return uploaded;
+
+  const cleanUrl = stripCacheParam(uploaded.publicUrl);
+  if (photos.includes(cleanUrl)) {
+    return { publicUrl: displayUrlWithCacheBust(cleanUrl) };
+  }
+
+  const { error } = await supabase
+    .from("bands")
+    .update({ photos: [...photos, cleanUrl] })
+    .eq("id", bandId);
+
+  if (error) {
+    await deleteMediaByUrl(supabase, cleanUrl);
+    return { error: error.message };
+  }
+
+  revalidateBandMedia(bandSlug);
+  return { publicUrl: displayUrlWithCacheBust(cleanUrl) };
 }
 
 export async function uploadAvatarFile(
@@ -77,10 +173,40 @@ export async function uploadAvatarFile(
   const validation = validateImageFile(file);
   if (validation) return { error: validation };
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const ext = file.type === "image/gif" ? "gif" : "webp";
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("avatar_url")
+    .eq("id", userId)
+    .single();
 
-  const saved = await writeLocalMedia(avatarPath(userId, ext), buffer);
-  if ("error" in saved) return saved;
-  return { publicUrl: saved.publicUrl };
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const ext = extensionForFile(file);
+  const storagePath = avatarStoragePath(userId, ext);
+
+  const uploaded = await uploadBandMedia(
+    supabase,
+    storagePath,
+    buffer,
+    contentTypeForFile(file),
+    true
+  );
+  if ("error" in uploaded) return uploaded;
+
+  const cleanUrl = stripCacheParam(uploaded.publicUrl);
+  const { error } = await supabase
+    .from("profiles")
+    .update({ avatar_url: cleanUrl })
+    .eq("id", userId);
+
+  if (error) {
+    await deleteMediaByUrl(supabase, cleanUrl);
+    return { error: error.message };
+  }
+
+  if (profile?.avatar_url && stripCacheParam(profile.avatar_url) !== cleanUrl) {
+    await deleteMediaByUrl(supabase, profile.avatar_url);
+  }
+
+  revalidatePath("/", "layout");
+  return { publicUrl: displayUrlWithCacheBust(cleanUrl) };
 }

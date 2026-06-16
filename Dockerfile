@@ -33,12 +33,9 @@ ARG NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
-ENV UPLOAD_DIR=/app/data/uploads
 
 RUN groupadd --gid 1001 nodejs \
-  && useradd --uid 1001 --gid nodejs --system nodejs \
-  && mkdir -p /app/data/uploads \
-  && chown -R nodejs:nodejs /app/data/uploads
+  && useradd --uid 1001 --gid nodejs --system nodejs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nodejs:nodejs /app/.next/standalone ./

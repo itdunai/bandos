@@ -1,11 +1,11 @@
 import { ScrollToHash } from "@/components/band/scroll-to-hash";
 import { PhotoGallery } from "@/components/ui/image-lightbox";
 import { FormattedText } from "@/components/ui/minimal-editor";
+import { SafeMediaImage } from "@/components/ui/safe-media-image";
 import { sanitizeHref } from "@/lib/safe-url";
 import { formatDuration } from "@/lib/utils";
 import { SOCIAL_LABELS, SONG_TYPE_LABELS, type SocialLinks, type SongType } from "@/types/database";
 import { ExternalLink, Guitar, ListMusic, MapPin, Music, Users } from "lucide-react";
-import Image from "next/image";
 
 interface PublicSong {
   title: string;
@@ -46,11 +46,10 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
         <div className="mb-8 flex items-center gap-3">
           {band.logo_url ? (
             <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
-              <Image
+              <SafeMediaImage
                 src={band.logo_url}
                 alt={band.name}
                 fill
-                unoptimized
                 className="object-cover"
               />
             </div>

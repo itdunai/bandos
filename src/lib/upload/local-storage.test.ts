@@ -4,7 +4,6 @@ import path from "path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   deleteLocalMediaUrl,
-  isLocalMediaUrl,
   publicUrlForStoragePath,
   readLocalMediaFile,
   writeLocalMedia,
@@ -20,13 +19,6 @@ beforeEach(async () => {
 afterEach(async () => {
   delete process.env.UPLOAD_DIR;
   await rm(tempDir, { recursive: true, force: true });
-});
-
-describe("isLocalMediaUrl", () => {
-  it("detects /media/ prefix", () => {
-    expect(isLocalMediaUrl("/media/bands/x/logo.webp")).toBe(true);
-    expect(isLocalMediaUrl("https://example.com/x")).toBe(false);
-  });
 });
 
 describe("publicUrlForStoragePath", () => {

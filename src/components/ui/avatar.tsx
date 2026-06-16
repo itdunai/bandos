@@ -1,5 +1,5 @@
+import { SafeMediaImage } from "@/components/ui/safe-media-image";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 
 export function Avatar({
   name,
@@ -28,14 +28,19 @@ export function Avatar({
 
   if (src) {
     return (
-      <Image
-        src={src}
-        alt={name}
-        width={48}
-        height={48}
-        unoptimized
-        className={cn("rounded-full object-cover", className)}
-      />
+      <div
+        className={cn(
+          "relative h-12 w-12 shrink-0 overflow-hidden rounded-full",
+          className
+        )}
+      >
+        <SafeMediaImage
+          src={src}
+          alt={name}
+          fill
+          className="object-cover"
+        />
+      </div>
     );
   }
 
