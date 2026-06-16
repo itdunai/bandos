@@ -20,8 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BandOS",
-  description: "Единое пространство для музыкальной группы",
+  title: "BandOS — всё для музыкальной группы в одном месте",
+  description:
+    "Репертуар, сет-листы, режим «Играем», график, финансы и публичная страница для заказчиков. Бесплатно для кавер- и авторских групп.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
