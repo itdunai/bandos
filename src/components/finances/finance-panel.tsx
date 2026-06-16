@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FinanceChart } from "@/components/finances/finance-chart";
+import { Modal } from "@/components/ui/modal";
 import {
   buildFinanceCsv,
   computeFinanceSummary,
@@ -29,6 +30,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
+import { cn } from "@/lib/utils";
 
 interface PerformanceOption {
   id: string;
@@ -70,6 +72,7 @@ export function FinancePanel({
   const [activeForm, setActiveForm] = useState<"income" | "expense" | null>(
     null
   );
+  const [openingBalanceOpen, setOpeningBalanceOpen] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState("");
 
   const selectedPerformance = performances.find((p) => p.id === selectedEventId);
@@ -81,6 +84,7 @@ export function FinancePanel({
     startTransition(async () => {
       const result = await setOpeningBalance(bandId, bandSlug, formData);
       if (result.error) setError(result.error);
+      else setOpeningBalanceOpen(false);
     });
   }
 
@@ -136,13 +140,22 @@ export function FinancePanel({
             {formatMoney(summary.balance)}
           </div>
         </Card>
-        <Card className="p-4">
+        <Card
+          className={cn(
+            "p-4",
+            isAdmin && "cursor-pointer transition-colors hover:border-accent/50"
+          )}
+          onClick={isAdmin ? () => setOpeningBalanceOpen(true) : undefined}
+        >
           <div className="text-xs uppercase tracking-wider text-text-muted">
             Стартовый баланс
           </div>
           <div className="mt-1 text-xl font-medium">
             {formatMoney(summary.openingBalance)}
           </div>
+          {isAdmin && (
+            <p className="mt-1 text-[10px] text-text-muted">Нажмите, чтобы изменить</p>
+          )}
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-1 text-xs uppercase tracking-wider text-text-muted">
@@ -202,30 +215,37 @@ export function FinancePanel({
       <FinanceChart data={chartData} />
 
       {isAdmin && (
-        <Card className="p-4">
-          <h3 className="mb-3 text-sm font-medium">Стартовый баланс</h3>
+        <Modal
+          open={openingBalanceOpen}
+          onClose={() => setOpeningBalanceOpen(false)}
+          title="Стартовый баланс"
+        >
           <p className="mb-3 text-xs text-text-secondary">
             Начальная сумма на счёте группы до учёта операций в BandOS.
           </p>
-          <form
-            onSubmit={handleOpeningBalance}
-            className="flex flex-wrap items-end gap-2"
-          >
-            <div className="min-w-[160px] flex-1">
-              <Input
-                name="opening_balance"
-                type="number"
-                min={0}
-                step="0.01"
-                defaultValue={openingBalance}
-                required
-              />
+          <form onSubmit={handleOpeningBalance} className="space-y-3">
+            <Input
+              name="opening_balance"
+              type="number"
+              min={0}
+              step="0.01"
+              defaultValue={openingBalance}
+              required
+            />
+            <div className="flex gap-2">
+              <Button type="submit" variant="accent" loading={pending} disabled={pending}>
+                {pending ? "Сохранение…" : "Сохранить"}
+              </Button>
+              <Button
+                type="button"
+                disabled={pending}
+                onClick={() => setOpeningBalanceOpen(false)}
+              >
+                Отмена
+              </Button>
             </div>
-            <Button type="submit" variant="accent" loading={pending} disabled={pending}>
-              {pending ? "Сохранение…" : "Сохранить"}
-            </Button>
           </form>
-        </Card>
+        </Modal>
       )}
 
       {isAdmin && (

@@ -45,6 +45,7 @@ export function BandHomeShell({
     photos: Array.isArray(band.photos) ? band.photos : [],
     description: band.description ?? null,
     genre: band.genre ?? null,
+    city: band.city ?? null,
     tech_rider: band.tech_rider ?? null,
     rider_public: band.rider_public ?? true,
     social_links: band.social_links ?? {},

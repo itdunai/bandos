@@ -1,8 +1,10 @@
 import { ScrollToHash } from "@/components/band/scroll-to-hash";
+import { PhotoGallery } from "@/components/ui/image-lightbox";
+import { FormattedText } from "@/components/ui/minimal-editor";
 import { sanitizeHref } from "@/lib/safe-url";
 import { formatDuration } from "@/lib/utils";
 import { SOCIAL_LABELS, SONG_TYPE_LABELS, type SocialLinks, type SongType } from "@/types/database";
-import { ExternalLink, Guitar, ListMusic, Music, Users } from "lucide-react";
+import { ExternalLink, Guitar, ListMusic, MapPin, Music, Users } from "lucide-react";
 import Image from "next/image";
 
 interface PublicSong {
@@ -16,6 +18,7 @@ export interface PublicBandPageData {
   slug: string;
   description: string | null;
   genre: string | null;
+  city: string | null;
   logo_url: string | null;
   photos: string[];
   rider_public: boolean;
@@ -65,7 +68,14 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
         </div>
 
         {band.genre && (
-          <p className="mb-4 text-sm text-accent">{band.genre}</p>
+          <p className="mb-2 text-sm text-accent">{band.genre}</p>
+        )}
+
+        {band.city && (
+          <p className="mb-4 flex items-center gap-1.5 text-sm text-text-secondary">
+            <MapPin className="h-3.5 w-3.5" />
+            {band.city}
+          </p>
         )}
 
         {showRider && band.description && (
@@ -86,21 +96,8 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
         </div>
 
         {photos.length > 0 && (
-          <div className="mb-8 grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {photos.map((url) => (
-              <div
-                key={url}
-                className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border"
-              >
-                <Image
-                  src={url}
-                  alt=""
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-              </div>
-            ))}
+          <div className="mb-8">
+            <PhotoGallery photos={photos} title="Фото" />
           </div>
         )}
 
@@ -111,9 +108,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
             </h2>
             {band.tech_rider ? (
               <div className="rounded-xl border border-border bg-bg-2 p-5">
-                <pre className="font-sans text-sm leading-relaxed whitespace-pre-wrap text-text-primary">
-                  {band.tech_rider}
-                </pre>
+                <FormattedText text={band.tech_rider} />
               </div>
             ) : (
               <p className="text-sm text-text-muted">Техрайдер пока не заполнен.</p>

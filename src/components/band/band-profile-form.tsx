@@ -5,8 +5,8 @@ import { BandMediaSection } from "@/components/band/band-media-section";
 import { ShareLinkButton } from "@/components/band/share-link-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MinimalEditor } from "@/components/ui/minimal-editor";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { Textarea } from "@/components/ui/textarea";
 import type { Band, SocialLinks } from "@/types/database";
 import { SOCIAL_LABELS } from "@/types/database";
 
@@ -42,17 +42,24 @@ export function BandProfileForm({
           <Label>Название</Label>
           <Input name="name" required defaultValue={band.name} />
         </div>
-        <div>
-          <Label>Жанр</Label>
-          <Input name="genre" defaultValue={band.genre ?? ""} placeholder="Alt-rock, indie..." />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <Label>Жанр</Label>
+            <Input name="genre" defaultValue={band.genre ?? ""} placeholder="Alt-rock, indie..." />
+          </div>
+          <div>
+            <Label>Город</Label>
+            <Input name="city" defaultValue={band.city ?? ""} placeholder="Москва" />
+          </div>
         </div>
         <div>
           <Label>Описание</Label>
-          <Textarea
+          <textarea
             name="description"
             rows={4}
             defaultValue={band.description ?? ""}
             placeholder="Кто вы, откуда, как звучите..."
+            className="w-full rounded-lg border border-border bg-bg-3 px-3 py-2 text-sm outline-none focus:border-accent"
           />
         </div>
         <div className="grid grid-cols-2 gap-3 text-sm">
@@ -72,12 +79,10 @@ export function BandProfileForm({
           <h2 className="text-sm font-medium">Техрайдер</h2>
           <ShareLinkButton path={riderSharePath} label="Поделиться" />
         </div>
-        <Textarea
+        <MinimalEditor
           name="tech_rider"
-          rows={8}
           defaultValue={band.tech_rider ?? ""}
           placeholder={"Барабанная установка: ...\nГитарный комбик: ...\nМониторы: 4 шт.\n..."}
-          className="font-mono text-xs"
         />
         <label className="flex items-center gap-2 text-xs text-text-secondary">
           <input

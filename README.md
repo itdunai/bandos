@@ -31,6 +31,10 @@
    - `supabase/migrations/013_member_permissions.sql`
    - `supabase/migrations/014_finances.sql`
    - `supabase/migrations/015_finances_view_permission.sql`
+   - `supabase/migrations/016_band_media.sql` — лого/фото группы, публичная страница
+   - `supabase/migrations/017_administrator_preset.sql` — пресет «Администратор»
+   - `supabase/migrations/018_drop_unused_band_media_storage.sql` — если раньше применяли 016 со Storage
+   - `supabase/migrations/019_band_city.sql` — поле «Город» группы
 3. **Authentication → Providers → Email** — включите Email
 4. Для локальной разработки отключите «Confirm email» (или подтверждайте вручную)
 5. **Authentication → URL Configuration**:
@@ -44,6 +48,14 @@ cp .env.local.example .env.local
 ```
 
 Заполните `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`.
+
+Опционально для картинок (лого, фото, аватары):
+
+```env
+# UPLOAD_DIR=./data/uploads   # по умолчанию data/uploads в корне проекта
+```
+
+Файлы сохраняются на диск приложения и отдаются по URL `/media/...`. В Docker задано `UPLOAD_DIR=/app/data/uploads`.
 
 ### 3. Запуск
 
@@ -87,7 +99,17 @@ npm run dev
 | `/rider/{slug}` | Публичная страница (профиль, райдер, репертуар) |
 | `/repertoire/{slug}` | То же (старые ссылки) |
 
-## E2E-тесты
+## Тесты
+
+### Unit (Vitest)
+
+```bash
+npm run test
+```
+
+Покрытие критичной логики без БД: права участников, расчёт финансов, безопасность путей загрузки.
+
+### E2E (Playwright)
 
 ```bash
 npx playwright install chromium
@@ -105,7 +127,9 @@ E2E_EMAIL=user@example.com E2E_PASSWORD=secret E2E_BAND_SLUG=gorizont npm run te
 2. **Права (013):** музыкант не редактирует треки; менеджер — график и дела.
 3. **Финансы (014–015):** admin задаёт баланс, добавляет расход; менеджер видит, музыкант — нет (без права `finances`).
 4. **Гонорар:** концерт с fee → «Учесть в финансах» на форме или в графике.
-5. **PWA:** в Chrome → «Установить приложение»; режим «Играем» кэшируется для повторного открытия.
+5. **Медиа (016):** загрузка лого/фото на `/{slug}?edit=1`, аватар в `/members`; URL вида `/media/bands/...`.
+6. **Администратор (017):** пресет с полными правами (кроме роли создателя).
+7. **PWA:** в Chrome → «Установить приложение»; режим «Играем» кэшируется для повторного открытия.
 
 ## PWA
 

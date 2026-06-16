@@ -80,24 +80,22 @@ export default async function MembersPage({
       )}
 
       {member && (
-        <Card className="mb-6">
-          <h3 className="mb-3 text-sm font-medium">Мой профиль</h3>
-          <MemberProfileForm
-            member={member}
-            bandSlug={band.slug}
-            avatarUrl={myAvatarUrl}
-          />
-        </Card>
-      )}
+        <div className="mb-6 grid gap-4 lg:grid-cols-2">
+          <Card className="h-full">
+            <h3 className="mb-3 text-sm font-medium">Мой профиль</h3>
+            <MemberProfileForm
+              member={member}
+              bandSlug={band.slug}
+              avatarUrl={myAvatarUrl}
+            />
+          </Card>
 
-      {showInvite && (
-        <div className="mb-6">
-          <InviteForm bandId={band.id} />
+          {showInvite && <InviteForm bandId={band.id} />}
         </div>
       )}
 
       <h3 className="mb-3 text-xs uppercase tracking-wider text-text-muted">Состав</h3>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {members?.map((m, i) => {
           const profile = m.profiles as { avatar_url: string | null } | null;
           const avatarUrl = profile?.avatar_url ?? null;

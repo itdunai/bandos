@@ -8,6 +8,7 @@ import {
   type PermissionPreset,
 } from "@/lib/band/permissions";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const PRESETS = [
   "musician",
@@ -27,28 +28,30 @@ export function PermissionPresetFields({
   defaultPermissions?: BandPermissions;
 }) {
   const presetName = `${namePrefix}permission_preset`;
+  const [preset, setPreset] = useState<PermissionPreset>(defaultPreset);
 
   return (
     <div className="space-y-3">
       <div>
         <p className="mb-2 text-xs text-text-secondary">Группа прав</p>
         <div className="space-y-2">
-          {PRESETS.map((preset) => {
+          {PRESETS.map((value) => {
             const meta =
-              preset === "custom"
+              value === "custom"
                 ? { label: "Свои права", description: "Выбрать разрешения вручную" }
-                : PRESET_META[preset];
+                : PRESET_META[value];
 
             return (
               <label
-                key={preset}
+                key={value}
                 className="flex cursor-pointer gap-2 rounded-lg border border-border bg-bg-3 px-3 py-2 transition-colors has-[:checked]:border-accent/50"
               >
                 <input
                   type="radio"
                   name={presetName}
-                  value={preset}
-                  defaultChecked={defaultPreset === preset}
+                  value={value}
+                  checked={preset === value}
+                  onChange={() => setPreset(value)}
                   className="mt-0.5 accent-accent"
                 />
                 <span className="min-w-0">
@@ -63,29 +66,29 @@ export function PermissionPresetFields({
         </div>
       </div>
 
-      <div className="rounded-lg border border-dashed border-border px-3 py-2">
-        <p className="mb-2 text-[11px] text-text-muted">
-          Для «Свои права» отметьте разрешения:
-        </p>
-        <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-          {BAND_PERMISSIONS.map((key) => (
-            <label
-              key={key}
-              className={cn(
-                "flex items-center gap-2 text-xs text-text-secondary"
-              )}
-            >
-              <input
-                type="checkbox"
-                name={`${namePrefix}perm_${key}`}
-                defaultChecked={defaultPermissions[key] === true}
-                className="accent-accent"
-              />
-              {PERMISSION_LABELS[key]}
-            </label>
-          ))}
+      {preset === "custom" && (
+        <div className="rounded-lg border border-dashed border-border px-3 py-2">
+          <p className="mb-2 text-[11px] text-text-muted">Разрешения:</p>
+          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+            {BAND_PERMISSIONS.map((key) => (
+              <label
+                key={key}
+                className={cn(
+                  "flex items-center gap-2 text-xs text-text-secondary"
+                )}
+              >
+                <input
+                  type="checkbox"
+                  name={`${namePrefix}perm_${key}`}
+                  defaultChecked={defaultPermissions[key] === true}
+                  className="accent-accent"
+                />
+                {PERMISSION_LABELS[key]}
+              </label>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

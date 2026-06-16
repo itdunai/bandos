@@ -32,6 +32,7 @@ export async function updateBandProfile(
   const name = (formData.get("name") as string).trim();
   const description = (formData.get("description") as string).trim() || null;
   const genre = (formData.get("genre") as string).trim() || null;
+  const city = (formData.get("city") as string).trim() || null;
   const techRider = (formData.get("tech_rider") as string).trim() || null;
   const riderPublic = formData.get("rider_public") === "on";
 
@@ -41,6 +42,7 @@ export async function updateBandProfile(
       name,
       description,
       genre,
+      city,
       tech_rider: techRider,
       rider_public: riderPublic,
       social_links: parseSocialLinks(formData),

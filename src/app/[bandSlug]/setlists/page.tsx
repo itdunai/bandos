@@ -1,7 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell";
-import { EmptyState } from "@/components/empty-state";
 import { SetlistList } from "@/components/setlists/setlist-list";
-import { Button } from "@/components/ui/button";
 import {
   getBandBySlug,
   getBandMemberCount,
@@ -9,10 +7,7 @@ import {
 } from "@/lib/band/queries";
 import { sumSetlistDurationSec } from "@/lib/setlist-duration";
 import { createClient } from "@/lib/supabase/server";
-import { ListMusic, Plus } from "lucide-react";
-import Link from "next/link";
 import { hasPermission } from "@/lib/band/permissions";
-import { bandPath } from "@/lib/paths";
 import { notFound } from "next/navigation";
 
 export default async function SetlistsPage({
@@ -65,35 +60,18 @@ export default async function SetlistsPage({
       member={member}
       memberCount={memberCount}
       title="Сет-листы"
-      actions={
-        canEditSetlists ? (
-          <Link href={bandPath(band.slug, "setlists", "new")}>
-            <Button variant="accent">
-              <Plus className="h-3.5 w-3.5" />
-              Создать
-            </Button>
-          </Link>
-        ) : undefined
-      }
     >
-      {!setlists?.length ? (
-        <EmptyState
-          icon={<ListMusic className="h-8 w-8" />}
-          title="Нет сет-листов"
-          description="Соберите порядок треков для концерта или репетиции."
-        />
-      ) : (
-        <SetlistList
-          bandSlug={band.slug}
-          setlists={setlists.map((sl) => ({
-            id: sl.id,
-            name: sl.name,
-            itemCount:
-              (sl.setlist_items as { count: number }[])?.[0]?.count ?? 0,
-            durationSec: durationBySetlist.get(sl.id) ?? 0,
-          }))}
-        />
-      )}
+      <SetlistList
+        bandSlug={band.slug}
+        canCreate={canEditSetlists}
+        setlists={(setlists ?? []).map((sl) => ({
+          id: sl.id,
+          name: sl.name,
+          itemCount:
+            (sl.setlist_items as { count: number }[])?.[0]?.count ?? 0,
+          durationSec: durationBySetlist.get(sl.id) ?? 0,
+        }))}
+      />
     </AppShell>
   );
 }

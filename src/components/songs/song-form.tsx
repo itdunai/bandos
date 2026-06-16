@@ -91,19 +91,23 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
             <Label>Длительность</Label>
             <Input name="duration" defaultValue={formatDurationInput(song?.duration_sec)} placeholder="4:12" />
           </div>
+          {isEdit && (
+            <div>
+              <Label>Жанр</Label>
+              <Input name="genre" defaultValue={song?.genre ?? ""} placeholder="Alt-rock" />
+            </div>
+          )}
+        </div>
+        {isEdit && (
           <div>
-            <Label>Жанр</Label>
-            <Input name="genre" defaultValue={song?.genre ?? ""} placeholder="Alt-rock" />
+            <Label>Структура</Label>
+            <Input
+              name="structure"
+              defaultValue={song?.structure ?? ""}
+              placeholder="Intro → Verse → Chorus → Solo → Outro"
+            />
           </div>
-        </div>
-        <div>
-          <Label>Структура</Label>
-          <Input
-            name="structure"
-            defaultValue={song?.structure ?? ""}
-            placeholder="Intro → Verse → Chorus → Solo → Outro"
-          />
-        </div>
+        )}
         <div>
           <Label>Источник (ссылка)</Label>
           <Input

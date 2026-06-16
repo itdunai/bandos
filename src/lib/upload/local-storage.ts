@@ -24,8 +24,14 @@ export function publicUrlForStoragePath(storagePath: string) {
 }
 
 function resolveSafeAbsolutePath(relativePath: string): string | null {
-  const normalized = path.normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, "");
-  if (normalized.includes("..")) return null;
+  const normalized = path.normalize(relativePath).replace(/\\/g, "/");
+  if (
+    !normalized ||
+    path.isAbsolute(normalized) ||
+    normalized.split("/").some((part) => part === "..")
+  ) {
+    return null;
+  }
 
   const root = path.resolve(getUploadRoot());
   const absolute = path.resolve(root, normalized);

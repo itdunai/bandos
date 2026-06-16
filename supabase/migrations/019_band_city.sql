@@ -1,11 +1,8 @@
--- Логотип и фото группы (файлы на диске приложения, URL /media/...)
--- Supabase Storage не используется.
+-- Город группы
 
 ALTER TABLE public.bands
-  ADD COLUMN IF NOT EXISTS logo_url TEXT,
-  ADD COLUMN IF NOT EXISTS photos JSONB NOT NULL DEFAULT '[]'::jsonb;
+  ADD COLUMN IF NOT EXISTS city TEXT;
 
--- Публичный репертуар: только треки со статусом «Готова»
 CREATE OR REPLACE FUNCTION public.get_public_band_page(p_slug TEXT)
 RETURNS JSON AS $$
   SELECT json_build_object(
@@ -13,6 +10,7 @@ RETURNS JSON AS $$
     'slug', b.slug,
     'description', b.description,
     'genre', b.genre,
+    'city', b.city,
     'logo_url', b.logo_url,
     'photos', COALESCE(b.photos, '[]'::jsonb),
     'rider_public', b.rider_public,
@@ -46,4 +44,32 @@ RETURNS JSON AS $$
   FROM public.bands b
   WHERE b.slug = p_slug
     AND (b.rider_public = true OR COALESCE(b.repertoire_public, false) = true);
+$$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
+
+CREATE OR REPLACE FUNCTION public.get_public_bands_catalog()
+RETURNS JSON AS $$
+  SELECT COALESCE(
+    json_agg(
+      json_build_object(
+        'name', b.name,
+        'slug', b.slug,
+        'description', b.description,
+        'genre', b.genre,
+        'city', b.city,
+        'tracks_count', (
+          SELECT count(*)::int FROM public.songs s WHERE s.band_id = b.id
+        ),
+        'members_count', (
+          SELECT count(*)::int FROM public.band_members m
+          WHERE m.band_id = b.id AND m.is_active = true
+        ),
+        'rider_public', b.rider_public,
+        'repertoire_public', COALESCE(b.repertoire_public, false)
+      )
+      ORDER BY b.name
+    ),
+    '[]'::json
+  )
+  FROM public.bands b
+  WHERE b.rider_public = true OR COALESCE(b.repertoire_public, false) = true;
 $$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;

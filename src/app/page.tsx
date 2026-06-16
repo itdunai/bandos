@@ -11,6 +11,7 @@ interface CatalogBand {
   slug: string;
   description: string | null;
   genre: string | null;
+  city: string | null;
   tracks_count: number;
   members_count: number;
   rider_public: boolean;
@@ -150,6 +151,9 @@ export default async function HomePage() {
                   <h3 className="text-lg font-medium">{band.name}</h3>
                   {band.genre && (
                     <p className="text-xs text-accent">{band.genre}</p>
+                  )}
+                  {band.city && (
+                    <p className="text-xs text-text-muted">{band.city}</p>
                   )}
                 </div>
                 {band.description && (

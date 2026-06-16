@@ -7,6 +7,7 @@ import {
   saveBandPhotoUrl,
 } from "@/app/actions/media";
 import { ImageUploadField } from "@/components/uploads/image-upload-field";
+import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState, useTransition } from "react";
@@ -29,6 +30,7 @@ export function BandMediaSection({
   const [pending, startTransition] = useTransition();
   const [localLogoUrl, setLocalLogoUrl] = useState(logoUrl);
   const [localPhotos, setLocalPhotos] = useState(photos);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   useEffect(() => {
     setLocalLogoUrl(logoUrl);
@@ -74,23 +76,31 @@ export function BandMediaSection({
       <div className="space-y-2 border-t border-border pt-4">
         <div className="text-sm font-medium">Фото группы</div>
         <p className="text-xs text-text-secondary">
-          До 12 фото — показываются на публичной странице
+          До 12 фото — показываются на публичной странице. Нажмите для просмотра.
         </p>
 
         {localPhotos.length > 0 && (
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-            {localPhotos.map((url) => (
+          <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-6 lg:grid-cols-8">
+            {localPhotos.map((url, index) => (
               <div
                 key={url}
-                className="group relative aspect-square overflow-hidden rounded-lg border border-border"
+                className="group relative aspect-square overflow-hidden rounded-md border border-border"
               >
-                <Image
-                  src={url}
-                  alt=""
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
+                <button
+                  type="button"
+                  onClick={() => setLightboxIndex(index)}
+                  className="absolute inset-0 cursor-zoom-in"
+                  aria-label="Открыть фото"
+                >
+                  <Image
+                    src={url}
+                    alt=""
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    sizes="80px"
+                  />
+                </button>
                 <button
                   type="button"
                   disabled={pending}
@@ -102,10 +112,10 @@ export function BandMediaSection({
                       }
                     });
                   }}
-                  className="absolute right-1 top-1 rounded-md bg-bg/80 p-1 text-red opacity-0 transition-opacity group-hover:opacity-100"
+                  className="absolute right-0.5 top-0.5 z-10 rounded bg-bg/80 p-0.5 text-red opacity-0 transition-opacity group-hover:opacity-100"
                   aria-label="Удалить фото"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-3 w-3" />
                 </button>
               </div>
             ))}
@@ -137,6 +147,14 @@ export function BandMediaSection({
           aspect="square"
         />
       </div>
+
+      {lightboxIndex !== null && (
+        <ImageLightbox
+          images={localPhotos}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </section>
   );
 }

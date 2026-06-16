@@ -1,8 +1,10 @@
 import { ShareLinkButton } from "@/components/band/share-link-button";
+import { FormattedText } from "@/components/ui/minimal-editor";
+import { PhotoGallery } from "@/components/ui/image-lightbox";
 import { sanitizeHref } from "@/lib/safe-url";
 import type { Band, SocialLinks } from "@/types/database";
 import { SOCIAL_LABELS } from "@/types/database";
-import { ExternalLink, Music, Users } from "lucide-react";
+import { ExternalLink, MapPin, Music, Users } from "lucide-react";
 import Image from "next/image";
 
 export function BandProfileView({
@@ -40,8 +42,16 @@ export function BandProfileView({
           ) : null}
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-medium">{band.name}</h2>
-            {band.genre && (
-              <p className="mt-1 text-sm text-accent">{band.genre}</p>
+            {(band.genre || band.city) && (
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                {band.genre && <span className="text-accent">{band.genre}</span>}
+                {band.city && (
+                  <span className="flex items-center gap-1 text-text-secondary">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {band.city}
+                  </span>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -64,23 +74,7 @@ export function BandProfileView({
 
       {photos.length > 0 && (
         <div className="rounded-xl border border-border bg-bg-2 p-4">
-          <h3 className="mb-3 text-sm font-medium">Фото</h3>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {photos.map((url) => (
-              <div
-                key={url}
-                className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border"
-              >
-                <Image
-                  src={url}
-                  alt=""
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
+          <PhotoGallery photos={photos} title="Фото" />
         </div>
       )}
 
@@ -92,9 +86,7 @@ export function BandProfileView({
               <ShareLinkButton path={riderSharePath} label="Поделиться" />
             )}
           </div>
-          <pre className="text-xs text-text-secondary whitespace-pre-wrap font-sans">
-            {band.tech_rider}
-          </pre>
+          <FormattedText text={band.tech_rider} />
         </div>
       )}
 

@@ -11,7 +11,7 @@ import {
   type SongStatus,
   type SongType,
 } from "@/types/database";
-import { Music, Search } from "lucide-react";
+import { Music, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -31,9 +31,11 @@ const TYPES = Object.entries(SONG_TYPE_LABELS) as [SongType, string][];
 export function SongList({
   songs,
   bandSlug,
+  canCreate = false,
 }: {
   songs: Song[];
   bandSlug: string;
+  canCreate?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<SongStatus | "all">("all");
@@ -63,6 +65,9 @@ export function SongList({
     [song.key, song.bpm && `${song.bpm} BPM`, formatDuration(song.duration_sec)]
       .filter(Boolean)
       .join(" · ");
+
+  const showAddCard =
+    canCreate && statusFilter === "all" && typeFilter === "all" && !query.trim();
 
   return (
     <div className="space-y-4">
@@ -108,14 +113,18 @@ export function SongList({
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {filtered.length === 0 && !showAddCard ? (
         <p className="py-8 text-center text-sm text-text-secondary">
           Ничего не найдено
         </p>
       ) : (
         <>
-          {/* Мобилка: список */}
           <ul className="space-y-1.5 md:hidden">
+            {showAddCard && (
+              <li>
+                <AddSongLink bandSlug={bandSlug} variant="list" />
+              </li>
+            )}
             {filtered.map((song) => (
               <li key={song.id}>
                 <Link
@@ -139,8 +148,8 @@ export function SongList({
             ))}
           </ul>
 
-          {/* Десктоп: плитка 5 колонок */}
           <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+            {showAddCard && <AddSongLink bandSlug={bandSlug} variant="tile" />}
             {filtered.map((song) => (
               <Link
                 key={song.id}
@@ -169,6 +178,42 @@ export function SongList({
         {filtered.length} из {songs.length}
       </p>
     </div>
+  );
+}
+
+function AddSongLink({
+  bandSlug,
+  variant,
+}: {
+  bandSlug: string;
+  variant: "list" | "tile";
+}) {
+  const href = bandPath(bandSlug, "songs", "new");
+
+  if (variant === "list") {
+    return (
+      <Link
+        href={href}
+        className="flex items-center gap-3 rounded-lg border border-dashed border-border bg-bg-2 px-3 py-2.5 text-accent transition-colors hover:border-accent"
+      >
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-bg-3">
+          <Plus className="h-4 w-4" />
+        </div>
+        <span className="text-sm font-medium">Добавить трек</span>
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      className="flex min-h-[88px] flex-col items-center justify-center rounded-lg border border-dashed border-border bg-bg-2 p-2.5 text-accent transition-colors hover:border-accent"
+    >
+      <div className="flex h-7 w-7 items-center justify-center rounded-md bg-bg-3">
+        <Plus className="h-4 w-4" />
+      </div>
+      <span className="mt-2 text-xs font-medium">Добавить</span>
+    </Link>
   );
 }
 
