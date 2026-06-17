@@ -4,6 +4,7 @@ import {
   isBandAdmin,
   type BandPermission,
 } from "@/lib/band/permissions";
+import { redirectForbidden } from "@/lib/forbidden";
 import type { BandMember } from "@/types/database";
 import type { User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
@@ -44,7 +45,7 @@ async function loadMember(
 export async function requireBandMember(bandId: string): Promise<BandAuth> {
   const { supabase, user } = await loadAuth();
   const member = await loadMember(supabase, user, bandId);
-  if (!member) redirect("/");
+  if (!member) redirectForbidden({ reason: "not_member" });
   return { supabase, user, member, bandId };
 }
 
@@ -53,13 +54,17 @@ export async function requireBandPermission(
   permission: BandPermission
 ): Promise<BandAuth> {
   const auth = await requireBandMember(bandId);
-  if (!hasPermission(auth.member, permission)) redirect("/");
+  if (!hasPermission(auth.member, permission)) {
+    redirectForbidden({ reason: "no_permission", permission });
+  }
   return auth;
 }
 
 export async function requireBandAdmin(bandId: string): Promise<BandAuth> {
   const auth = await requireBandMember(bandId);
-  if (!isBandAdmin(auth.member)) redirect("/");
+  if (!isBandAdmin(auth.member)) {
+    redirectForbidden({ reason: "admin_required" });
+  }
   return auth;
 }
 
@@ -75,10 +80,13 @@ async function requireMemberByResource(
     .eq("id", id)
     .maybeSingle();
 
-  if (!data?.band_id) redirect("/");
+  if (!data?.band_id) redirectForbidden({ reason: "not_found" });
 
   const member = await loadMember(supabase, user, data.band_id);
-  if (!member || !hasPermission(member, permission)) redirect("/");
+  if (!member) redirectForbidden({ reason: "not_member" });
+  if (!hasPermission(member, permission)) {
+    redirectForbidden({ reason: "no_permission", permission });
+  }
 
   return { supabase, user, member, bandId: data.band_id };
 }

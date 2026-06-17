@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Mic2, Music } from "lucide-react";
+import type { ReactNode } from "react";
 
-export function HomeAudiences({ isLoggedIn }: { isLoggedIn: boolean }) {
+export function HomeAudiences({ ctaSlot }: { ctaSlot: ReactNode }) {
   return (
     <section className="border-b border-border py-14 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -22,13 +23,7 @@ export function HomeAudiences({ isLoggedIn }: { isLoggedIn: boolean }) {
               участников и разграничивайте права — кто редактирует треки, кто
               только смотрит.
             </p>
-            {!isLoggedIn && (
-              <Link href="/register" className="mt-4 inline-block">
-                <Button variant="accent" size="sm">
-                  Зарегистрироваться
-                </Button>
-              </Link>
-            )}
+            {ctaSlot}
           </div>
 
           <div className="rounded-xl border border-border bg-bg-2 p-6">

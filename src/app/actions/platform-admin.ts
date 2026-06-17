@@ -1,6 +1,7 @@
 "use server";
 
 import { isEmailPlatformAdmin } from "@/lib/platform/admin";
+import { captureServerError } from "@/lib/monitoring/sentry";
 import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
@@ -10,6 +11,9 @@ export async function bootstrapPlatformAdmin(): Promise<{ ok: boolean; error?: s
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 
   if (!serviceKey || !url) {
+    captureServerError(new Error("SUPABASE_SERVICE_ROLE_KEY не задан"), {
+      action: "platform.bootstrap_admin",
+    });
     return { ok: false, error: "SUPABASE_SERVICE_ROLE_KEY не задан" };
   }
 
@@ -19,6 +23,11 @@ export async function bootstrapPlatformAdmin(): Promise<{ ok: boolean; error?: s
   } = await supabase.auth.getUser();
 
   if (!user || !isEmailPlatformAdmin(user.email)) {
+    captureServerError(new Error("Нет доступа к bootstrap platform admin"), {
+      action: "platform.bootstrap_admin",
+      userId: user?.id,
+      extras: { email: user?.email ?? null },
+    });
     return { ok: false, error: "Нет доступа" };
   }
 
@@ -31,6 +40,12 @@ export async function bootstrapPlatformAdmin(): Promise<{ ok: boolean; error?: s
     .update({ is_platform_admin: true })
     .eq("id", user.id);
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    captureServerError(new Error(error.message), {
+      action: "platform.bootstrap_admin",
+      userId: user.id,
+    });
+    return { ok: false, error: error.message };
+  }
   return { ok: true };
 }

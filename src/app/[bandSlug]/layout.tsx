@@ -5,6 +5,7 @@ import {
   getUpcomingEvent,
   getUserBands,
 } from "@/lib/band/queries";
+import { redirectForbidden } from "@/lib/forbidden";
 import { isReservedBandSlug } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
@@ -37,7 +38,7 @@ export default async function BandLayout({
     getUpcomingEvent(band.id),
   ]);
   if (!member) {
-    redirect("/");
+    redirectForbidden({ reason: "not_member", bandSlug });
   }
 
   return (

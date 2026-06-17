@@ -11,6 +11,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 import { Play } from "lucide-react";
+import { CloudOff } from "lucide-react";
 import { bandPath } from "@/lib/paths";
 import { notFound } from "next/navigation";
 
@@ -54,8 +55,24 @@ export default async function PlayIndexPage({
     >
       <p className="mb-4 text-sm text-text-secondary">
         Выберите сет-лист — каждый участник увидит материалы для своего
-        инструмента.
+        инструмента. Откройте сет-лист онлайн хотя бы раз, чтобы он был
+        доступен без сети.
       </p>
+
+      <section className="mb-6">
+        <Link
+          href={bandPath(band.slug, "play", "offline")}
+          className="flex items-center gap-3 rounded-xl border border-border bg-bg-2 p-4 transition-colors hover:border-accent"
+        >
+          <CloudOff className="h-4 w-4 text-accent" />
+          <div>
+            <div className="font-medium">Офлайн-сет-листы</div>
+            <div className="text-xs text-text-muted">
+              Сохранённые для игры без интернета
+            </div>
+          </div>
+        </Link>
+      </section>
 
       {performances && performances.length > 0 && (
         <section className="mb-6">

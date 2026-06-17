@@ -1,3 +1,4 @@
+import { redirectForbidden } from "@/lib/forbidden";
 import { createClient } from "@/lib/supabase/server";
 import type { User } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
@@ -41,7 +42,7 @@ export async function requirePlatformAdmin(nextPath = "/admin") {
 
   const allowed = await isPlatformAdminUser(user);
   if (!allowed) {
-    redirect("/");
+    redirectForbidden({ reason: "platform_admin", back: nextPath });
   }
 
   const { data: profile } = await supabase

@@ -3,6 +3,8 @@ import { getPublicBandPage } from "@/lib/public-band";
 import { notFound } from "next/navigation";
 
 /** Тот же контент, что /rider — для обратной совместимости ссылок */
+export const revalidate = 60;
+
 export default async function PublicRepertoirePage({
   params,
 }: {

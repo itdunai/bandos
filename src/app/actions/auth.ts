@@ -8,13 +8,14 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { fetchInvitationByToken } from "@/lib/invitation";
 import { formatAuthError, isAlreadyRegisteredError } from "@/lib/auth-errors";
+import { captureServerError } from "@/lib/monitoring/sentry";
 import { logPlatformEventAsync } from "@/lib/platform/audit";
+import { revalidatePublicCatalog } from "@/lib/public-revalidate";
 import { bandPath } from "@/lib/paths";
 import { sanitizeRedirectPath } from "@/lib/safe-redirect";
 import { getSiteUrl } from "@/lib/site-url";
 import type { MemberRole } from "@/types/database";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 
 async function getInvitation(token: string) {
   const supabase = await createClient();
@@ -40,6 +41,10 @@ export async function signUpAccount(formData: FormData) {
   });
 
   if (signUpError) {
+    captureServerError(new Error(signUpError.message), {
+      action: "auth.sign_up_account",
+      extras: { email },
+    });
     redirect(
       `/register?error=${encodeURIComponent(formatAuthError(signUpError.message))}`
     );
@@ -87,6 +92,10 @@ export async function signUpFromInvite(token: string, formData: FormData) {
   });
 
   if (signUpError) {
+    captureServerError(new Error(signUpError.message), {
+      action: "auth.sign_up_from_invite",
+      extras: { token, email },
+    });
     const msg = formatAuthError(signUpError.message);
     if (isAlreadyRegisteredError(signUpError.message)) {
       redirect(
@@ -135,6 +144,11 @@ export async function createBand(formData: FormData) {
   );
 
   if (bandError) {
+    captureServerError(new Error(bandError.message), {
+      action: "auth.create_band",
+      userId: user.id,
+      extras: { bandName },
+    });
     logPlatformEventAsync({
       level: "error",
       event: "band.create_failed",
@@ -178,6 +192,10 @@ export async function signIn(formData: FormData) {
   });
 
   if (error) {
+    captureServerError(new Error(error.message), {
+      action: "auth.sign_in",
+      extras: { email },
+    });
     const params = new URLSearchParams({
       error: formatAuthError(error.message),
     });
@@ -207,6 +225,10 @@ async function finishAcceptInvitation(token: string) {
   });
 
   if (error) {
+    captureServerError(new Error(error.message), {
+      action: "auth.accept_invitation",
+      extras: { token },
+    });
     redirect(`/invite/${token}?error=${encodeURIComponent(error.message)}`);
   }
 
@@ -216,7 +238,7 @@ async function finishAcceptInvitation(token: string) {
     .eq("id", bandId)
     .single();
 
-  revalidatePath("/");
+  revalidatePublicCatalog();
 
   if (band) {
     redirect(bandPath(band.slug));

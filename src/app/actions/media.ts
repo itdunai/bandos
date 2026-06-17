@@ -1,13 +1,12 @@
 "use server";
 
 import { tryBandPermission } from "@/lib/band/assert-access";
-import { bandPath } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
 import {
   deleteMediaByUrl,
   stripCacheParam,
 } from "@/lib/upload/supabase-storage";
-import { revalidatePath } from "next/cache";
+import { revalidatePublicBand } from "@/lib/public-revalidate";
 
 function normalizePhotos(value: unknown): string[] {
   if (Array.isArray(value)) {
@@ -17,8 +16,7 @@ function normalizePhotos(value: unknown): string[] {
 }
 
 function revalidateBandMedia(bandSlug: string) {
-  revalidatePath(bandPath(bandSlug));
-  revalidatePath(`/rider/${bandSlug}`);
+  revalidatePublicBand(bandSlug);
 }
 
 export async function removeBandLogo(

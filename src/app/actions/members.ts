@@ -5,6 +5,7 @@ import {
   parsePermissionsPayload,
   parsePresetInput,
 } from "@/lib/band/permissions";
+import { redirectForbidden } from "@/lib/forbidden";
 import { bandPath } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -67,7 +68,7 @@ export async function updateMemberProfile(
     .eq("id", memberId)
     .maybeSingle();
 
-  if (!target?.band_id) redirect("/");
+  if (!target?.band_id) redirectForbidden({ reason: "not_found" });
 
   const { supabase, member: self } = await requireBandMember(target.band_id);
 

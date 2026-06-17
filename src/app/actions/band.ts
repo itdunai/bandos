@@ -5,6 +5,7 @@ import {
   requireBandPermission,
 } from "@/lib/band/assert-access";
 import { bandPath } from "@/lib/paths";
+import { revalidatePublicBandAndCatalog } from "@/lib/public-revalidate";
 import { redirectWithToast } from "@/lib/redirect-with-toast";
 import { sanitizeExternalUrl } from "@/lib/safe-url";
 import type { SocialLinks } from "@/types/database";
@@ -54,9 +55,7 @@ export async function updateBandProfile(
     return;
   }
 
-  revalidatePath(bandPath(bandSlug));
-  revalidatePath(`/rider/${bandSlug}`);
-  revalidatePath("/");
+  revalidatePublicBandAndCatalog(bandSlug);
   redirect(bandPath(bandSlug));
 }
 
@@ -73,7 +72,5 @@ export async function setRepertoirePublic(
     .eq("id", bandId);
 
   revalidatePath(bandPath(bandSlug, "songs"));
-  revalidatePath(`/rider/${bandSlug}`);
-  revalidatePath(`/repertoire/${bandSlug}`);
-  revalidatePath("/");
+  revalidatePublicBandAndCatalog(bandSlug);
 }

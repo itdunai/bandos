@@ -4,9 +4,11 @@ import { Guitar } from "lucide-react";
 export function AdminShell({
   children,
   userEmail,
+  buildSha,
 }: {
   children: React.ReactNode;
   userEmail: string;
+  buildSha: string;
 }) {
   return (
     <div className="min-h-screen bg-bg">
@@ -21,12 +23,20 @@ export function AdminShell({
               <div className="text-[10px] text-text-muted">{userEmail}</div>
             </div>
           </div>
-          <Link
-            href="/"
-            className="text-xs text-text-secondary hover:text-accent"
-          >
-            ← На сайт
-          </Link>
+          <div className="flex items-center gap-4">
+            <div
+              className="rounded-md border border-border bg-bg px-2 py-1 text-[10px] text-text-muted"
+              title="Версия текущего деплоя"
+            >
+              build: {buildSha}
+            </div>
+            <Link
+              href="/"
+              className="text-xs text-text-secondary hover:text-accent"
+            >
+              ← На сайт
+            </Link>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">{children}</main>

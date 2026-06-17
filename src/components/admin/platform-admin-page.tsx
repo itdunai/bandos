@@ -11,6 +11,7 @@ import {
 export async function PlatformAdminPage({ nextPath }: { nextPath: string }) {
   const { supabase, user, hasDbFlag, needsDbPromotion } =
     await requirePlatformAdmin(nextPath);
+  const buildSha = process.env.BUILD_SHA ?? "dev";
 
   const [stats, auditLog, health] = await Promise.all([
     hasDbFlag ? getPlatformStats(supabase) : Promise.resolve(null),
@@ -19,7 +20,7 @@ export async function PlatformAdminPage({ nextPath }: { nextPath: string }) {
   ]);
 
   return (
-    <AdminShell userEmail={user.email ?? "—"}>
+    <AdminShell userEmail={user.email ?? "—"} buildSha={buildSha}>
       {needsDbPromotion && (
         <div className="mb-6">
           <PlatformAdminSetup userEmail={user.email ?? ""} />

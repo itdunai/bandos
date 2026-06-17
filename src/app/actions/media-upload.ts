@@ -16,6 +16,8 @@ import {
   uploadBandMedia,
 } from "@/lib/upload/supabase-storage";
 import { logPlatformEventAsync } from "@/lib/platform/audit";
+import { captureServerError } from "@/lib/monitoring/sentry";
+import { revalidatePublicBand } from "@/lib/public-revalidate";
 import { revalidatePath } from "next/cache";
 
 function fileFromFormData(formData: FormData): File | null {
@@ -40,8 +42,7 @@ function normalizePhotos(value: unknown): string[] {
 }
 
 function revalidateBandMedia(bandSlug: string) {
-  revalidatePath(bandPath(bandSlug));
-  revalidatePath(`/rider/${bandSlug}`);
+  revalidatePublicBand(bandSlug);
 }
 
 function logMediaError(
@@ -50,6 +51,13 @@ function logMediaError(
   type: string,
   message: string
 ) {
+  captureServerError(new Error(message), {
+    action: "media.upload",
+    userId,
+    bandId,
+    extras: { type },
+  });
+
   logPlatformEventAsync({
     level: "error",
     event: "media.upload_failed",

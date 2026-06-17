@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Guitar } from "lucide-react";
+import type { ReactNode } from "react";
 
-export function HomeHero({ isLoggedIn }: { isLoggedIn: boolean }) {
+export function HomeHero({ ctaSlot }: { ctaSlot: ReactNode }) {
   return (
     <section className="relative overflow-hidden border-b border-border">
       <div
@@ -30,28 +31,7 @@ export function HomeHero({ isLoggedIn }: { isLoggedIn: boolean }) {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            {isLoggedIn ? (
-              <Link href="/new-band">
-                <Button variant="accent" size="lg">
-                  Создать группу
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/register">
-                  <Button variant="accent" size="lg">
-                    Создать группу бесплатно
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button variant="default" size="lg">
-                    Уже есть аккаунт
-                  </Button>
-                </Link>
-              </>
-            )}
+            {ctaSlot}
             <Link href="#catalog">
               <Button variant="ghost" size="lg">
                 Смотреть группы

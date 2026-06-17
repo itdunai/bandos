@@ -2,6 +2,7 @@
 
 import { requireBandAdmin } from "@/lib/band/assert-access";
 import { canViewFinances } from "@/lib/band/permissions";
+import { redirectForbidden } from "@/lib/forbidden";
 import { eventIncomeTitle } from "@/lib/finance";
 import { bandPath } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
@@ -185,6 +186,8 @@ export async function assertFinanceView(bandId: string) {
     .eq("is_active", true)
     .maybeSingle();
 
-  if (!member || !canViewFinances(member)) redirect("/");
+  if (!member || !canViewFinances(member)) {
+    redirectForbidden({ reason: "no_permission", permission: "finances" });
+  }
   return { supabase, user, member };
 }

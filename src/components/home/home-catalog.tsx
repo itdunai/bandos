@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { bandPath } from "@/lib/paths";
-import { MapPin, Music, Plus, Users } from "lucide-react";
+import { MapPin, Music, Users } from "lucide-react";
+import type { ReactNode } from "react";
 
 export interface CatalogBand {
   name: string;
@@ -16,39 +16,15 @@ export interface CatalogBand {
 
 export function HomeCatalog({
   catalog,
-  userBands,
-  isLoggedIn,
+  userBandsSlot,
 }: {
   catalog: CatalogBand[];
-  userBands: { id: string; slug: string; name: string }[];
-  isLoggedIn: boolean;
+  userBandsSlot: ReactNode;
 }) {
   return (
     <section id="catalog" className="scroll-mt-16 py-14 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {userBands.length > 0 && (
-          <div className="mb-10 rounded-xl border border-accent/30 bg-accent/5 p-4 sm:p-5">
-            <h2 className="text-sm font-medium">Мои группы</h2>
-            <p className="mt-1 text-xs text-text-secondary">
-              Быстрый переход в личный кабинет
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {userBands.map((band) => (
-                <Link key={band.id} href={bandPath(band.slug)}>
-                  <Button variant="default" size="sm">
-                    {band.name}
-                  </Button>
-                </Link>
-              ))}
-              <Link href="/new-band">
-                <Button variant="accent" size="sm">
-                  <Plus className="h-3.5 w-3.5" />
-                  Новая группа
-                </Button>
-              </Link>
-            </div>
-          </div>
-        )}
+        {userBandsSlot}
 
         <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -66,16 +42,14 @@ export function HomeCatalog({
             <p className="text-sm text-text-secondary">
               Пока нет групп с публичным профилем или репертуаром.
             </p>
-            {!isLoggedIn && (
-              <p className="mt-3 text-xs text-text-muted">
-                Вы музыкант?{" "}
-                <Link href="/register" className="text-accent hover:underline">
-                  Зарегистрируйтесь
-                </Link>{" "}
-                и создайте первую группу — она появится здесь, когда включите
-                публичную страницу.
-              </p>
-            )}
+            <p className="mt-3 text-xs text-text-muted">
+              Вы музыкант?{" "}
+              <Link href="/register" className="text-accent hover:underline">
+                Зарегистрируйтесь
+              </Link>{" "}
+              и создайте первую группу — она появится здесь, когда включите
+              публичную страницу.
+            </p>
           </Card>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

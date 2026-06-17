@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { PlayMode, type PlayTrack } from "@/components/play/play-mode";
+import { PlayFromCache } from "@/components/play/play-offline";
+import { PlaySetlistShell } from "@/components/play/play-setlist-shell";
+import type { PlayTrack } from "@/components/play/play-mode";
 import { Button } from "@/components/ui/button";
 import {
   getBandBySlug,
@@ -13,10 +15,18 @@ import { notFound } from "next/navigation";
 
 export default async function PlaySetlistPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ bandSlug: string; setlistId: string }>;
+  searchParams: Promise<{ offline?: string }>;
 }) {
   const { bandSlug, setlistId } = await params;
+  const { offline } = await searchParams;
+
+  if (offline === "1") {
+    return <PlayFromCache bandSlug={bandSlug} setlistId={setlistId} />;
+  }
+
   const band = await getBandBySlug(bandSlug);
   if (!band) notFound();
 
@@ -122,7 +132,9 @@ export default async function PlaySetlistPage({
           </Button>
         </Link>
       </div>
-      <PlayMode
+      <PlaySetlistShell
+        bandSlug={band.slug}
+        setlistId={setlistId}
         setlistName={setlist.name}
         tracks={tracks}
         instrument={member.instrument as Instrument}
