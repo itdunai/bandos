@@ -18,9 +18,7 @@ export default async function BandLayout({
 }) {
   const { bandSlug } = await params;
 
-  // Старый деплой без app/admin: /admin попадает сюда как slug группы → 404.
   if (isReservedBandSlug(bandSlug)) {
-    if (bandSlug.toLowerCase() === "admin") redirect("/platform");
     notFound();
   }
 

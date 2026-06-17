@@ -1,7 +1,6 @@
 /** Служебные URL приложения — нельзя использовать как slug группы. */
 export const RESERVED_BAND_SLUGS = new Set([
   "admin",
-  "platform",
   "login",
   "register",
   "new-band",
