@@ -8,6 +8,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { fetchInvitationByToken } from "@/lib/invitation";
 import { formatAuthError, isAlreadyRegisteredError } from "@/lib/auth-errors";
+import { logPlatformEventAsync } from "@/lib/platform/audit";
 import { bandPath } from "@/lib/paths";
 import { sanitizeRedirectPath } from "@/lib/safe-redirect";
 import { getSiteUrl } from "@/lib/site-url";
@@ -51,6 +52,13 @@ export async function signUpAccount(formData: FormData) {
   if (!authData.session) {
     redirect(`/register?confirm=1&email=${encodeURIComponent(email)}`);
   }
+
+  logPlatformEventAsync({
+    level: "info",
+    event: "user.registered",
+    userId: authData.user.id,
+    meta: { email },
+  });
 
   redirect("/");
 }
@@ -127,8 +135,22 @@ export async function createBand(formData: FormData) {
   );
 
   if (bandError) {
+    logPlatformEventAsync({
+      level: "error",
+      event: "band.create_failed",
+      userId: user.id,
+      meta: { message: bandError.message, bandName },
+    });
     redirect(`/new-band?error=${encodeURIComponent(bandError.message)}`);
   }
+
+  logPlatformEventAsync({
+    level: "info",
+    event: "band.created",
+    userId: user.id,
+    bandId: bandId as string,
+    meta: { bandName },
+  });
 
   const { data: band } = await supabase
     .from("bands")

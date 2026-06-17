@@ -15,6 +15,7 @@ import {
   stripCacheParam,
   uploadBandMedia,
 } from "@/lib/upload/supabase-storage";
+import { logPlatformEventAsync } from "@/lib/platform/audit";
 import { revalidatePath } from "next/cache";
 
 function fileFromFormData(formData: FormData): File | null {
@@ -41,6 +42,21 @@ function normalizePhotos(value: unknown): string[] {
 function revalidateBandMedia(bandSlug: string) {
   revalidatePath(bandPath(bandSlug));
   revalidatePath(`/rider/${bandSlug}`);
+}
+
+function logMediaError(
+  userId: string,
+  bandId: string | null,
+  type: string,
+  message: string
+) {
+  logPlatformEventAsync({
+    level: "error",
+    event: "media.upload_failed",
+    userId,
+    bandId,
+    meta: { type, message },
+  });
 }
 
 export async function uploadBandLogoFile(
@@ -75,7 +91,10 @@ export async function uploadBandLogoFile(
     contentTypeForFile(file),
     true
   );
-  if ("error" in uploaded) return uploaded;
+  if ("error" in uploaded) {
+    logMediaError(access.auth.user.id, bandId, "logo", uploaded.error);
+    return uploaded;
+  }
 
   const cleanUrl = stripCacheParam(uploaded.publicUrl);
   const { error } = await supabase
@@ -133,7 +152,10 @@ export async function uploadBandPhotoFile(
     contentTypeForFile(file),
     false
   );
-  if ("error" in uploaded) return uploaded;
+  if ("error" in uploaded) {
+    logMediaError(access.auth.user.id, bandId, "photo", uploaded.error);
+    return uploaded;
+  }
 
   const cleanUrl = stripCacheParam(uploaded.publicUrl);
   if (photos.includes(cleanUrl)) {
@@ -190,7 +212,10 @@ export async function uploadAvatarFile(
     contentTypeForFile(file),
     true
   );
-  if ("error" in uploaded) return uploaded;
+  if ("error" in uploaded) {
+    logMediaError(user.id, null, "avatar", uploaded.error);
+    return uploaded;
+  }
 
   const cleanUrl = stripCacheParam(uploaded.publicUrl);
   const { error } = await supabase

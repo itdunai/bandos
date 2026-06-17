@@ -35,6 +35,7 @@
    - `supabase/migrations/017_administrator_preset.sql` — пресет «Администратор»
    - `supabase/migrations/019_band_city.sql` — поле «Город» группы
    - `supabase/migrations/020_restore_band_media_storage.sql` — **обязательно**: bucket `band-media` для лого/фото/аватаров
+   - `supabase/migrations/021_platform_admin.sql` — панель `/admin` (статистика, журнал)
 3. **Authentication → Providers → Email** — включите Email
 4. Для локальной разработки отключите «Confirm email» (или подтверждайте вручную)
 5. **Authentication → URL Configuration**:
@@ -50,6 +51,20 @@ cp .env.local.example .env.local
 Заполните `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`.
 
 Картинки (лого, фото группы, аватары) загружаются **через сервер** в Supabase Storage (bucket `band-media`). После деплоя на Timeweb файлы не пропадают. Старые URL вида `/media/...` нужно перезагрузить.
+
+### Платформенная админка
+
+Для владельца проекта (не путать с админом группы):
+
+```env
+PLATFORM_ADMIN_EMAILS=your@email.com
+```
+
+Опционально `SUPABASE_SERVICE_ROLE_KEY` — для автовыдачи флага в БД с страницы `/admin`.
+
+1. Примените миграцию `021_platform_admin.sql`
+2. Откройте `/admin` под своим аккаунтом
+3. Если статистика пустая — выполните SQL из подсказки на странице или нажмите «Выдать права в БД»
 
 ### 3. Запуск
 
