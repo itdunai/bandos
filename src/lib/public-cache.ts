@@ -13,6 +13,7 @@ export function publicBandTag(slug: string) {
 
 async function fetchPublicBandsCatalog(): Promise<CatalogBand[]> {
   const supabase = createPublicSupabaseClient();
+  if (!supabase) return [];
   const { data, error } = await supabase.rpc("get_public_bands_catalog");
   if (error || !data) return [];
   return data as CatalogBand[];
@@ -22,6 +23,7 @@ async function fetchPublicBandPage(
   bandSlug: string
 ): Promise<PublicBandPageData | null> {
   const supabase = createPublicSupabaseClient();
+  if (!supabase) return null;
   const { data, error } = await supabase.rpc("get_public_band_page", {
     p_slug: bandSlug,
   });
