@@ -29,14 +29,14 @@ export async function isPlatformAdminUser(user: User): Promise<boolean> {
   return profile?.is_platform_admin === true;
 }
 
-export async function requirePlatformAdmin() {
+export async function requirePlatformAdmin(nextPath = "/admin") {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?next=/admin");
+    redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
   const allowed = await isPlatformAdminUser(user);

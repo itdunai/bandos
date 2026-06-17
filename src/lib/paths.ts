@@ -1,3 +1,22 @@
+/** Служебные URL приложения — нельзя использовать как slug группы. */
+export const RESERVED_BAND_SLUGS = new Set([
+  "admin",
+  "platform",
+  "login",
+  "register",
+  "new-band",
+  "api",
+  "auth",
+  "invite",
+  "media",
+  "rider",
+  "repertoire",
+]);
+
+export function isReservedBandSlug(slug: string): boolean {
+  return RESERVED_BAND_SLUGS.has(slug.toLowerCase());
+}
+
 /**
  * Безопасный путь к разделу группы.
  * encodeURIComponent нужен для redirect() — кириллица в Location ломает Node.js.

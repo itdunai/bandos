@@ -5,6 +5,7 @@ import {
   getUpcomingEvent,
   getUserBands,
 } from "@/lib/band/queries";
+import { isReservedBandSlug } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
 
@@ -16,6 +17,12 @@ export default async function BandLayout({
   params: Promise<{ bandSlug: string }>;
 }) {
   const { bandSlug } = await params;
+
+  // Старый деплой без app/admin: /admin попадает сюда как slug группы → 404.
+  if (isReservedBandSlug(bandSlug)) {
+    if (bandSlug.toLowerCase() === "admin") redirect("/platform");
+    notFound();
+  }
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
