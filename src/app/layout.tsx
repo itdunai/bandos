@@ -54,7 +54,7 @@ export default async function RootLayout({
   return (
     <html
       lang="ru"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${showCookieBanner ? " cookie-consent-open" : ""}`}
     >
       <body className="min-h-full">
         <PublicConfigScript config={supabaseConfig} />

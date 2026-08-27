@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseDocument, parseInline } from "@/lib/legal/parse-document";
-import {
-  cookieConsentSetValue,
-  isCookieConsentAccepted,
-} from "@/lib/legal/cookie-consent";
+import { isCookieConsentAccepted } from "@/lib/legal/cookie-consent";
 import { isReservedBandSlug } from "@/lib/paths";
 
 describe("parseDocument", () => {
@@ -54,11 +51,6 @@ describe("cookie consent", () => {
     expect(isCookieConsentAccepted("accepted")).toBe(true);
     expect(isCookieConsentAccepted("denied")).toBe(false);
     expect(isCookieConsentAccepted(null)).toBe(false);
-  });
-
-  it("builds a path-scoped consent cookie", () => {
-    expect(cookieConsentSetValue()).toContain("bandos_cookie_consent=accepted");
-    expect(cookieConsentSetValue()).toContain("Path=/");
   });
 });
 

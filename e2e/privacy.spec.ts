@@ -5,7 +5,7 @@ test.describe("Privacy policy and cookie consent", () => {
     await page.goto("/privacy");
 
     await expect(
-      page.getByRole("heading", { name: /политик/i })
+      page.getByRole("heading", { name: "Политика конфиденциальности", exact: true })
     ).toBeVisible();
 
     const banner = page.getByRole("region", {
