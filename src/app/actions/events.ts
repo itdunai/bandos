@@ -5,6 +5,10 @@ import {
   requireEventMember,
 } from "@/lib/band/assert-access";
 import { insertEventFeeIncome } from "@/app/actions/finances";
+import {
+  datetimeLocalToIso,
+  parseTimezoneOffsetMinutes,
+} from "@/lib/datetime";
 import { bandPath } from "@/lib/paths";
 import { revalidatePath } from "next/cache";
 import { redirectWithToast } from "@/lib/redirect-with-toast";
@@ -15,12 +19,15 @@ function parseEventForm(formData: FormData) {
   const endsAt = (formData.get("ends_at") as string) || null;
   const feeRaw = formData.get("fee") as string;
   const setlistId = (formData.get("setlist_id") as string) || null;
+  const tzOffset = parseTimezoneOffsetMinutes(
+    formData.get("timezone_offset")
+  );
 
   return {
     event_type: formData.get("event_type") as string,
     title: (formData.get("title") as string).trim(),
-    starts_at: startsAt ? new Date(startsAt).toISOString() : null,
-    ends_at: endsAt ? new Date(endsAt).toISOString() : null,
+    starts_at: startsAt ? datetimeLocalToIso(startsAt, tzOffset) : null,
+    ends_at: endsAt ? datetimeLocalToIso(endsAt, tzOffset) : null,
     location: (formData.get("location") as string) || null,
     notes: (formData.get("notes") as string) || null,
     setlist_id: setlistId || null,

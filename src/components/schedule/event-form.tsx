@@ -54,6 +54,11 @@ export function EventForm({
 
   return (
     <form action={action} className="space-y-4">
+      <input
+        type="hidden"
+        name="timezone_offset"
+        value={new Date().getTimezoneOffset()}
+      />
       <div>
         <Label>Тип</Label>
         <select name="event_type" className={selectClass} defaultValue={type}>
