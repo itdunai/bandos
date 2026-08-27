@@ -35,7 +35,7 @@ export function BandReleasesBlock({
           </Link>
         )}
       </div>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      <div className="grid grid-cols-5 gap-2 sm:grid-cols-10">
         {releases.map((release) => {
           const firstExternal = release.links
             .map((l) => sanitizeHref(l.url))
