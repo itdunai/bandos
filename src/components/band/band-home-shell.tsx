@@ -3,6 +3,7 @@
 import { BandProfileForm } from "@/components/band/band-profile-form";
 import { BandProfileView } from "@/components/band/band-profile-view";
 import { AppShell } from "@/components/layout/app-shell";
+import type { ReleaseListItem } from "@/components/releases/release-list";
 import { Button } from "@/components/ui/button";
 import { bandPath } from "@/lib/paths";
 import type { Band, BandMember } from "@/types/database";
@@ -14,6 +15,7 @@ export function BandHomeShell({
   member,
   memberCount,
   tracksCount,
+  releases,
   riderSharePath,
   canEditProfile,
   initialEdit,
@@ -22,6 +24,7 @@ export function BandHomeShell({
   member: BandMember | null;
   memberCount: number;
   tracksCount: number;
+  releases: ReleaseListItem[];
   riderSharePath: string;
   canEditProfile: boolean;
   initialEdit: boolean;
@@ -82,6 +85,7 @@ export function BandHomeShell({
           band={bandProps}
           tracksCount={tracksCount}
           membersCount={memberCount}
+          releases={releases}
           riderSharePath={riderSharePath}
         />
       )}

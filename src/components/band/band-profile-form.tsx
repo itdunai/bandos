@@ -2,6 +2,7 @@
 
 import { updateBandProfile } from "@/app/actions/band";
 import { BandMediaSection } from "@/components/band/band-media-section";
+import { PublicPageShare } from "@/components/band/public-page-share";
 import { ShareLinkButton } from "@/components/band/share-link-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +35,8 @@ export function BandProfileForm({
         logoUrl={band.logo_url ?? null}
         photos={Array.isArray(band.photos) ? band.photos : []}
       />
+
+      <PublicPageShare path={riderSharePath} />
 
       <form action={action} className="space-y-5">
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">

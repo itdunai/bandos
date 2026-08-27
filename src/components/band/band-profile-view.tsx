@@ -1,4 +1,7 @@
+import { BandReleasesBlock } from "@/components/band/band-releases-block";
+import { PublicPageShare } from "@/components/band/public-page-share";
 import { ShareLinkButton } from "@/components/band/share-link-button";
+import type { ReleaseListItem } from "@/components/releases/release-list";
 import { PhotoGallery } from "@/components/ui/image-lightbox";
 import { FormattedText } from "@/components/ui/minimal-editor";
 import { SafeMediaImage } from "@/components/ui/safe-media-image";
@@ -11,11 +14,13 @@ export function BandProfileView({
   band,
   tracksCount,
   membersCount,
+  releases,
   riderSharePath,
 }: {
   band: Band;
   tracksCount: number;
   membersCount: number;
+  releases: ReleaseListItem[];
   riderSharePath: string;
 }) {
   const links = (band.social_links ?? {}) as SocialLinks;
@@ -55,7 +60,7 @@ export function BandProfileView({
           </div>
         </div>
         {band.description && (
-          <p className="mt-3 text-sm text-text-secondary whitespace-pre-wrap">
+          <p className="mt-3 whitespace-pre-wrap text-sm text-text-secondary">
             {band.description}
           </p>
         )}
@@ -70,6 +75,10 @@ export function BandProfileView({
           </div>
         </div>
       </div>
+
+      <PublicPageShare path={riderSharePath} />
+
+      <BandReleasesBlock releases={releases} bandSlug={band.slug} />
 
       {photos.length > 0 && (
         <div className="rounded-xl border border-border bg-bg-2 p-4">
