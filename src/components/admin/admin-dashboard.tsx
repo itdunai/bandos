@@ -5,7 +5,9 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle2,
+  FileText,
 } from "lucide-react";
+import Link from "next/link";
 
 export function AdminDashboard({
   stats,
@@ -26,6 +28,25 @@ export function AdminDashboard({
           Статистика, журнал и здоровье сервиса
         </p>
       </div>
+
+      <section>
+        <h2 className="mb-3 text-xs uppercase tracking-wider text-text-muted">
+          Контент сайта
+        </h2>
+        <Link href="/admin/privacy" className="block">
+          <Card className="flex items-start gap-3 p-4 transition-colors hover:border-accent/40">
+            <FileText className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+            <div>
+              <div className="text-sm font-medium">
+                Политика конфиденциальности
+              </div>
+              <p className="mt-0.5 text-xs text-text-secondary">
+                Редактировать текст страницы /privacy
+              </p>
+            </div>
+          </Card>
+        </Link>
+      </section>
 
       <section>
         <h2 className="mb-3 text-xs uppercase tracking-wider text-text-muted">

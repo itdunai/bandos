@@ -36,7 +36,7 @@ description: >-
    - RLS remains backup; app layer must gate first.
 5. **Redirects** — `sanitizeRedirectPath()` in `src/lib/safe-redirect.ts`; reject `//`, schemes, backslashes.
 6. **External URLs** — `sanitizeExternalUrl()` in `src/lib/safe-url.ts` on save and render (`href`).
-7. **Public routes** — `src/lib/supabase/middleware.ts`: `/`, `/login`, `/register`, `/invite`, `/rider/`, `/repertoire/`.
+7. **Public routes** — `src/lib/supabase/middleware.ts`: `/`, `/login`, `/register`, `/invite`, `/rider/`, `/repertoire/`, `/privacy`.
 8. **XSS** — React text nodes only; no `dangerouslySetInnerHTML` for user content.
 
 ## Commands

@@ -36,6 +36,7 @@
    - `supabase/migrations/019_band_city.sql` — поле «Город» группы
    - `supabase/migrations/020_restore_band_media_storage.sql` — **обязательно**: bucket `band-media` для лого/фото/аватаров
    - `supabase/migrations/021_platform_admin.sql` — панель `/admin` (статистика, журнал)
+   - `supabase/migrations/022_site_pages.sql` — политика конфиденциальности (`/privacy`, редактирование в `/admin/privacy`)
 3. **Authentication → Providers → Email** — включите Email
 4. Для локальной разработки отключите «Confirm email» (или подтверждайте вручную)
 5. **Authentication → URL Configuration**:
@@ -69,9 +70,10 @@ PLATFORM_ADMIN_EMAILS=your@email.com
 
 Опционально `SUPABASE_SERVICE_ROLE_KEY` — для автовыдачи флага в БД с страницы `/admin`.
 
-1. Примените миграцию `021_platform_admin.sql`
+1. Примените миграции `021_platform_admin.sql` и `022_site_pages.sql`
 2. Откройте `/admin` под своим аккаунтом
 3. Если статистика пустая — выполните SQL из подсказки на странице или нажмите «Выдать права в БД»
+4. Политика конфиденциальности: публичная страница `/privacy`, редактирование `/admin/privacy`. В шаблоне замените данные в `[квадратных скобках]` на реквизиты оператора.
 
 **Если `/admin` отдаёт 404 на Timeweb:**
 

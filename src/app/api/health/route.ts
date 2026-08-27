@@ -9,6 +9,6 @@ export function GET() {
       sha: process.env.BUILD_SHA ?? "dev",
       nodeEnv: process.env.NODE_ENV ?? "unknown",
     },
-    features: { platformAdmin: true },
+    features: { platformAdmin: true, privacyPolicy: true },
   });
 }

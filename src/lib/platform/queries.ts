@@ -74,5 +74,18 @@ export async function checkPlatformHealth(supabase: SupabaseClient) {
     detail: storageError?.message,
   });
 
+  const { error: pagesError } = await supabase
+    .from("site_pages")
+    .select("slug", { count: "exact", head: true })
+    .limit(1);
+
+  checks.push({
+    name: "PostgreSQL (site_pages)",
+    ok: !pagesError,
+    detail: pagesError
+      ? `${pagesError.message} — примените миграцию 022_site_pages.sql`
+      : undefined,
+  });
+
   return checks;
 }

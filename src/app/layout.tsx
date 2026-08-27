@@ -4,6 +4,7 @@ import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { PublicConfigScript } from "@/components/providers/public-config-script";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
 import { PwaRegister } from "@/components/pwa-register";
+import { CookieConsentBanner } from "@/components/legal/cookie-consent-banner";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { validateRuntimeEnv } from "@/lib/env";
 import { consumeToast } from "@/lib/redirect-with-toast";
@@ -53,6 +54,7 @@ export default async function RootLayout({
           <ToastProvider initial={toast}>
             <NavigationProgress />
             {children}
+            <CookieConsentBanner />
             <div
               className="pointer-events-none fixed bottom-2 right-2 z-50 rounded-md border border-border bg-bg/90 px-2 py-1 text-[10px] text-text-muted backdrop-blur"
               title="Версия текущего деплоя"

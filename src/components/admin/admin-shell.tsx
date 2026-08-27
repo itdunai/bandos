@@ -24,6 +24,18 @@ export function AdminShell({
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <Link
+              href="/admin"
+              className="text-xs text-text-secondary hover:text-accent"
+            >
+              Панель
+            </Link>
+            <Link
+              href="/admin/privacy"
+              className="text-xs text-text-secondary hover:text-accent"
+            >
+              Политика
+            </Link>
             <div
               className="rounded-md border border-border bg-bg px-2 py-1 text-[10px] text-text-muted"
               title="Версия текущего деплоя"

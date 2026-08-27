@@ -10,6 +10,9 @@ export function HomeFooter() {
           <span className="text-xs">BandOS — операционная система музыкальной группы</span>
         </div>
         <div className="flex flex-wrap justify-center gap-4 text-xs text-text-muted">
+          <Link href="/privacy" className="hover:text-text-primary">
+            Политика конфиденциальности
+          </Link>
           <Link href="/login" className="hover:text-text-primary">
             Вход
           </Link>

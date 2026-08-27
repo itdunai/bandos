@@ -11,6 +11,7 @@ export const RESERVED_BAND_SLUGS = new Set([
   "media",
   "rider",
   "repertoire",
+  "privacy",
 ]);
 
 export function isReservedBandSlug(slug: string): boolean {
