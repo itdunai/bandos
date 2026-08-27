@@ -8,6 +8,7 @@ import { SubmitButton } from "@/components/ui/submit-button";
 import {
   Calendar,
   ClipboardList,
+  Disc3,
   Info,
   ListMusic,
   Music,
@@ -40,6 +41,7 @@ const NAV = [
     section: "Музыка",
     items: [
       { href: "songs", label: "Треки", icon: Music },
+      { href: "releases", label: "Релизы", icon: Disc3 },
       { href: "setlists", label: "Сет-листы", icon: ListMusic },
     ],
   },

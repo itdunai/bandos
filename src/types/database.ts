@@ -173,6 +173,55 @@ export interface Event {
   fee?: number | null;
 }
 
+export type ReleasePlatform =
+  | "spotify"
+  | "apple_music"
+  | "yandex_music"
+  | "vk_music"
+  | "youtube_music"
+  | "bandcamp"
+  | "zvuk"
+  | "other";
+
+export interface Release {
+  id: string;
+  band_id: string;
+  song_id: string;
+  title: string;
+  released_at: string;
+  cover_url: string | null;
+  notes: string | null;
+}
+
+export interface ReleaseLink {
+  id: string;
+  release_id: string;
+  platform: ReleasePlatform;
+  url: string;
+}
+
+export const RELEASE_PLATFORMS: ReleasePlatform[] = [
+  "spotify",
+  "apple_music",
+  "yandex_music",
+  "vk_music",
+  "youtube_music",
+  "bandcamp",
+  "zvuk",
+  "other",
+];
+
+export const RELEASE_PLATFORM_LABELS: Record<ReleasePlatform, string> = {
+  spotify: "Spotify",
+  apple_music: "Apple Music",
+  yandex_music: "Яндекс Музыка",
+  vk_music: "VK Музыка",
+  youtube_music: "YouTube Music",
+  bandcamp: "Bandcamp",
+  zvuk: "Звук",
+  other: "Другое",
+};
+
 export const INSTRUMENT_LABELS: Record<Instrument, string> = {
   guitar: "Гитара",
   bass: "Бас",

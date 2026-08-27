@@ -69,7 +69,7 @@ export async function requireBandAdmin(bandId: string): Promise<BandAuth> {
 }
 
 async function requireMemberByResource(
-  table: "setlists" | "songs" | "events" | "todos",
+  table: "setlists" | "songs" | "events" | "todos" | "releases",
   id: string,
   permission: BandPermission
 ): Promise<BandAuth> {
@@ -105,6 +105,10 @@ export function requireEventMember(eventId: string) {
 
 export function requireTodoMember(todoId: string) {
   return requireMemberByResource("todos", todoId, "todos");
+}
+
+export function requireReleaseMember(releaseId: string) {
+  return requireMemberByResource("releases", releaseId, "songs");
 }
 
 /** For actions that return `{ error }` instead of redirecting. */

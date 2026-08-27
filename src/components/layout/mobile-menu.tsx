@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Calendar,
   ClipboardList,
+  Disc3,
   Info,
   LogOut,
   Plus,
@@ -26,6 +27,7 @@ const MENU_ITEMS = [
   { href: "", label: "О группе", icon: Info, isHome: true },
   { href: "members", label: "Участники", icon: Users },
   { href: "finances", label: "Финансы", icon: Wallet },
+  { href: "releases", label: "Релизы", icon: Disc3 },
   { href: "schedule", label: "График", icon: Calendar },
   { href: "metronome", label: "Метроном", icon: Timer },
 ] as const;

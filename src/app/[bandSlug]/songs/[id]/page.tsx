@@ -15,7 +15,7 @@ import { sanitizeHref } from "@/lib/safe-url";
 import { createClient } from "@/lib/supabase/server";
 import { formatDuration } from "@/lib/utils";
 import { SONG_STATUS_LABELS, type SongStatus } from "@/types/database";
-import { ExternalLink, Pencil } from "lucide-react";
+import { ExternalLink, Disc3, Pencil } from "lucide-react";
 import { notFound } from "next/navigation";
 
 const STATUS_VARIANT: Record<
@@ -52,10 +52,17 @@ export default async function SongDetailPage({
 
   if (!song) notFound();
 
-  const { data: contents } = await supabase
-    .from("song_contents")
-    .select("*")
-    .eq("song_id", id);
+  const [{ data: contents }, { data: existingRelease }] = await Promise.all([
+    supabase.from("song_contents").select("*").eq("song_id", id),
+    supabase
+      .from("releases")
+      .select("id")
+      .eq("band_id", band.id)
+      .eq("song_id", id)
+      .order("released_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
 
   const chords = contents?.find((c) => c.content_type === "chords");
   const tabs = contents?.find((c) => c.content_type === "tabs");
@@ -72,6 +79,26 @@ export default async function SongDetailPage({
       actions={
         canEditSongs ? (
           <div className="flex gap-2">
+            {existingRelease ? (
+              <Link href={bandPath(band.slug, "releases", existingRelease.id)}>
+                <Button>
+                  <Disc3 className="h-3.5 w-3.5" />
+                  Смотреть релиз
+                </Button>
+              </Link>
+            ) : (
+              <Link
+                href={
+                  bandPath(band.slug, "releases", "new") +
+                  `?songId=${encodeURIComponent(id)}`
+                }
+              >
+                <Button>
+                  <Disc3 className="h-3.5 w-3.5" />
+                  В релизы
+                </Button>
+              </Link>
+            )}
             <Link href={bandPath(band.slug, "songs", id, "edit")}>
               <Button variant="accent">
                 <Pencil className="h-3.5 w-3.5" />
@@ -84,6 +111,13 @@ export default async function SongDetailPage({
               title={song.title}
             />
           </div>
+        ) : existingRelease ? (
+          <Link href={bandPath(band.slug, "releases", existingRelease.id)}>
+            <Button>
+              <Disc3 className="h-3.5 w-3.5" />
+              Смотреть релиз
+            </Button>
+          </Link>
         ) : undefined
       }
     >

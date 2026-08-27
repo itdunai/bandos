@@ -39,6 +39,7 @@ export function decodeBandSlug(raw: string): string {
 const UPCOMING_BANNER_HIDDEN_SECTIONS = new Set([
   "finances",
   "songs",
+  "releases",
   "setlists",
   "metronome",
   "play",
