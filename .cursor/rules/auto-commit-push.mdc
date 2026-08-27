@@ -1,0 +1,15 @@
+---
+description: Immediately commit and push completed work to master
+alwaysApply: true
+---
+
+# Git: commit and push immediately
+
+After finishing a task with code changes in this project:
+
+1. Commit all related changes right away (do not wait for the user to ask).
+2. Push to `origin` on the current branch (usually `master`).
+3. Use the repo commit style (Russian prefixes like `Исправление.`, `Улучшение.`, `Добавление.`).
+4. Do not ask for confirmation before commit/push unless secrets or destructive git operations are involved.
+
+"Гит пул" in user messages for this project means **push** to remote (publish), not `git pull`, unless they clearly ask to pull remote changes.
