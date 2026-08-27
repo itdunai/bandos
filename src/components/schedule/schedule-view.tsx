@@ -1,12 +1,13 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { bandPath } from "@/lib/paths";
 import { cn, formatDate } from "@/lib/utils";
 import type { EventType } from "@/types/database";
 import { RecordEventFeeButton } from "@/components/finances/record-event-fee-button";
 import { formatMoney } from "@/lib/finance";
-import { Calendar, Mic2, Star } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Mic2, Star } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 
@@ -37,9 +38,6 @@ const MONTHS = [
   "Ноябрь",
   "Декабрь",
 ];
-
-const selectClass =
-  "rounded-lg border border-border bg-bg-3 px-3 py-2 text-sm outline-none focus:border-accent";
 
 function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -105,8 +103,7 @@ export function ScheduleView({
   isAdmin?: boolean;
 }) {
   const today = new Date();
-  const currentYear = today.getFullYear();
-  const [year, setYear] = useState(currentYear);
+  const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const eventsListRef = useRef<HTMLElement>(null);
@@ -119,18 +116,6 @@ export function ScheduleView({
       year: "numeric",
     }).format(today)
   );
-
-  const years = useMemo(() => {
-    const set = new Set<number>([currentYear]);
-    for (const e of events) {
-      set.add(new Date(e.starts_at).getFullYear());
-    }
-    const min = Math.min(...set);
-    const max = Math.max(...set);
-    const list: number[] = [];
-    for (let y = min - 1; y <= max + 1; y++) list.push(y);
-    return list;
-  }, [events, currentYear]);
 
   const eventsByDay = useMemo(() => {
     const map = new Map<number, ScheduleEvent[]>();
@@ -171,13 +156,10 @@ export function ScheduleView({
   const calendarCells = getCalendarCells(year, month);
   const now = today.getTime();
 
-  function handleMonthChange(nextMonth: number) {
-    setMonth(nextMonth);
-    setSelectedDay(null);
-  }
-
-  function handleYearChange(nextYear: number) {
-    setYear(nextYear);
+  function shiftMonth(delta: number) {
+    const next = new Date(year, month + delta, 1);
+    setYear(next.getFullYear());
+    setMonth(next.getMonth());
     setSelectedDay(null);
   }
 
@@ -195,31 +177,31 @@ export function ScheduleView({
         <span className="font-medium text-text-primary">{todayLabel}</span>
       </p>
 
-      <div className="mx-auto flex w-full max-w-[1000px] flex-wrap items-center justify-center gap-3">
-        <select
-          value={year}
-          onChange={(e) => handleYearChange(Number(e.target.value))}
-          className={selectClass}
-          aria-label="Год"
+      <div className="mx-auto flex w-full max-w-[1000px] items-center justify-center gap-2 sm:gap-4">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => shiftMonth(-1)}
+          aria-label="Предыдущий месяц"
         >
-          {years.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
-          ))}
-        </select>
-        <select
-          value={month}
-          onChange={(e) => handleMonthChange(Number(e.target.value))}
-          className={selectClass}
-          aria-label="Месяц"
+          <ChevronLeft className="size-5" />
+        </Button>
+        <p
+          className="min-w-[10rem] text-center text-base font-medium text-text-primary sm:min-w-[12rem] sm:text-lg"
+          aria-live="polite"
         >
-          {MONTHS.map((name, i) => (
-            <option key={name} value={i}>
-              {name}
-            </option>
-          ))}
-        </select>
+          {MONTHS[month]} {year}
+        </p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => shiftMonth(1)}
+          aria-label="Следующий месяц"
+        >
+          <ChevronRight className="size-5" />
+        </Button>
       </div>
 
       <div className="mx-auto w-full max-w-[1000px]">
