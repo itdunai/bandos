@@ -36,7 +36,9 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/invite") ||
     pathname.startsWith("/auth/callback") ||
     pathname.startsWith("/rider/") ||
-    pathname.startsWith("/repertoire/");
+    pathname.startsWith("/repertoire/") ||
+    pathname === "/privacy" ||
+    pathname.startsWith("/privacy/");
 
   const isNewBandRoute = pathname === "/new-band";
 

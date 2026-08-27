@@ -17,6 +17,14 @@ export interface Profile {
   created_at: string;
 }
 
+export interface SitePage {
+  slug: string;
+  title: string;
+  body: string;
+  updated_at: string;
+  updated_by: string | null;
+}
+
 export interface SocialLinks {
   vk?: string;
   telegram?: string;

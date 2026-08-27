@@ -52,6 +52,10 @@ html.navigating button:not(:disabled) {
   cursor: wait;
 }
 
+html.cookie-consent-open body {
+  padding-bottom: 8rem;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -4,10 +4,16 @@ import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { PublicConfigScript } from "@/components/providers/public-config-script";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
 import { PwaRegister } from "@/components/pwa-register";
+import { CookieConsentBanner } from "@/components/legal/cookie-consent-banner";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { validateRuntimeEnv } from "@/lib/env";
+import {
+  COOKIE_CONSENT_COOKIE,
+  isCookieConsentAccepted,
+} from "@/lib/legal/cookie-consent";
 import { consumeToast } from "@/lib/redirect-with-toast";
 import { getSupabasePublicConfig } from "@/lib/supabase/public-config";
+import { cookies } from "next/headers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -40,11 +46,15 @@ export default async function RootLayout({
   const toast = await consumeToast();
   const supabaseConfig = getSupabasePublicConfig();
   const buildSha = process.env.BUILD_SHA ?? "dev";
+  const cookieStore = await cookies();
+  const showCookieBanner = !isCookieConsentAccepted(
+    cookieStore.get(COOKIE_CONSENT_COOKIE)?.value
+  );
 
   return (
     <html
       lang="ru"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${showCookieBanner ? " cookie-consent-open" : ""}`}
     >
       <body className="min-h-full">
         <PublicConfigScript config={supabaseConfig} />
@@ -53,6 +63,7 @@ export default async function RootLayout({
           <ToastProvider initial={toast}>
             <NavigationProgress />
             {children}
+            {showCookieBanner && <CookieConsentBanner />}
             <div
               className="pointer-events-none fixed bottom-2 right-2 z-50 rounded-md border border-border bg-bg/90 px-2 py-1 text-[10px] text-text-muted backdrop-blur"
               title="Версия текущего деплоя"

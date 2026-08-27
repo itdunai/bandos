@@ -74,6 +74,13 @@ export default async function RegisterPage({
             autoComplete="new-password"
           />
         </div>
+        <p className="text-[11px] leading-relaxed text-text-muted">
+          Нажимая «Зарегистрироваться», вы соглашаетесь с{" "}
+          <Link href="/privacy" className="text-accent hover:underline">
+            Политикой конфиденциальности
+          </Link>
+          .
+        </p>
         <SubmitButton type="submit" variant="accent" className="w-full py-2.5" loadingLabel="Регистрация…">
           Зарегистрироваться
         </SubmitButton>
