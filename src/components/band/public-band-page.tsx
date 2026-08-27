@@ -1,16 +1,32 @@
+import { BandReleasesBlock } from "@/components/band/band-releases-block";
 import { ScrollToHash } from "@/components/band/scroll-to-hash";
+import type { ReleaseListItem } from "@/components/releases/release-list";
 import { PhotoGallery } from "@/components/ui/image-lightbox";
 import { FormattedText } from "@/components/ui/minimal-editor";
 import { SafeMediaImage } from "@/components/ui/safe-media-image";
 import { sanitizeHref } from "@/lib/safe-url";
 import { formatDuration } from "@/lib/utils";
-import { SOCIAL_LABELS, SONG_TYPE_LABELS, type SocialLinks, type SongType } from "@/types/database";
+import {
+  SOCIAL_LABELS,
+  SONG_TYPE_LABELS,
+  type ReleasePlatform,
+  type SocialLinks,
+  type SongType,
+} from "@/types/database";
 import { ExternalLink, Guitar, ListMusic, MapPin, Music, Users } from "lucide-react";
 
 interface PublicSong {
   title: string;
   song_type: SongType;
   duration_sec: number | null;
+}
+
+interface PublicRelease {
+  id: string;
+  title: string;
+  released_at: string;
+  cover_url: string | null;
+  links: { platform: ReleasePlatform; url: string }[] | null;
 }
 
 export interface PublicBandPageData {
@@ -28,6 +44,7 @@ export interface PublicBandPageData {
   tracks_count: number;
   members_count: number;
   songs: PublicSong[];
+  releases?: PublicRelease[];
 }
 
 export function PublicBandPage({ band }: { band: PublicBandPageData }) {
@@ -38,6 +55,16 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
   const photos = Array.isArray(band.photos) ? band.photos : [];
   const showRider = band.rider_public;
   const showRepertoire = band.repertoire_public;
+  const releases: ReleaseListItem[] = (band.releases ?? []).map((r) => ({
+    id: r.id,
+    band_id: "",
+    song_id: "",
+    title: r.title,
+    released_at: r.released_at,
+    cover_url: r.cover_url,
+    notes: null,
+    links: r.links ?? [],
+  }));
 
   return (
     <div className="min-h-screen bg-bg text-text-primary">
@@ -78,7 +105,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
         )}
 
         {showRider && band.description && (
-          <p className="mb-6 text-sm text-text-secondary whitespace-pre-wrap">
+          <p className="mb-6 whitespace-pre-wrap text-sm text-text-secondary">
             {band.description}
           </p>
         )}
@@ -97,6 +124,16 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
         {photos.length > 0 && (
           <div className="mb-8">
             <PhotoGallery photos={photos} title="Фото" />
+          </div>
+        )}
+
+        {releases.length > 0 && (
+          <div className="mb-8">
+            <BandReleasesBlock
+              releases={releases}
+              bandSlug={band.slug}
+              variant="public"
+            />
           </div>
         )}
 

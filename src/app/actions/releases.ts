@@ -5,6 +5,7 @@ import {
   requireReleaseMember,
 } from "@/lib/band/assert-access";
 import { bandPath } from "@/lib/paths";
+import { revalidatePublicBand } from "@/lib/public-revalidate";
 import { sanitizeExternalUrl } from "@/lib/safe-url";
 import {
   RELEASE_PLATFORMS,
@@ -126,6 +127,8 @@ export async function createRelease(
 
   revalidatePath(bandPath(bandSlug, "releases"));
   revalidatePath(bandPath(bandSlug, "songs", data.song_id));
+  revalidatePath(bandPath(bandSlug));
+  revalidatePublicBand(bandSlug);
   redirect(bandPath(bandSlug, "releases", release.id));
 }
 
@@ -194,6 +197,8 @@ export async function updateRelease(
   revalidatePath(bandPath(bandSlug, "releases"));
   revalidatePath(bandPath(bandSlug, "releases", releaseId));
   revalidatePath(bandPath(bandSlug, "songs", data.song_id));
+  revalidatePath(bandPath(bandSlug));
+  revalidatePublicBand(bandSlug);
   redirect(bandPath(bandSlug, "releases", releaseId));
 }
 
@@ -210,6 +215,8 @@ export async function deleteRelease(releaseId: string, bandSlug: string) {
   await supabase.from("releases").delete().eq("id", releaseId).eq("band_id", bandId);
 
   revalidatePath(bandPath(bandSlug, "releases"));
+  revalidatePath(bandPath(bandSlug));
+  revalidatePublicBand(bandSlug);
   if (release?.song_id) {
     revalidatePath(bandPath(bandSlug, "songs", release.song_id));
   }

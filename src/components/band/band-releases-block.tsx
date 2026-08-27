@@ -1,22 +1,23 @@
-import { Badge } from "@/components/ui/badge";
 import type { ReleaseListItem } from "@/components/releases/release-list";
 import { bandPath } from "@/lib/paths";
+import { sanitizeHref } from "@/lib/safe-url";
 import { formatDate } from "@/lib/utils";
-import {
-  RELEASE_PLATFORM_LABELS,
-  type ReleasePlatform,
-} from "@/types/database";
 import { Disc3 } from "lucide-react";
 import Link from "next/link";
 
 export function BandReleasesBlock({
   releases,
   bandSlug,
+  variant = "internal",
 }: {
   releases: ReleaseListItem[];
   bandSlug: string;
+  /** internal — ссылки в BandOS; public — внешние ссылки на площадки */
+  variant?: "internal" | "public";
 }) {
   if (releases.length === 0) return null;
+
+  const isPublic = variant === "public";
 
   return (
     <div className="rounded-xl border border-border bg-bg-2 p-4">
@@ -25,61 +26,86 @@ export function BandReleasesBlock({
           <Disc3 className="h-4 w-4 text-text-muted" />
           Релизы
         </h3>
-        <Link
-          href={bandPath(bandSlug, "releases")}
-          className="text-xs text-accent hover:underline"
-        >
-          Все релизы
-        </Link>
-      </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {releases.map((release) => (
+        {!isPublic && (
           <Link
-            key={release.id}
-            href={bandPath(bandSlug, "releases", release.id)}
-            className="group overflow-hidden rounded-lg border border-border bg-bg-3 transition-colors hover:border-accent"
+            href={bandPath(bandSlug, "releases")}
+            className="text-xs text-accent hover:underline"
           >
-            <div className="aspect-square bg-bg">
-              {release.cover_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={release.cover_url}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-text-muted">
-                  <Disc3 className="h-7 w-7 opacity-40" />
-                </div>
-              )}
-            </div>
-            <div className="space-y-1 p-2">
-              <p className="truncate text-sm font-medium group-hover:text-accent">
-                {release.title}
-              </p>
-              <p className="text-[10px] text-text-muted">
-                {formatDate(release.released_at, {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </p>
-              {release.links.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {release.links.slice(0, 2).map((link) => (
-                    <Badge key={link.platform} variant="purple">
-                      {
-                        RELEASE_PLATFORM_LABELS[
-                          link.platform as ReleasePlatform
-                        ]
-                      }
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
+            Все релизы
           </Link>
-        ))}
+        )}
+      </div>
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {releases.map((release) => {
+          const firstExternal = release.links
+            .map((l) => sanitizeHref(l.url))
+            .find(Boolean);
+          const href = isPublic
+            ? firstExternal
+            : bandPath(bandSlug, "releases", release.id);
+
+          const body = (
+            <>
+              <div className="aspect-square bg-bg">
+                {release.cover_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={release.cover_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-text-muted">
+                    <Disc3 className="h-5 w-5 opacity-40" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-0.5 p-1.5">
+                <p className="truncate text-[11px] font-medium group-hover:text-accent sm:text-xs">
+                  {release.title}
+                </p>
+                <p className="truncate text-[9px] text-text-muted sm:text-[10px]">
+                  {formatDate(release.released_at, {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            </>
+          );
+
+          const className =
+            "group overflow-hidden rounded-lg border border-border bg-bg-3 transition-colors hover:border-accent";
+
+          if (!href) {
+            return (
+              <div key={release.id} className={className}>
+                {body}
+              </div>
+            );
+          }
+
+          if (isPublic) {
+            return (
+              <a
+                key={release.id}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={className}
+              >
+                {body}
+              </a>
+            );
+          }
+
+          return (
+            <Link key={release.id} href={href} className={className}>
+              {body}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
