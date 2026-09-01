@@ -13,3 +13,13 @@ After finishing a task with code changes in this project:
 4. Do not ask for confirmation before commit/push unless secrets or destructive git operations are involved.
 
 "Гит пул" in user messages for this project means **push** to remote (publish), not `git pull`, unless they clearly ask to pull remote changes.
+
+## BUILD_SHA (версия деплоя)
+
+При сборке Docker передавайте hash коммита, иначе в UI будет `build: dev`:
+
+```bash
+docker build --build-arg BUILD_SHA=$(git rev-parse --short HEAD) ...
+```
+
+Версия показывается внизу sidebar (desktop) и burger-меню (mobile).

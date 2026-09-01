@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
+import { BuildVersionLabel } from "@/components/layout/build-version-label";
 import { canViewFinances } from "@/lib/band/permissions";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { cn } from "@/lib/utils";
@@ -137,6 +138,7 @@ export function MobileMenu({
               Выйти
             </SubmitButton>
           </form>
+          <BuildVersionLabel className="px-3 pt-1 text-[10px] text-text-muted" />
         </div>
       </aside>
     </>

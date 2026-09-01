@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { bandPath } from "@/lib/paths";
 import { Avatar } from "@/components/ui/avatar";
 import { BandSwitcher } from "@/components/layout/band-switcher";
+import { BuildVersionLabel } from "@/components/layout/build-version-label";
 import { useUserBands } from "@/components/layout/band-shell-context";
 import type { Band, BandMember } from "@/types/database";
 import { INSTRUMENT_LABELS } from "@/types/database";
@@ -161,6 +162,7 @@ export function Sidebar({
             </div>
           </div>
         )}
+        <BuildVersionLabel className="truncate px-2 text-[10px] text-text-muted" />
       </div>
     </aside>
   );

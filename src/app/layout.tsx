@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { BuildShaProvider } from "@/components/layout/build-sha-context";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { PublicConfigScript } from "@/components/providers/public-config-script";
 import { SupabaseProvider } from "@/components/providers/supabase-provider";
@@ -59,18 +60,14 @@ export default async function RootLayout({
       <body className="min-h-full">
         <PublicConfigScript config={supabaseConfig} />
         <SupabaseProvider config={supabaseConfig}>
-          <PwaRegister />
-          <ToastProvider initial={toast}>
-            <NavigationProgress />
-            {children}
-            {showCookieBanner && <CookieConsentBanner />}
-            <div
-              className="pointer-events-none fixed bottom-2 right-2 z-50 rounded-md border border-border bg-bg/90 px-2 py-1 text-[10px] text-text-muted backdrop-blur"
-              title="Версия текущего деплоя"
-            >
-              build: {buildSha}
-            </div>
-          </ToastProvider>
+          <BuildShaProvider sha={buildSha}>
+            <PwaRegister />
+            <ToastProvider initial={toast}>
+              <NavigationProgress />
+              {children}
+              {showCookieBanner && <CookieConsentBanner />}
+            </ToastProvider>
+          </BuildShaProvider>
         </SupabaseProvider>
       </body>
     </html>
