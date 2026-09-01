@@ -34,12 +34,12 @@ export function AppShell({
   fullWidth?: boolean;
 }) {
   return (
-    <div className="flex min-h-screen min-w-0 overflow-x-hidden bg-bg">
-      <div className="hidden md:flex">
+    <div className="flex min-h-screen min-w-0 overflow-x-hidden bg-bg md:h-dvh md:max-h-dvh md:overflow-hidden">
+      <div className="hidden shrink-0 md:flex">
         <Sidebar band={band} member={member} memberCount={memberCount} />
       </div>
 
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col md:min-h-0 md:overflow-hidden">
         <MobileHeader band={band} member={member} />
         {!fullWidth && (
           <header className="flex shrink-0 flex-col gap-2 border-b border-border px-5 py-3.5 md:flex-row md:items-center md:justify-between">
@@ -57,8 +57,8 @@ export function AppShell({
         <main
           className={
             fullWidth
-              ? "min-w-0 flex-1 overflow-x-hidden"
-              : "min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-5 pb-mobile-main md:pb-5"
+              ? "min-h-0 min-w-0 flex-1 overflow-x-hidden"
+              : "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-5 pb-mobile-main md:pb-5"
           }
         >
           {!fullWidth && <UpcomingBannerSlot bandSlug={band.slug} />}

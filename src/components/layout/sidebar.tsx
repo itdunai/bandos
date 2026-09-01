@@ -72,7 +72,7 @@ export function Sidebar({
   const userBands = useUserBands();
 
   return (
-    <aside className="flex w-[200px] shrink-0 flex-col border-r border-border bg-bg-2">
+    <aside className="flex h-dvh w-[200px] shrink-0 flex-col border-r border-border bg-bg-2">
       <div className="border-b border-border px-4 py-4">
         <BandSwitcher bands={userBands} currentBand={band} />
         <div className="mt-1 text-[11px] text-text-muted">
