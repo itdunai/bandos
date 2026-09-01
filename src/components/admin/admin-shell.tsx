@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Guitar } from "lucide-react";
+import { SiteLogo } from "@/components/brand/site-logo";
 
 export function AdminShell({
   children,
@@ -15,11 +15,9 @@ export function AdminShell({
       <header className="border-b border-border bg-bg-2">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-dark">
-              <Guitar className="h-4 w-4 text-white" />
-            </div>
+            <SiteLogo className="h-8" />
             <div>
-              <div className="text-sm font-medium">BandOS Admin</div>
+              <div className="text-sm font-medium">Admin</div>
               <div className="text-[10px] text-text-muted">{userEmail}</div>
             </div>
           </div>

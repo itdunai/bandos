@@ -1,6 +1,6 @@
-const CACHE = "bandos-v3";
+const CACHE = "bandos-v4";
 /** Только статика PWA — не кэшируем HTML страниц (иначе после деплоя 404 на чанках). */
-const PRECACHE_URLS = ["/manifest.webmanifest", "/icon.svg"];
+const PRECACHE_URLS = ["/manifest.webmanifest", "/favicon.ico", "/logo.png"];
 
 const OFFLINE_PLAY_HTML =
   "<!DOCTYPE html><html lang='ru'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>BandOS — офлайн</title><style>body{font-family:system-ui,sans-serif;background:#0d0d0f;color:#f0f0f4;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;text-align:center}p{color:#9090a8;max-width:320px;line-height:1.5}</style></head><body><div><h1>Нет сети</h1><p>Откройте раздел «Офлайн-сет-листы» в режиме «Играем» — если вы уже сохраняли сет-лист ранее.</p></div></body></html>";

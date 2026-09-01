@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { createBand } from "@/app/actions/auth";
+import { SiteLogo } from "@/components/brand/site-logo";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
-import { Guitar } from "lucide-react";
 import { INSTRUMENT_LABELS, type Instrument } from "@/types/database";
 import { redirect } from "next/navigation";
 
@@ -32,9 +32,7 @@ export default async function NewBandPage({
   return (
     <Card className="p-6">
       <div className="mb-6 flex flex-col items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-dark">
-          <Guitar className="h-5 w-5 text-white" />
-        </div>
+        <SiteLogo className="h-14" />
         <h1 className="text-lg font-medium">Создать группу</h1>
         <p className="text-center text-xs text-text-secondary">
           Ваша первая (или новая) группа в BandOS

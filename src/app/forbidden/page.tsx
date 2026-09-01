@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { SiteLogo } from "@/components/brand/site-logo";
 import {
   forbiddenBackPath,
   getForbiddenMessage,
 } from "@/lib/forbidden";
-import { ArrowLeft, Guitar, ShieldX } from "lucide-react";
+import { ArrowLeft, ShieldX } from "lucide-react";
 
 export default async function ForbiddenPage({
   searchParams,
@@ -23,9 +24,8 @@ export default async function ForbiddenPage({
   return (
     <div className="flex min-h-screen flex-col bg-bg">
       <header className="border-b border-border bg-bg-2 px-4 py-3 sm:px-6">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-accent">
-          <Guitar className="h-4 w-4" />
-          BandOS
+        <Link href="/" className="inline-flex items-center">
+          <SiteLogo className="h-8" />
         </Link>
       </header>
 

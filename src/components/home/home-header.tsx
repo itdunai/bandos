@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Guitar, LogIn, Plus } from "lucide-react";
+import { SiteLogo } from "@/components/brand/site-logo";
+import { LogIn, Plus } from "lucide-react";
 import { bandPath } from "@/lib/paths";
 
 export function HomeHeader({
@@ -14,12 +15,9 @@ export function HomeHeader({
     <header className="sticky top-0 z-40 border-b border-border/80 bg-bg/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-dark shadow-lg shadow-accent-dark/20">
-            <Guitar className="h-4 w-4 text-white" />
-          </div>
-          <div>
-            <div className="text-sm font-medium leading-none">BandOS</div>
-            <div className="mt-0.5 text-[10px] text-text-muted">
+          <SiteLogo className="h-10" priority />
+          <div className="hidden sm:block">
+            <div className="text-[10px] text-text-muted">
               Операционная система группы
             </div>
           </div>

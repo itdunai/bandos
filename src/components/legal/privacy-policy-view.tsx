@@ -1,7 +1,7 @@
 import { FormattedDocument } from "@/components/legal/formatted-document";
+import { SiteLogo } from "@/components/brand/site-logo";
 import { formatDate } from "@/lib/utils";
 import type { SitePage } from "@/lib/legal/site-pages";
-import { Guitar } from "lucide-react";
 import Link from "next/link";
 
 export function PrivacyPolicyView({ page }: { page: SitePage }) {
@@ -9,12 +9,8 @@ export function PrivacyPolicyView({ page }: { page: SitePage }) {
     <div className="flex min-h-screen flex-col bg-bg">
       <header className="border-b border-border bg-bg-2 px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-accent"
-          >
-            <Guitar className="h-4 w-4" />
-            BandOS
+          <Link href="/" className="inline-flex items-center gap-2">
+            <SiteLogo className="h-8" />
           </Link>
           <Link
             href="/"

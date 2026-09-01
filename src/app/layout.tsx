@@ -32,6 +32,10 @@ export const metadata: Metadata = {
   description:
     "Репертуар, сет-листы, режим «Играем», график, финансы и публичная страница для заказчиков. Бесплатно для кавер- и авторских групп.",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/logo.png",
+  },
   appleWebApp: {
     capable: true,
     title: "BandOS",

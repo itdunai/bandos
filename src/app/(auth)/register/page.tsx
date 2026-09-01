@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { signUpAccount } from "@/app/actions/auth";
+import { SiteLogo } from "@/components/brand/site-logo";
 import { PrivacyConsentField } from "@/components/legal/privacy-consent-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
-import { Guitar, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export default async function RegisterPage({
   searchParams,
@@ -41,9 +42,7 @@ export default async function RegisterPage({
   return (
     <Card className="p-6">
       <div className="mb-6 flex flex-col items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-dark">
-          <Guitar className="h-5 w-5 text-white" />
-        </div>
+        <SiteLogo className="h-14" />
         <h1 className="text-lg font-medium">Регистрация</h1>
         <p className="text-center text-xs text-text-secondary">
           Создайте аккаунт BandOS

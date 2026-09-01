@@ -9,8 +9,8 @@ import {
 import { HomeFeatures } from "@/components/home/home-features";
 import { HomeFooter } from "@/components/home/home-footer";
 import { HomeHero } from "@/components/home/home-hero";
+import { SiteLogo } from "@/components/brand/site-logo";
 import { getPublicBandsCatalog } from "@/lib/public-cache";
-import { Guitar } from "lucide-react";
 
 export const revalidate = 60;
 
@@ -22,8 +22,7 @@ export default async function HomePage() {
   if (!supabaseConfigured) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-bg p-6 text-center">
-        <Guitar className="h-12 w-12 text-accent" />
-        <h1 className="text-2xl font-medium">BandOS</h1>
+        <SiteLogo className="h-16" />
         <p className="max-w-md text-sm text-text-secondary">
           Скопируйте <code className="text-accent">.env.local.example</code> в{" "}
           <code className="text-accent">.env.local</code> и укажите ключи Supabase.
