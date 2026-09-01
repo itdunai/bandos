@@ -78,7 +78,7 @@ export default async function SongDetailPage({
       title={song.title}
       actions={
         canEditSongs ? (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {existingRelease ? (
               <Link href={bandPath(band.slug, "releases", existingRelease.id)}>
                 <Button>

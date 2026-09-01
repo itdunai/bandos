@@ -42,10 +42,12 @@ export function AppShell({
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <MobileHeader band={band} member={member} />
         {!fullWidth && (
-          <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-3.5">
-            <h1 className="min-w-0 text-base font-medium">{title}</h1>
+          <header className="flex shrink-0 flex-col gap-2 border-b border-border px-5 py-3.5 md:flex-row md:items-center md:justify-between">
+            <h1 className="w-full min-w-0 text-base font-medium md:w-auto">
+              {title}
+            </h1>
             {actions && (
-              <div className="flex max-w-full shrink-0 flex-wrap justify-end gap-2">
+              <div className="flex w-full flex-wrap gap-2 md:w-auto md:justify-end">
                 {actions}
               </div>
             )}
