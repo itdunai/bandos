@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export function SiteLogo({
@@ -9,12 +8,11 @@ export function SiteLogo({
   priority?: boolean;
 }) {
   return (
-    <Image
-      src="/logo.png"
+    // eslint-disable-next-line @next/next/no-img-element -- локальный SVG wordmark
+    <img
+      src="/logo.svg"
       alt="BandOS"
-      width={400}
-      height={400}
-      priority={priority}
+      fetchPriority={priority ? "high" : undefined}
       className={cn("h-auto w-auto object-contain", className)}
     />
   );
