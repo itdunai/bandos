@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signUpAccount } from "@/app/actions/auth";
+import { PrivacyConsentField } from "@/components/legal/privacy-consent-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -74,13 +75,7 @@ export default async function RegisterPage({
             autoComplete="new-password"
           />
         </div>
-        <p className="text-[11px] leading-relaxed text-text-muted">
-          Нажимая «Зарегистрироваться», вы соглашаетесь с{" "}
-          <Link href="/privacy" className="text-accent hover:underline">
-            Политикой конфиденциальности
-          </Link>
-          .
-        </p>
+        <PrivacyConsentField id="register_privacy_consent" />
         <SubmitButton type="submit" variant="accent" className="w-full py-2.5" loadingLabel="Регистрация…">
           Зарегистрироваться
         </SubmitButton>

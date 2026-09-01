@@ -14,6 +14,7 @@ test.describe("BandOS auth & navigation", () => {
     await page.goto("/login");
     await page.getByLabel(/email|почта/i).fill(email!);
     await page.getByLabel(/пароль|password/i).fill(password!);
+    await page.getByRole("checkbox", { name: /политик/i }).check();
     await page.getByRole("button", { name: /войти|login/i }).click();
     await page.waitForURL(`**/${bandSlug}**`);
 
@@ -25,6 +26,7 @@ test.describe("BandOS auth & navigation", () => {
     await page.goto("/login");
     await page.getByLabel(/email|почта/i).fill(email!);
     await page.getByLabel(/пароль|password/i).fill(password!);
+    await page.getByRole("checkbox", { name: /политик/i }).check();
     await page.getByRole("button", { name: /войти|login/i }).click();
     await page.waitForURL(`**/${bandSlug}**`);
 

@@ -24,6 +24,12 @@ async function getInvitation(token: string) {
 
 /** Регистрация аккаунта без создания группы */
 export async function signUpAccount(formData: FormData) {
+  if (formData.get("privacy_consent") !== "on") {
+    redirect(
+      `/register?error=${encodeURIComponent("Необходимо согласие с Политикой конфиденциальности")}`
+    );
+  }
+
   const supabase = await createClient();
 
   const email = formData.get("email") as string;
@@ -180,6 +186,15 @@ export async function createBand(formData: FormData) {
 }
 
 export async function signIn(formData: FormData) {
+  if (formData.get("privacy_consent") !== "on") {
+    const next = formData.get("next") as string | null;
+    const params = new URLSearchParams({
+      error: "Необходимо согласие с Политикой конфиденциальности",
+    });
+    if (next) params.set("next", next);
+    redirect(`/login?${params.toString()}`);
+  }
+
   const supabase = await createClient();
 
   const email = formData.get("email") as string;

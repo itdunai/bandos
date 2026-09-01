@@ -1,3 +1,4 @@
+import { BandContactsBlock } from "@/components/band/band-contacts-block";
 import { BandReleasesBlock } from "@/components/band/band-releases-block";
 import { ScrollToHash } from "@/components/band/scroll-to-hash";
 import type { ReleaseListItem } from "@/components/releases/release-list";
@@ -10,6 +11,7 @@ import {
   SOCIAL_LABELS,
   SONG_TYPE_LABELS,
   type ReleasePlatform,
+  type BandContact,
   type SocialLinks,
   type SongType,
 } from "@/types/database";
@@ -41,6 +43,7 @@ export interface PublicBandPageData {
   repertoire_public: boolean;
   tech_rider: string | null;
   social_links: SocialLinks;
+  contacts?: BandContact[];
   tracks_count: number;
   members_count: number;
   songs: PublicSong[];
@@ -65,6 +68,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
     notes: null,
     links: r.links ?? [],
   }));
+  const contacts = band.contacts ?? [];
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-bg text-text-primary">
@@ -134,6 +138,12 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
               bandSlug={band.slug}
               variant="public"
             />
+          </div>
+        )}
+
+        {contacts.length > 0 && (
+          <div className="mb-8">
+            <BandContactsBlock contacts={contacts} />
           </div>
         )}
 

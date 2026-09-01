@@ -33,6 +33,11 @@ export interface SocialLinks {
   website?: string;
 }
 
+export interface BandContact {
+  name: string;
+  phone: string;
+}
+
 export interface Band {
   id: string;
   name: string;
@@ -46,6 +51,7 @@ export interface Band {
   rider_public: boolean;
   repertoire_public: boolean;
   social_links: SocialLinks;
+  contacts?: BandContact[];
   finance_opening_balance?: number;
   created_by: string | null;
   created_at: string;

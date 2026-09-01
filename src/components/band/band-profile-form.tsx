@@ -1,6 +1,7 @@
 "use client";
 
 import { updateBandProfile } from "@/app/actions/band";
+import { BandContactsFields } from "@/components/band/band-contacts-fields";
 import { BandMediaSection } from "@/components/band/band-media-section";
 import { PublicPageShare } from "@/components/band/public-page-share";
 import { ShareLinkButton } from "@/components/band/share-link-button";
@@ -8,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MinimalEditor } from "@/components/ui/minimal-editor";
 import { SubmitButton } from "@/components/ui/submit-button";
-import type { Band, SocialLinks } from "@/types/database";
+import type { Band, BandContact, SocialLinks } from "@/types/database";
 import { SOCIAL_LABELS } from "@/types/database";
 
 const SOCIAL_KEYS = Object.keys(SOCIAL_LABELS) as (keyof SocialLinks)[];
@@ -26,6 +27,7 @@ export function BandProfileForm({
 }) {
   const action = updateBandProfile.bind(null, band.id, band.slug);
   const links = (band.social_links ?? {}) as SocialLinks;
+  const contacts = (band.contacts ?? []) as BandContact[];
 
   return (
     <div className="space-y-5">
@@ -97,6 +99,8 @@ export function BandProfileForm({
           Публичная ссылка на техрайдер (без входа в BandOS)
         </label>
       </section>
+
+      <BandContactsFields initial={contacts} />
 
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
         <h2 className="text-sm font-medium">Соцсети и ссылки</h2>

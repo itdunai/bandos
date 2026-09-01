@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signIn } from "@/app/actions/auth";
+import { PrivacyConsentField } from "@/components/legal/privacy-consent-field";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
@@ -47,6 +48,7 @@ export default async function LoginPage({
             autoComplete="current-password"
           />
         </div>
+        <PrivacyConsentField id="login_privacy_consent" />
         <SubmitButton type="submit" variant="accent" className="w-full py-2.5" loadingLabel="Вход…">
           Войти
         </SubmitButton>

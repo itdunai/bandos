@@ -1,5 +1,6 @@
 "use server";
 
+import { parseContactsJson } from "@/lib/band/parse-contacts";
 import {
   requireBandAdmin,
   requireBandPermission,
@@ -47,6 +48,7 @@ export async function updateBandProfile(
       tech_rider: techRider,
       rider_public: riderPublic,
       social_links: parseSocialLinks(formData),
+      contacts: parseContactsJson(formData.get("contacts_json")),
     })
     .eq("id", bandId);
 

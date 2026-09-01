@@ -52,6 +52,7 @@ export function BandHomeShell({
     tech_rider: band.tech_rider ?? null,
     rider_public: band.rider_public ?? true,
     social_links: band.social_links ?? {},
+    contacts: Array.isArray(band.contacts) ? band.contacts : [],
   };
 
   return (

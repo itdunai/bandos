@@ -1,3 +1,4 @@
+import { BandContactsBlock } from "@/components/band/band-contacts-block";
 import { BandReleasesBlock } from "@/components/band/band-releases-block";
 import { PublicPageShare } from "@/components/band/public-page-share";
 import { ShareLinkButton } from "@/components/band/share-link-button";
@@ -6,7 +7,7 @@ import { PhotoGallery } from "@/components/ui/image-lightbox";
 import { FormattedText } from "@/components/ui/minimal-editor";
 import { SafeMediaImage } from "@/components/ui/safe-media-image";
 import { sanitizeHref } from "@/lib/safe-url";
-import type { Band, SocialLinks } from "@/types/database";
+import type { Band, BandContact, SocialLinks } from "@/types/database";
 import { SOCIAL_LABELS } from "@/types/database";
 import { ExternalLink, MapPin, Music, Users } from "lucide-react";
 
@@ -29,6 +30,7 @@ export function BandProfileView({
     .filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   const photos = Array.isArray(band.photos) ? band.photos : [];
+  const contacts = (band.contacts ?? []) as BandContact[];
 
   return (
     <div className="space-y-4">
@@ -79,6 +81,8 @@ export function BandProfileView({
       <PublicPageShare path={riderSharePath} />
 
       <BandReleasesBlock releases={releases} bandSlug={band.slug} />
+
+      <BandContactsBlock contacts={contacts} />
 
       {photos.length > 0 && (
         <div className="rounded-xl border border-border bg-bg-2 p-4">

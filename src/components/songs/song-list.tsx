@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { bandPath } from "@/lib/paths";
+import { exportSongsToExcel } from "@/lib/songs-export";
 import { cn, formatDuration } from "@/lib/utils";
 import {
   SONG_STATUS_LABELS,
@@ -12,7 +13,7 @@ import {
   type SongStatus,
   type SongType,
 } from "@/types/database";
-import { LayoutGrid, Music, Plus, Search, Table2 } from "lucide-react";
+import { Download, LayoutGrid, Music, Plus, Search, Table2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -102,31 +103,44 @@ export function SongList({
             className="pl-9"
           />
         </div>
-        <div className="flex shrink-0 rounded-lg border border-border bg-bg-2 p-0.5">
+        <div className="flex shrink-0 gap-2">
           <Button
             type="button"
-            variant={viewMode === "tiles" ? "accent" : "ghost"}
+            variant="default"
             size="sm"
-            className="gap-1.5 px-2.5"
-            onClick={() => changeViewMode("tiles")}
-            aria-pressed={viewMode === "tiles"}
-            aria-label="Плитки"
+            className="gap-1.5"
+            onClick={() => exportSongsToExcel(songs, bandSlug)}
+            disabled={songs.length === 0}
           >
-            <LayoutGrid className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Плитки</span>
+            <Download className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Excel</span>
           </Button>
-          <Button
-            type="button"
-            variant={viewMode === "table" ? "accent" : "ghost"}
-            size="sm"
-            className="gap-1.5 px-2.5"
-            onClick={() => changeViewMode("table")}
-            aria-pressed={viewMode === "table"}
-            aria-label="Таблица"
-          >
-            <Table2 className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Таблица</span>
-          </Button>
+          <div className="hidden rounded-lg border border-border bg-bg-2 p-0.5 md:flex">
+            <Button
+              type="button"
+              variant={viewMode === "tiles" ? "accent" : "ghost"}
+              size="sm"
+              className="gap-1.5 px-2.5"
+              onClick={() => changeViewMode("tiles")}
+              aria-pressed={viewMode === "tiles"}
+              aria-label="Плитки"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Плитки</span>
+            </Button>
+            <Button
+              type="button"
+              variant={viewMode === "table" ? "accent" : "ghost"}
+              size="sm"
+              className="gap-1.5 px-2.5"
+              onClick={() => changeViewMode("table")}
+              aria-pressed={viewMode === "table"}
+              aria-label="Таблица"
+            >
+              <Table2 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Таблица</span>
+            </Button>
+          </div>
         </div>
       </div>
 
