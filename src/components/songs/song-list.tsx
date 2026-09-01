@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { bandPath } from "@/lib/paths";
 import { cn, formatDuration } from "@/lib/utils";
@@ -11,9 +12,9 @@ import {
   type SongStatus,
   type SongType,
 } from "@/types/database";
-import { Music, Plus, Search } from "lucide-react";
+import { LayoutGrid, Music, Plus, Search, Table2 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const STATUS_VARIANT: Record<
   SongStatus,
@@ -28,6 +29,16 @@ const STATUS_VARIANT: Record<
 const STATUSES = Object.entries(SONG_STATUS_LABELS) as [SongStatus, string][];
 const TYPES = Object.entries(SONG_TYPE_LABELS) as [SongType, string][];
 
+type SongViewMode = "tiles" | "table";
+
+const VIEW_STORAGE_KEY = "bandos-songs-view";
+
+function loadViewMode(): SongViewMode {
+  if (typeof window === "undefined") return "tiles";
+  const stored = localStorage.getItem(VIEW_STORAGE_KEY);
+  return stored === "table" ? "table" : "tiles";
+}
+
 export function SongList({
   songs,
   bandSlug,
@@ -40,6 +51,16 @@ export function SongList({
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<SongStatus | "all">("all");
   const [typeFilter, setTypeFilter] = useState<SongType | "all">("all");
+  const [viewMode, setViewMode] = useState<SongViewMode>("tiles");
+
+  useEffect(() => {
+    setViewMode(loadViewMode());
+  }, []);
+
+  function changeViewMode(mode: SongViewMode) {
+    setViewMode(mode);
+    localStorage.setItem(VIEW_STORAGE_KEY, mode);
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -71,14 +92,42 @@ export function SongList({
 
   return (
     <div className="space-y-4">
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Поиск по названию, тональности..."
-          className="pl-9"
-        />
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Поиск по названию, тональности..."
+            className="pl-9"
+          />
+        </div>
+        <div className="flex shrink-0 rounded-lg border border-border bg-bg-2 p-0.5">
+          <Button
+            type="button"
+            variant={viewMode === "tiles" ? "accent" : "ghost"}
+            size="sm"
+            className="gap-1.5 px-2.5"
+            onClick={() => changeViewMode("tiles")}
+            aria-pressed={viewMode === "tiles"}
+            aria-label="Плитки"
+          >
+            <LayoutGrid className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Плитки</span>
+          </Button>
+          <Button
+            type="button"
+            variant={viewMode === "table" ? "accent" : "ghost"}
+            size="sm"
+            className="gap-1.5 px-2.5"
+            onClick={() => changeViewMode("table")}
+            aria-pressed={viewMode === "table"}
+            aria-label="Таблица"
+          >
+            <Table2 className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Таблица</span>
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -117,6 +166,12 @@ export function SongList({
         <p className="py-8 text-center text-sm text-text-secondary">
           Ничего не найдено
         </p>
+      ) : viewMode === "table" ? (
+        <SongTable
+          songs={filtered}
+          bandSlug={bandSlug}
+          showAddRow={showAddCard}
+        />
       ) : (
         <>
           <ul className="space-y-1.5 md:hidden">
@@ -177,6 +232,85 @@ export function SongList({
       <p className="text-center text-[11px] text-text-muted">
         {filtered.length} из {songs.length}
       </p>
+    </div>
+  );
+}
+
+function SongTable({
+  songs,
+  bandSlug,
+  showAddRow,
+}: {
+  songs: Song[];
+  bandSlug: string;
+  showAddRow: boolean;
+}) {
+  return (
+    <div className="overflow-x-auto rounded-xl border border-border">
+      <table className="w-full min-w-[640px] text-left text-sm">
+        <thead>
+          <tr className="border-b border-border bg-bg-2 text-xs uppercase tracking-wider text-text-muted">
+            <th className="px-4 py-3 font-medium">Название</th>
+            <th className="px-4 py-3 font-medium">Тип</th>
+            <th className="px-4 py-3 font-medium">Статус</th>
+            <th className="hidden px-4 py-3 font-medium sm:table-cell">Тональность</th>
+            <th className="hidden px-4 py-3 font-medium md:table-cell">BPM</th>
+            <th className="hidden px-4 py-3 font-medium lg:table-cell">Размер</th>
+            <th className="px-4 py-3 text-right font-medium">Длительность</th>
+          </tr>
+        </thead>
+        <tbody>
+          {showAddRow && (
+            <tr className="border-b border-border/50">
+              <td colSpan={7} className="px-4 py-2">
+                <Link
+                  href={bandPath(bandSlug, "songs", "new")}
+                  className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Добавить трек
+                </Link>
+              </td>
+            </tr>
+          )}
+          {songs.map((song) => (
+            <tr
+              key={song.id}
+              className="border-b border-border/50 transition-colors last:border-0 hover:bg-bg-2/80"
+            >
+              <td className="px-4 py-3 font-medium">
+                <Link
+                  href={bandPath(bandSlug, "songs", song.id)}
+                  className="flex items-center gap-2 hover:text-accent"
+                >
+                  <Music className="h-3.5 w-3.5 shrink-0 text-accent" />
+                  <span className="truncate">{song.title}</span>
+                </Link>
+              </td>
+              <td className="px-4 py-3 text-text-secondary">
+                {SONG_TYPE_LABELS[song.song_type]}
+              </td>
+              <td className="px-4 py-3">
+                <Badge variant={STATUS_VARIANT[song.status]}>
+                  {SONG_STATUS_LABELS[song.status]}
+                </Badge>
+              </td>
+              <td className="hidden px-4 py-3 text-text-secondary sm:table-cell">
+                {song.key ?? "—"}
+              </td>
+              <td className="hidden px-4 py-3 text-text-secondary md:table-cell">
+                {song.bpm ?? "—"}
+              </td>
+              <td className="hidden px-4 py-3 text-text-secondary lg:table-cell">
+                {song.time_signature || "—"}
+              </td>
+              <td className="px-4 py-3 text-right text-text-secondary">
+                {formatDuration(song.duration_sec)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
