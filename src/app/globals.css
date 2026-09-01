@@ -65,3 +65,13 @@ html.cookie-consent-open body {
 * {
   box-sizing: border-box;
 }
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .pb-mobile-main {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  }
+}

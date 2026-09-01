@@ -58,7 +58,7 @@ export function AppShell({
           className={
             fullWidth
               ? "min-w-0 flex-1 overflow-x-hidden"
-              : "min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-5 pb-28 md:pb-5"
+              : "min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-5 pb-mobile-main md:pb-5"
           }
         >
           {!fullWidth && <UpcomingBannerSlot bandSlug={band.slug} />}

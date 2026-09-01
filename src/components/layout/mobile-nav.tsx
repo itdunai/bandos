@@ -16,7 +16,7 @@ export function MobileNav({ bandSlug }: { bandSlug: string }) {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-border bg-bg-2 pb-8 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-border bg-bg-2 pb-safe md:hidden">
       {ITEMS.map((item) => {
         const href = bandPath(bandSlug, item.href);
         const active = pathname === href || pathname.startsWith(`${href}/`);

@@ -38,6 +38,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  viewportFit: "cover" as const,
+};
+
 export default async function RootLayout({
   children,
 }: Readonly<{
