@@ -17,7 +17,7 @@ export function FinanceChart({
   return (
     <div className="rounded-xl border border-border bg-bg-2 p-4">
       <h3 className="mb-4 text-sm font-medium">Доходы и расходы по месяцам</h3>
-      <div className="flex items-end justify-between gap-2 overflow-x-auto pb-1">
+      <div className="flex items-end justify-between gap-2 overflow-x-auto pb-1 w-full min-w-0 max-w-full">
         {data.map((month) => {
           const incomeH = Math.round((month.income / max) * 72);
           const expenseH = Math.round((month.expense / max) * 72);

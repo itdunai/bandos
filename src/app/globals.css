@@ -36,11 +36,17 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   background: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 14px;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 html.navigating {

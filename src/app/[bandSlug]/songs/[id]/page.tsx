@@ -173,7 +173,7 @@ export default async function SongDetailPage({
               href={sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-sm text-accent hover:underline"
+              className="inline-flex items-center gap-1 break-all text-sm text-accent hover:underline"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               {sourceUrl}

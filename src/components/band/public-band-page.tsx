@@ -67,7 +67,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
   }));
 
   return (
-    <div className="min-h-screen bg-bg text-text-primary">
+    <div className="min-h-screen overflow-x-hidden bg-bg text-text-primary">
       <ScrollToHash />
       <div className="mx-auto max-w-3xl px-4 py-10">
         <div className="mb-8 flex items-center gap-3">
@@ -186,8 +186,8 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
             {songs.length === 0 ? (
               <p className="text-sm text-text-muted">Репертуар пока пуст.</p>
             ) : (
-              <div className="overflow-hidden rounded-xl border border-border">
-                <table className="w-full text-left text-sm">
+              <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-border">
+                <table className="w-full min-w-[480px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border bg-bg-2 text-xs uppercase tracking-wider text-text-muted">
                       <th className="px-4 py-3 font-medium">Название</th>

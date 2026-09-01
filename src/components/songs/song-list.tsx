@@ -91,7 +91,7 @@ export function SongList({
     canCreate && statusFilter === "all" && typeFilter === "all" && !query.trim();
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 max-w-full space-y-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative min-w-0 flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
@@ -167,41 +167,32 @@ export function SongList({
           Ничего не найдено
         </p>
       ) : viewMode === "table" ? (
-        <SongTable
-          songs={filtered}
-          bandSlug={bandSlug}
-          showAddRow={showAddCard}
-        />
+        <>
+          <div className="md:hidden">
+            <SongMobileList
+              songs={filtered}
+              bandSlug={bandSlug}
+              showAddCard={showAddCard}
+              meta={meta}
+            />
+          </div>
+          <div className="hidden md:block">
+            <SongTable
+              songs={filtered}
+              bandSlug={bandSlug}
+              showAddRow={showAddCard}
+            />
+          </div>
+        </>
       ) : (
         <>
-          <ul className="space-y-1.5 md:hidden">
-            {showAddCard && (
-              <li>
-                <AddSongLink bandSlug={bandSlug} variant="list" />
-              </li>
-            )}
-            {filtered.map((song) => (
-              <li key={song.id}>
-                <Link
-                  href={bandPath(bandSlug, "songs", song.id)}
-                  className="flex items-center gap-3 rounded-lg border border-border bg-bg-2 px-3 py-2.5 transition-colors hover:border-accent"
-                >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-bg-3 text-accent">
-                    <Music className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium">{song.title}</div>
-                    <div className="truncate text-[11px] text-text-secondary">
-                      {meta(song)}
-                    </div>
-                  </div>
-                  <Badge variant={STATUS_VARIANT[song.status]}>
-                    {SONG_STATUS_LABELS[song.status]}
-                  </Badge>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <SongMobileList
+            songs={filtered}
+            bandSlug={bandSlug}
+            showAddCard={showAddCard}
+            meta={meta}
+            className="md:hidden"
+          />
 
           <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
             {showAddCard && <AddSongLink bandSlug={bandSlug} variant="tile" />}
@@ -236,6 +227,51 @@ export function SongList({
   );
 }
 
+function SongMobileList({
+  songs,
+  bandSlug,
+  showAddCard,
+  meta,
+  className,
+}: {
+  songs: Song[];
+  bandSlug: string;
+  showAddCard: boolean;
+  meta: (song: Song) => string;
+  className?: string;
+}) {
+  return (
+    <ul className={cn("space-y-1.5", className)}>
+      {showAddCard && (
+        <li>
+          <AddSongLink bandSlug={bandSlug} variant="list" />
+        </li>
+      )}
+      {songs.map((song) => (
+        <li key={song.id}>
+          <Link
+            href={bandPath(bandSlug, "songs", song.id)}
+            className="flex items-center gap-3 rounded-lg border border-border bg-bg-2 px-3 py-2.5 transition-colors hover:border-accent"
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-bg-3 text-accent">
+              <Music className="h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-medium">{song.title}</div>
+              <div className="truncate text-[11px] text-text-secondary">
+                {meta(song)}
+              </div>
+            </div>
+            <Badge variant={STATUS_VARIANT[song.status]} className="shrink-0">
+              {SONG_STATUS_LABELS[song.status]}
+            </Badge>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function SongTable({
   songs,
   bandSlug,
@@ -246,7 +282,7 @@ function SongTable({
   showAddRow: boolean;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
+    <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-border">
       <table className="w-full min-w-[640px] text-left text-sm">
         <thead>
           <tr className="border-b border-border bg-bg-2 text-xs uppercase tracking-wider text-text-muted">
