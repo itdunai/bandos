@@ -1,10 +1,35 @@
 import { bandPath } from "@/lib/paths";
 import { cn, formatDate } from "@/lib/utils";
-import type { Event } from "@/types/database";
+import { EVENT_TYPE_LABELS, type Event } from "@/types/database";
 import { Calendar, Mic2, Star } from "lucide-react";
 import Link from "next/link";
 
 const REMINDER_DAYS = 7;
+
+function getEventMeta(eventType: Event["event_type"]) {
+  if (eventType === "rehearsal") {
+    return {
+      Icon: Mic2,
+      label: EVENT_TYPE_LABELS.rehearsal,
+      isRehearsal: true,
+      isPerformance: false,
+    };
+  }
+  if (eventType === "performance") {
+    return {
+      Icon: Star,
+      label: EVENT_TYPE_LABELS.performance,
+      isRehearsal: false,
+      isPerformance: true,
+    };
+  }
+  return {
+    Icon: Calendar,
+    label: EVENT_TYPE_LABELS.other,
+    isRehearsal: false,
+    isPerformance: false,
+  };
+}
 
 export function UpcomingEventBanner({
   event,
@@ -14,8 +39,7 @@ export function UpcomingEventBanner({
   bandSlug: string;
 }) {
   const date = new Date(event.starts_at);
-  const isRehearsal = event.event_type === "rehearsal";
-  const Icon = isRehearsal ? Mic2 : Star;
+  const { Icon, label, isRehearsal, isPerformance } = getEventMeta(event.event_type);
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -35,7 +59,7 @@ export function UpcomingEventBanner({
       href={bandPath(bandSlug, "schedule", event.id, "edit")}
       className={cn(
         "mb-4 flex items-center gap-3 rounded-xl border p-4 transition-colors hover:border-accent/50",
-        isRehearsal ? "border-border bg-bg-2" : "border-amber/30 bg-amber/5",
+        isRehearsal ? "border-border bg-bg-2" : isPerformance ? "border-amber/30 bg-amber/5" : "border-border bg-bg-2",
         urgency === "urgent" && "ring-1 ring-amber/40",
         urgency === "soon" && "ring-1 ring-accent/30"
       )}
@@ -43,7 +67,7 @@ export function UpcomingEventBanner({
       <div
         className={cn(
           "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-          isRehearsal ? "bg-bg-3 text-accent" : "bg-amber/15 text-amber"
+          isRehearsal ? "bg-bg-3 text-accent" : isPerformance ? "bg-amber/15 text-amber" : "bg-bg-3 text-text-muted"
         )}
       >
         <Icon className="h-5 w-5" />
@@ -75,10 +99,10 @@ export function UpcomingEventBanner({
       <span
         className={cn(
           "hidden shrink-0 rounded-md px-2 py-1 text-[10px] uppercase sm:inline",
-          isRehearsal ? "bg-accent/15 text-accent" : "bg-amber/15 text-amber"
+          isRehearsal ? "bg-accent/15 text-accent" : isPerformance ? "bg-amber/15 text-amber" : "bg-bg-3 text-text-muted"
         )}
       >
-        {isRehearsal ? "Репетиция" : "Концерт"}
+        {label}
       </span>
     </Link>
   );

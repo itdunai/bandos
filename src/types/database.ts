@@ -6,7 +6,7 @@ export type SongType = "original" | "cover";
 export const TIME_SIGNATURES = ["2/4", "3/4", "4/4", "5/4", "6/8", "7/8"] as const;
 export type TimeSignature = (typeof TIME_SIGNATURES)[number];
 export type ContentType = "chords" | "tabs" | "lyrics" | "notes" | "structure";
-export type EventType = "rehearsal" | "performance";
+export type EventType = "rehearsal" | "performance" | "other";
 export type AttendanceStatus = "going" | "maybe" | "absent";
 
 export interface Profile {
@@ -177,6 +177,7 @@ export interface Event {
   setlist_id: string | null;
   organizer?: string | null;
   fee?: number | null;
+  rent?: number | null;
 }
 
 export type ReleasePlatform =
@@ -247,6 +248,12 @@ export const SONG_STATUS_LABELS: Record<SongStatus, string> = {
 export const SONG_TYPE_LABELS: Record<SongType, string> = {
   original: "Авторская",
   cover: "Кавер",
+};
+
+export const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  rehearsal: "Репетиция",
+  performance: "Выступление",
+  other: "Другое",
 };
 
 export const ROLE_LABELS: Record<MemberRole, string> = {

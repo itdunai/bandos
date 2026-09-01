@@ -3,7 +3,7 @@
 import { requireBandAdmin } from "@/lib/band/assert-access";
 import { canViewFinances } from "@/lib/band/permissions";
 import { redirectForbidden } from "@/lib/forbidden";
-import { eventIncomeTitle } from "@/lib/finance";
+import { eventIncomeTitle, eventRentExpenseTitle } from "@/lib/finance";
 import { bandPath } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
 import type { FinanceTransactionType } from "@/types/database";
@@ -154,6 +154,48 @@ export async function insertEventFeeIncome(
   return {};
 }
 
+export async function insertEventRentExpense(
+  bandId: string,
+  eventId: string,
+  userId: string
+): Promise<{ error?: string }> {
+  const supabase = await createClient();
+
+  const { data: event } = await supabase
+    .from("events")
+    .select("id, title, rent, event_type, starts_at, band_id")
+    .eq("id", eventId)
+    .eq("band_id", bandId)
+    .maybeSingle();
+
+  if (!event || event.event_type !== "rehearsal" || !event.rent || event.rent <= 0) {
+    return { error: "У репетиции нет аренды" };
+  }
+
+  const { data: existing } = await supabase
+    .from("finance_transactions")
+    .select("id")
+    .eq("event_id", eventId)
+    .maybeSingle();
+
+  if (existing) return { error: "Аренда уже учтена" };
+
+  const transactionAt = new Date(event.starts_at).toISOString().slice(0, 10);
+
+  const { error } = await supabase.from("finance_transactions").insert({
+    band_id: bandId,
+    transaction_type: "expense",
+    amount: event.rent,
+    title: eventRentExpenseTitle(event.title),
+    event_id: eventId,
+    transaction_at: transactionAt,
+    created_by: userId,
+  });
+
+  if (error) return { error: error.message };
+  return {};
+}
+
 export async function recordEventFeeIncome(
   eventId: string,
   bandId: string,
@@ -161,6 +203,22 @@ export async function recordEventFeeIncome(
 ): Promise<{ error?: string }> {
   const { user } = await requireBandAdmin(bandId);
   const result = await insertEventFeeIncome(bandId, eventId, user.id);
+
+  if (!result.error) {
+    revalidatePath(bandPath(bandSlug, "finances"));
+    revalidatePath(bandPath(bandSlug, "schedule"));
+  }
+
+  return result;
+}
+
+export async function recordEventRentExpense(
+  eventId: string,
+  bandId: string,
+  bandSlug: string
+): Promise<{ error?: string }> {
+  const { user } = await requireBandAdmin(bandId);
+  const result = await insertEventRentExpense(bandId, eventId, user.id);
 
   if (!result.error) {
     revalidatePath(bandPath(bandSlug, "finances"));

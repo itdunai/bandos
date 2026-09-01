@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { bandPath } from "@/lib/paths";
 import { cn, formatDate } from "@/lib/utils";
 import type { EventType } from "@/types/database";
+import { EVENT_TYPE_LABELS } from "@/types/database";
 import { RecordEventFeeButton } from "@/components/finances/record-event-fee-button";
+import { RecordEventRentButton } from "@/components/finances/record-event-rent-button";
 import { formatMoney } from "@/lib/finance";
 import { Calendar, ChevronLeft, ChevronRight, Mic2, Star } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +21,7 @@ export interface ScheduleEvent {
   location: string | null;
   notes: string | null;
   fee?: number | null;
+  rent?: number | null;
   finance_recorded?: boolean;
 }
 
@@ -89,6 +92,40 @@ function formatTime(iso: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function getEventMeta(eventType: EventType) {
+  if (eventType === "rehearsal") {
+    return {
+      Icon: Mic2,
+      shortLabel: "Реп.",
+      badgeVariant: "purple" as const,
+      isRehearsal: true,
+      isPerformance: false,
+    };
+  }
+  if (eventType === "performance") {
+    return {
+      Icon: Star,
+      shortLabel: "Концерт",
+      badgeVariant: "amber" as const,
+      isRehearsal: false,
+      isPerformance: true,
+    };
+  }
+  return {
+    Icon: Calendar,
+    shortLabel: "Другое",
+    badgeVariant: "muted" as const,
+    isRehearsal: false,
+    isPerformance: false,
+  };
+}
+
+function eventMoney(event: ScheduleEvent) {
+  if (event.event_type === "performance") return event.fee;
+  if (event.event_type === "rehearsal") return event.rent;
+  return null;
 }
 
 export function ScheduleView({
@@ -237,6 +274,7 @@ export function ScheduleView({
               const hasRehearsal = dayEvents.some(
                 (e) => e.event_type === "rehearsal"
               );
+              const hasOther = dayEvents.some((e) => e.event_type === "other");
 
               if (!hasEvents) {
                 const isFuture = isFutureDay(today, year, month, day);
@@ -302,6 +340,9 @@ export function ScheduleView({
                       )}
                       {hasPerformance && (
                         <span className="h-1.5 w-1.5 rounded-full bg-amber" />
+                      )}
+                      {hasOther && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-text-muted" />
                       )}
                     </span>
                   </button>
@@ -434,13 +475,20 @@ function CalendarEventTile({
   isAdmin: boolean;
   past: boolean;
 }) {
-  const isRehearsal = event.event_type === "rehearsal";
-  const Icon = isRehearsal ? Mic2 : Star;
+  const meta = getEventMeta(event.event_type);
+  const { Icon, shortLabel, isRehearsal, isPerformance } = meta;
+  const money = eventMoney(event);
   const showFeeAction =
     isAdmin &&
-    !isRehearsal &&
+    isPerformance &&
     event.fee &&
     event.fee > 0 &&
+    !event.finance_recorded;
+  const showRentAction =
+    isAdmin &&
+    isRehearsal &&
+    event.rent &&
+    event.rent > 0 &&
     !event.finance_recorded;
 
   return (
@@ -448,7 +496,7 @@ function CalendarEventTile({
       className={cn(
         "rounded-md border px-2 py-1.5",
         past ? "border-border/60 opacity-70" : "border-border",
-        !isRehearsal && !past && "border-amber/30 bg-amber/5",
+        isPerformance && !past && "border-amber/30 bg-amber/5",
         isRehearsal && !past && "bg-bg-2"
       )}
     >
@@ -460,7 +508,7 @@ function CalendarEventTile({
           <Icon
             className={cn(
               "h-3 w-3 shrink-0",
-              isRehearsal ? "text-accent" : "text-amber"
+              isRehearsal ? "text-accent" : isPerformance ? "text-amber" : "text-text-muted"
             )}
           />
           <span className="truncate text-[11px] font-medium leading-tight">
@@ -470,22 +518,34 @@ function CalendarEventTile({
         <div className="mt-0.5 truncate text-[10px] text-text-secondary">
           {formatTime(event.starts_at)}
           {event.location && ` · ${event.location}`}
-          {event.fee ? ` · ${formatMoney(event.fee)}` : ""}
+          {money ? ` · ${formatMoney(money)}` : ""}
         </div>
         <span
           className={cn(
             "mt-0.5 inline-block rounded px-1 py-px text-[8px] uppercase tracking-wide",
             isRehearsal
               ? "bg-accent/15 text-accent"
-              : "bg-amber/15 text-amber"
+              : isPerformance
+                ? "bg-amber/15 text-amber"
+                : "bg-bg-3 text-text-muted"
           )}
         >
-          {isRehearsal ? "Реп." : "Концерт"}
+          {shortLabel}
         </span>
       </Link>
       {showFeeAction && (
         <div className="mt-1">
           <RecordEventFeeButton
+            eventId={event.id}
+            bandId={bandId}
+            bandSlug={bandSlug}
+            compact
+          />
+        </div>
+      )}
+      {showRentAction && (
+        <div className="mt-1">
+          <RecordEventRentButton
             eventId={event.id}
             bandId={bandId}
             bandSlug={bandSlug}
@@ -513,13 +573,20 @@ function EventCard({
   showDate?: boolean;
 }) {
   const date = new Date(event.starts_at);
-  const isRehearsal = event.event_type === "rehearsal";
-  const Icon = isRehearsal ? Mic2 : Star;
+  const meta = getEventMeta(event.event_type);
+  const { Icon, badgeVariant, isRehearsal, isPerformance } = meta;
+  const money = eventMoney(event);
   const showFeeAction =
     isAdmin &&
-    !isRehearsal &&
+    isPerformance &&
     event.fee &&
     event.fee > 0 &&
+    !event.finance_recorded;
+  const showRentAction =
+    isAdmin &&
+    isRehearsal &&
+    event.rent &&
+    event.rent > 0 &&
     !event.finance_recorded;
 
   return (
@@ -527,7 +594,7 @@ function EventCard({
       className={cn(
         "rounded-xl border bg-bg-2 p-3.5",
         past ? "border-border opacity-70" : "border-border",
-        !isRehearsal && !past && "border-amber/30"
+        isPerformance && !past && "border-amber/30"
       )}
     >
     <Link
@@ -538,13 +605,13 @@ function EventCard({
         <div
           className={cn(
             "min-w-[52px] shrink-0 rounded-lg px-3 py-2 text-center",
-            !isRehearsal ? "bg-amber/10" : "bg-bg-3"
+            isPerformance ? "bg-amber/10" : "bg-bg-3"
           )}
         >
           <div
             className={cn(
               "text-xl font-medium leading-none",
-              !isRehearsal && "text-amber"
+              isPerformance && "text-amber"
             )}
           >
             {date.getDate()}
@@ -559,7 +626,7 @@ function EventCard({
           <Icon
             className={cn(
               "h-3.5 w-3.5 shrink-0",
-              isRehearsal ? "text-accent" : "text-amber"
+              isRehearsal ? "text-accent" : isPerformance ? "text-amber" : "text-text-muted"
             )}
           />
           <span className="truncate">{event.title}</span>
@@ -576,7 +643,7 @@ function EventCard({
           )}
           {event.location && <span>{event.location} · </span>}
           {formatTime(event.starts_at)}
-          {event.fee ? ` · ${formatMoney(event.fee)}` : ""}
+          {money ? ` · ${formatMoney(money)}` : ""}
         </div>
         {event.notes && (
           <p className="mt-2 line-clamp-2 text-xs text-text-secondary">
@@ -584,8 +651,8 @@ function EventCard({
           </p>
         )}
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <Badge variant={isRehearsal ? "purple" : "amber"}>
-            {isRehearsal ? "Репетиция" : "Выступление"}
+          <Badge variant={badgeVariant}>
+            {EVENT_TYPE_LABELS[event.event_type]}
           </Badge>
           {event.finance_recorded && (
             <Badge variant="blue">В финансах</Badge>
@@ -596,6 +663,15 @@ function EventCard({
     {showFeeAction && (
       <div className="mt-3 border-t border-border pt-3">
         <RecordEventFeeButton
+          eventId={event.id}
+          bandId={bandId}
+          bandSlug={bandSlug}
+        />
+      </div>
+    )}
+    {showRentAction && (
+      <div className="mt-3 border-t border-border pt-3">
+        <RecordEventRentButton
           eventId={event.id}
           bandId={bandId}
           bandSlug={bandSlug}

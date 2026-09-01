@@ -117,3 +117,7 @@ export function buildFinanceCsv(
 export function eventIncomeTitle(eventTitle: string) {
   return `Гонорар: ${eventTitle}`;
 }
+
+export function eventRentExpenseTitle(eventTitle: string) {
+  return `Аренда: ${eventTitle}`;
+}

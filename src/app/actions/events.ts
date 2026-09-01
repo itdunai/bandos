@@ -4,7 +4,7 @@ import {
   requireBandPermission,
   requireEventMember,
 } from "@/lib/band/assert-access";
-import { insertEventFeeIncome } from "@/app/actions/finances";
+import { insertEventFeeIncome, insertEventRentExpense } from "@/app/actions/finances";
 import {
   datetimeLocalToIso,
   parseTimezoneOffsetMinutes,
@@ -18,6 +18,7 @@ function parseEventForm(formData: FormData) {
   const startsAt = formData.get("starts_at") as string;
   const endsAt = (formData.get("ends_at") as string) || null;
   const feeRaw = formData.get("fee") as string;
+  const rentRaw = formData.get("rent") as string;
   const setlistId = (formData.get("setlist_id") as string) || null;
   const tzOffset = parseTimezoneOffsetMinutes(
     formData.get("timezone_offset")
@@ -33,6 +34,7 @@ function parseEventForm(formData: FormData) {
     setlist_id: setlistId || null,
     organizer: (formData.get("organizer") as string) || null,
     fee: feeRaw ? parseFloat(feeRaw) : null,
+    rent: rentRaw ? parseFloat(rentRaw) : null,
   };
 }
 
@@ -61,6 +63,7 @@ export async function createEvent(bandId: string, bandSlug: string, formData: Fo
       setlist_id: data.event_type === "performance" ? data.setlist_id : null,
       organizer: data.event_type === "performance" ? data.organizer : null,
       fee: data.event_type === "performance" ? data.fee : null,
+      rent: data.event_type === "rehearsal" ? data.rent : null,
     })
     .select("id")
     .single();
@@ -75,6 +78,10 @@ export async function createEvent(bandId: string, bandSlug: string, formData: Fo
 
   if (formData.get("record_in_finances") === "on") {
     await insertEventFeeIncome(bandId, event.id, user.id);
+  }
+
+  if (formData.get("record_rent_in_finances") === "on") {
+    await insertEventRentExpense(bandId, event.id, user.id);
   }
 
   revalidatePath(bandPath(bandSlug, "schedule"));
@@ -103,6 +110,7 @@ export async function updateEvent(
       setlist_id: data.event_type === "performance" ? data.setlist_id : null,
       organizer: data.event_type === "performance" ? data.organizer : null,
       fee: data.event_type === "performance" ? data.fee : null,
+      rent: data.event_type === "rehearsal" ? data.rent : null,
     })
     .eq("id", eventId)
     .eq("band_id", bandId);
@@ -117,6 +125,10 @@ export async function updateEvent(
 
   if (formData.get("record_in_finances") === "on") {
     await insertEventFeeIncome(bandId, eventId, user.id);
+  }
+
+  if (formData.get("record_rent_in_finances") === "on") {
+    await insertEventRentExpense(bandId, eventId, user.id);
   }
 
   revalidatePath(bandPath(bandSlug, "schedule"));

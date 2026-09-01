@@ -34,7 +34,20 @@ export default async function NewEventPage({
     .eq("band_id", band.id)
     .order("name");
 
-  const defaultType = (type === "performance" ? "performance" : "rehearsal") as EventType;
+  const defaultType = (
+    type === "performance"
+      ? "performance"
+      : type === "other"
+        ? "other"
+        : "rehearsal"
+  ) as EventType;
+
+  const pageTitle =
+    defaultType === "performance"
+      ? "Новое выступление"
+      : defaultType === "other"
+        ? "Новое событие"
+        : "Новая репетиция";
   const defaultStartsAt =
     date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T18:00` : undefined;
 
@@ -43,7 +56,7 @@ export default async function NewEventPage({
       band={band}
       member={member}
       memberCount={memberCount}
-      title={defaultType === "performance" ? "Новое выступление" : "Новая репетиция"}
+      title={pageTitle}
     >
       {error && (
         <div className="mb-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-xs text-red">

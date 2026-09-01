@@ -14,11 +14,11 @@ export function HomeHeader({
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-bg/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-center">
-          <SiteLogo className="h-10" priority />
+        <Link href="/" className="flex min-w-0 shrink items-center">
+          <SiteLogo className="h-7 max-w-[100px] sm:h-10 sm:max-w-none" priority />
         </Link>
 
-        <nav className="flex items-center gap-2 sm:gap-3">
+        <nav className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             href="#catalog"
             className="hidden text-xs text-text-secondary transition-colors hover:text-text-primary sm:inline"
