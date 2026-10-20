@@ -37,6 +37,11 @@
    - `supabase/migrations/020_restore_band_media_storage.sql` — **обязательно**: bucket `band-media` для лого/фото/аватаров
    - `supabase/migrations/021_platform_admin.sql` — панель `/admin` (статистика, журнал)
    - `supabase/migrations/022_site_pages.sql` — политика конфиденциальности (`/privacy`, редактирование в `/admin/privacy`)
+   - `supabase/migrations/023_releases.sql`
+   - `supabase/migrations/024_public_releases.sql`
+   - `supabase/migrations/025_band_contacts.sql`
+   - `supabase/migrations/026_event_other_rent.sql`
+   - `supabase/migrations/027_privilege_escalation_guards.sql` — **обязательно**: запрет самоназначения прав (platform admin, роль/права в группе)
 3. **Authentication → Providers → Email** — включите Email
 4. Для локальной разработки отключите «Confirm email» (или подтверждайте вручную)
 5. **Authentication → URL Configuration**:
