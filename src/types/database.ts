@@ -25,13 +25,22 @@ export interface SitePage {
   updated_by: string | null;
 }
 
+/** Своя ссылка, добавленная группой (соцсеть не из фиксированного списка). */
+export interface CustomSocialLink {
+  label: string;
+  url: string;
+}
+
 export interface SocialLinks {
   vk?: string;
   telegram?: string;
   youtube?: string;
   instagram?: string;
   website?: string;
+  custom?: CustomSocialLink[];
 }
+
+export type SocialPlatform = Exclude<keyof SocialLinks, "custom">;
 
 export interface BandContact {
   name: string;
@@ -72,7 +81,7 @@ export interface FinanceTransaction {
   created_at: string;
 }
 
-export const SOCIAL_LABELS: Record<keyof SocialLinks, string> = {
+export const SOCIAL_LABELS: Record<SocialPlatform, string> = {
   vk: "ВКонтакте",
   telegram: "Telegram",
   youtube: "YouTube",

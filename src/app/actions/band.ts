@@ -1,6 +1,7 @@
 "use server";
 
 import { parseContactsJson } from "@/lib/band/parse-contacts";
+import { parseSocialLinksForm } from "@/lib/band/social-links";
 import {
   requireBandAdmin,
   requireBandPermission,
@@ -8,21 +9,8 @@ import {
 import { bandPath } from "@/lib/paths";
 import { revalidatePublicBandAndCatalog } from "@/lib/public-revalidate";
 import { redirectWithToast } from "@/lib/redirect-with-toast";
-import { sanitizeExternalUrl } from "@/lib/safe-url";
-import type { SocialLinks } from "@/types/database";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
-function parseSocialLinks(formData: FormData): SocialLinks {
-  const keys = ["vk", "telegram", "youtube", "instagram", "website"] as const;
-  const links: SocialLinks = {};
-  for (const key of keys) {
-    const val = (formData.get(`social_${key}`) as string)?.trim();
-    const safe = sanitizeExternalUrl(val);
-    if (safe) links[key] = safe;
-  }
-  return links;
-}
 
 export async function updateBandProfile(
   bandId: string,
@@ -47,7 +35,7 @@ export async function updateBandProfile(
       city,
       tech_rider: techRider,
       rider_public: riderPublic,
-      social_links: parseSocialLinks(formData),
+      social_links: parseSocialLinksForm(formData),
       contacts: parseContactsJson(formData.get("contacts_json")),
     })
     .eq("id", bandId);

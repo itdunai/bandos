@@ -6,9 +6,8 @@ import type { ReleaseListItem } from "@/components/releases/release-list";
 import { PhotoGallery } from "@/components/ui/image-lightbox";
 import { FormattedText } from "@/components/ui/minimal-editor";
 import { SafeMediaImage } from "@/components/ui/safe-media-image";
-import { sanitizeHref } from "@/lib/safe-url";
-import type { Band, BandContact, SocialLinks } from "@/types/database";
-import { SOCIAL_LABELS } from "@/types/database";
+import type { Band, BandContact } from "@/types/database";
+import { getSocialLinkList } from "@/lib/band/social-links";
 import { ExternalLink, MapPin, Music, Users } from "lucide-react";
 
 export function BandProfileView({
@@ -24,10 +23,7 @@ export function BandProfileView({
   releases: ReleaseListItem[];
   riderSharePath: string;
 }) {
-  const links = (band.social_links ?? {}) as SocialLinks;
-  const linkEntries = Object.entries(links)
-    .map(([key, url]) => [key, sanitizeHref(url)] as const)
-    .filter((entry): entry is [string, string] => Boolean(entry[1]));
+  const linkEntries = getSocialLinkList(band.social_links);
 
   const photos = Array.isArray(band.photos) ? band.photos : [];
   const contacts = (band.contacts ?? []) as BandContact[];
@@ -106,16 +102,16 @@ export function BandProfileView({
         <div className="rounded-xl border border-border bg-bg-2 p-4">
           <h3 className="mb-2 text-sm font-medium">Ссылки</h3>
           <ul className="space-y-1.5">
-            {linkEntries.map(([key, url]) => (
-              <li key={key}>
+            {linkEntries.map((link) => (
+              <li key={link.id}>
                 <a
-                  href={url}
+                  href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  {SOCIAL_LABELS[key as keyof SocialLinks] ?? key}
+                  {link.label}
                 </a>
               </li>
             ))}

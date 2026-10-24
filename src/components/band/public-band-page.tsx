@@ -5,10 +5,9 @@ import type { ReleaseListItem } from "@/components/releases/release-list";
 import { PhotoGallery } from "@/components/ui/image-lightbox";
 import { FormattedText } from "@/components/ui/minimal-editor";
 import { SafeMediaImage } from "@/components/ui/safe-media-image";
-import { sanitizeHref } from "@/lib/safe-url";
+import { getSocialLinkList } from "@/lib/band/social-links";
 import { formatDuration } from "@/lib/utils";
 import {
-  SOCIAL_LABELS,
   SONG_TYPE_LABELS,
   type ReleasePlatform,
   type BandContact,
@@ -51,9 +50,7 @@ export interface PublicBandPageData {
 }
 
 export function PublicBandPage({ band }: { band: PublicBandPageData }) {
-  const links = Object.entries(band.social_links ?? {})
-    .map(([key, url]) => [key, sanitizeHref(url)] as const)
-    .filter((entry): entry is [string, string] => Boolean(entry[1]));
+  const links = getSocialLinkList(band.social_links);
   const songs = band.songs ?? [];
   const photos = Array.isArray(band.photos) ? band.photos : [];
   const showRider = band.rider_public;
@@ -147,6 +144,27 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
           </div>
         )}
 
+        {links.length > 0 && (
+          <section className="mb-8 rounded-xl border border-border bg-bg-2 p-5">
+            <h2 className="mb-3 text-sm font-medium">Соцсети и ссылки</h2>
+            <ul className="flex flex-wrap gap-2">
+              {links.map((link) => (
+                <li key={link.id}>
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-bg-3 px-3 py-1.5 text-sm text-accent transition-colors hover:border-accent"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {showRider && (
           <section className="mb-8">
             <h2 className="mb-3 text-sm font-medium uppercase tracking-wider text-text-muted">
@@ -159,27 +177,6 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
             ) : (
               <p className="text-sm text-text-muted">Техрайдер пока не заполнен.</p>
             )}
-          </section>
-        )}
-
-        {showRider && links.length > 0 && (
-          <section className="mb-8 rounded-xl border border-border bg-bg-2 p-5">
-            <h2 className="mb-3 text-sm font-medium">Ссылки</h2>
-            <ul className="space-y-2">
-              {links.map(([key, url]) => (
-                <li key={key}>
-                  <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    {SOCIAL_LABELS[key as keyof SocialLinks] ?? key}
-                  </a>
-                </li>
-              ))}
-            </ul>
           </section>
         )}
 

@@ -2,6 +2,7 @@
 
 import { updateBandProfile } from "@/app/actions/band";
 import { BandContactsFields } from "@/components/band/band-contacts-fields";
+import { BandSocialLinksFields } from "@/components/band/band-social-links-fields";
 import { BandMediaSection } from "@/components/band/band-media-section";
 import { PublicPageShare } from "@/components/band/public-page-share";
 import { ShareLinkButton } from "@/components/band/share-link-button";
@@ -10,9 +11,6 @@ import { Label } from "@/components/ui/label";
 import { MinimalEditor } from "@/components/ui/minimal-editor";
 import { SubmitButton } from "@/components/ui/submit-button";
 import type { Band, BandContact, SocialLinks } from "@/types/database";
-import { SOCIAL_LABELS } from "@/types/database";
-
-const SOCIAL_KEYS = Object.keys(SOCIAL_LABELS) as (keyof SocialLinks)[];
 
 export function BandProfileForm({
   band,
@@ -102,20 +100,7 @@ export function BandProfileForm({
 
       <BandContactsFields initial={contacts} />
 
-      <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
-        <h2 className="text-sm font-medium">Соцсети и ссылки</h2>
-        {SOCIAL_KEYS.map((key) => (
-          <div key={key}>
-            <Label>{SOCIAL_LABELS[key]}</Label>
-            <Input
-              name={`social_${key}`}
-              type="url"
-              defaultValue={links[key] ?? ""}
-              placeholder="https://..."
-            />
-          </div>
-        ))}
-      </section>
+      <BandSocialLinksFields initial={links} />
 
       <SubmitButton type="submit" variant="accent" className="px-6 py-2" loadingLabel="Сохранение…">
         Сохранить
