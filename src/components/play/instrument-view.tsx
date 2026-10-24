@@ -40,7 +40,7 @@ export function InstrumentView({
   const [showLyrics, setShowLyrics] = useState(false);
 
   return (
-    <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-4 pb-12">
       <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-text-secondary">
         {track.key && (
           <span className="rounded-md bg-bg-3 px-3 py-1">

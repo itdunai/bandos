@@ -1,8 +1,12 @@
 "use client";
 
 import { BandSwitcher } from "@/components/layout/band-switcher";
-import { useUserBands } from "@/components/layout/band-shell-context";
+import {
+  useUpcomingEvent,
+  useUserBands,
+} from "@/components/layout/band-shell-context";
 import { MobileMenu } from "@/components/layout/mobile-menu";
+import { UpcomingEventChip } from "@/components/schedule/upcoming-event-chip";
 import type { Band, BandMember } from "@/types/database";
 import { Menu } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -17,6 +21,7 @@ export function MobileHeader({
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const userBands = useUserBands();
+  const upcoming = useUpcomingEvent();
 
   return (
     <>
@@ -24,6 +29,7 @@ export function MobileHeader({
         <div className="min-w-0 flex-1">
           <BandSwitcher bands={userBands} currentBand={band} compact />
         </div>
+        <UpcomingEventChip event={upcoming} bandSlug={band.slug} variant="header" />
         <button
           type="button"
           onClick={() => setMenuOpen(true)}

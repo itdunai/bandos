@@ -24,7 +24,11 @@ import { bandPath } from "@/lib/paths";
 import { Avatar } from "@/components/ui/avatar";
 import { BandSwitcher } from "@/components/layout/band-switcher";
 import { BuildVersionLabel } from "@/components/layout/build-version-label";
-import { useUserBands } from "@/components/layout/band-shell-context";
+import {
+  useUpcomingEvent,
+  useUserBands,
+} from "@/components/layout/band-shell-context";
+import { UpcomingEventChip } from "@/components/schedule/upcoming-event-chip";
 import type { Band, BandMember } from "@/types/database";
 import { INSTRUMENT_LABELS } from "@/types/database";
 
@@ -70,6 +74,7 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const userBands = useUserBands();
+  const upcoming = useUpcomingEvent();
 
   return (
     <aside className="flex h-dvh w-[200px] shrink-0 flex-col border-r border-border bg-bg-2">
@@ -78,6 +83,7 @@ export function Sidebar({
         <div className="mt-1 text-[11px] text-text-muted">
           {memberCount} участник{memberCount === 1 ? "" : memberCount < 5 ? "а" : "ов"}
         </div>
+        <UpcomingEventChip event={upcoming} bandSlug={band.slug} variant="sidebar" />
       </div>
 
       <nav className="flex-1 overflow-y-auto py-2">

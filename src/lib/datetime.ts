@@ -30,3 +30,23 @@ export function parseTimezoneOffsetMinutes(raw: FormDataEntryValue | null): numb
   if (typeof raw !== "string" || !/^-?\d{1,4}$/.test(raw)) return 0;
   return Number(raw);
 }
+
+/**
+ * Parse an event date-time field. `DateTimeField` sends a UTC ISO string
+ * computed in the browser (correct offset for that exact date, DST included);
+ * older clients send `datetime-local` wall time plus `timezone_offset`.
+ */
+export function parseFormDateTime(
+  value: string,
+  timezoneOffsetMinutes: number
+): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?Z$/.test(trimmed)) {
+    const ms = Date.parse(trimmed);
+    return Number.isNaN(ms) ? null : new Date(ms).toISOString();
+  }
+
+  return datetimeLocalToIso(trimmed, timezoneOffsetMinutes);
+}

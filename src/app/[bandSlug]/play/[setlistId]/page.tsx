@@ -123,7 +123,7 @@ export default async function PlaySetlistPage({
     }) ?? [];
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-bg">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-bg">
       <div className="absolute left-3 top-3 z-10">
         <Link href={bandPath(band.slug, "play")}>
           <Button variant="ghost" size="sm">

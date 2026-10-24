@@ -2,6 +2,7 @@
 
 import { createEvent, deleteEvent, updateEvent } from "@/app/actions/events";
 import { Button } from "@/components/ui/button";
+import { DateTimeField } from "@/components/ui/date-time-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -17,13 +18,6 @@ interface SetlistOption {
 
 const selectClass =
   "w-full rounded-lg border border-border bg-bg-3 px-3 py-2 text-sm outline-none focus:border-accent";
-
-function toDatetimeLocal(iso: string | null | undefined): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
 
 function titlePlaceholder(type: EventType) {
   if (type === "rehearsal") return "Репетиция #43";
@@ -62,11 +56,6 @@ export function EventForm({
 
   return (
     <form action={action} className="space-y-4">
-      <input
-        type="hidden"
-        name="timezone_offset"
-        value={new Date().getTimezoneOffset()}
-      />
       <div>
         <Label>Тип</Label>
         <select
@@ -91,24 +80,23 @@ export function EventForm({
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <Label>Начало *</Label>
-          <Input
+          <Label htmlFor="event-starts-at">Начало *</Label>
+          <DateTimeField
+            id="event-starts-at"
             name="starts_at"
-            type="datetime-local"
             required
-            defaultValue={
-              toDatetimeLocal(event?.starts_at) ||
-              defaultStartsAt ||
-              ""
-            }
+            defaultIso={event?.starts_at}
+            defaultLocal={defaultStartsAt}
           />
         </div>
         <div>
-          <Label>Конец</Label>
-          <Input
+          <Label htmlFor="event-ends-at">Конец</Label>
+          <DateTimeField
+            id="event-ends-at"
             name="ends_at"
-            type="datetime-local"
-            defaultValue={toDatetimeLocal(event?.ends_at)}
+            defaultIso={event?.ends_at}
+            defaultTime="21:00"
+            fallbackDateFrom="starts_at"
           />
         </div>
       </div>

@@ -45,7 +45,7 @@ export function PlayFromCache({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-bg">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-bg">
       <PlaySetlistShell
         bandSlug={session.bandSlug}
         setlistId={session.setlistId}

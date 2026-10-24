@@ -14,9 +14,9 @@ export function Tabs({
 }) {
   const [active, setActive] = useState(defaultTab ?? tabs[0]?.id ?? "");
 
-  const current = tabs.find((t) => t.id === active) ?? tabs[0];
-
   if (!tabs.length) return null;
+
+  const currentId = tabs.some((t) => t.id === active) ? active : tabs[0].id;
 
   return (
     <div className={className}>
@@ -28,7 +28,7 @@ export function Tabs({
             onClick={() => setActive(tab.id)}
             className={cn(
               "px-3 py-2 text-sm transition-colors -mb-px border-b-2",
-              active === tab.id
+              currentId === tab.id
                 ? "border-accent text-accent"
                 : "border-transparent text-text-secondary hover:text-text-primary"
             )}
@@ -37,7 +37,12 @@ export function Tabs({
           </button>
         ))}
       </div>
-      <div>{current?.content}</div>
+      {/* Все панели остаются в DOM: поля формы из неактивных вкладок тоже отправляются. */}
+      {tabs.map((tab) => (
+        <div key={tab.id} hidden={tab.id !== currentId}>
+          {tab.content}
+        </div>
+      ))}
     </div>
   );
 }

@@ -34,19 +34,3 @@ export function decodeBandSlug(raw: string): string {
     return raw;
   }
 }
-
-/** Разделы, где баннер ближайшего события не показывается (первый сегмент после slug группы). */
-const UPCOMING_BANNER_HIDDEN_SECTIONS = new Set([
-  "finances",
-  "songs",
-  "releases",
-  "setlists",
-  "metronome",
-  "play",
-]);
-
-export function isUpcomingBannerHiddenPath(pathname: string): boolean {
-  const section = pathname.split("/").filter(Boolean)[1];
-  if (!section) return false;
-  return UPCOMING_BANNER_HIDDEN_SECTIONS.has(decodeBandSlug(section));
-}

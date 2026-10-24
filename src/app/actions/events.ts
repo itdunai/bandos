@@ -6,7 +6,7 @@ import {
 } from "@/lib/band/assert-access";
 import { insertEventFeeIncome, insertEventRentExpense } from "@/app/actions/finances";
 import {
-  datetimeLocalToIso,
+  parseFormDateTime,
   parseTimezoneOffsetMinutes,
 } from "@/lib/datetime";
 import { bandPath } from "@/lib/paths";
@@ -27,8 +27,8 @@ function parseEventForm(formData: FormData) {
   return {
     event_type: formData.get("event_type") as string,
     title: (formData.get("title") as string).trim(),
-    starts_at: startsAt ? datetimeLocalToIso(startsAt, tzOffset) : null,
-    ends_at: endsAt ? datetimeLocalToIso(endsAt, tzOffset) : null,
+    starts_at: startsAt ? parseFormDateTime(startsAt, tzOffset) : null,
+    ends_at: endsAt ? parseFormDateTime(endsAt, tzOffset) : null,
     location: (formData.get("location") as string) || null,
     notes: (formData.get("notes") as string) || null,
     setlist_id: setlistId || null,
@@ -38,15 +38,21 @@ function parseEventForm(formData: FormData) {
   };
 }
 
+function validateEventForm(data: ReturnType<typeof parseEventForm>): string | null {
+  if (!data.title || !data.starts_at) return "Заполните название и дату";
+  if (data.ends_at && data.ends_at <= data.starts_at) {
+    return "Окончание должно быть позже начала";
+  }
+  return null;
+}
+
 export async function createEvent(bandId: string, bandSlug: string, formData: FormData) {
   const { supabase, user } = await requireBandPermission(bandId, "schedule");
   const data = parseEventForm(formData);
 
-  if (!data.title || !data.starts_at) {
-    await redirectWithToast(
-      bandPath(bandSlug, "schedule", "new"),
-      "Заполните название и дату"
-    );
+  const invalid = validateEventForm(data);
+  if (invalid) {
+    await redirectWithToast(bandPath(bandSlug, "schedule", "new"), invalid);
     return;
   }
 
@@ -97,6 +103,15 @@ export async function updateEvent(
 ) {
   const { supabase, user } = await requireBandPermission(bandId, "schedule");
   const data = parseEventForm(formData);
+
+  const invalid = validateEventForm(data);
+  if (invalid) {
+    await redirectWithToast(
+      bandPath(bandSlug, "schedule", eventId, "edit"),
+      invalid
+    );
+    return;
+  }
 
   const { error } = await supabase
     .from("events")

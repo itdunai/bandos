@@ -69,7 +69,7 @@ export function PlayMode({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg">
+    <div className="flex min-h-0 flex-1 flex-col bg-bg">
       <header className="shrink-0 border-b border-border px-4 py-3">
         <div className="text-center text-[11px] uppercase tracking-wider text-text-muted">
           {setlistName}
@@ -107,10 +107,10 @@ export function PlayMode({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <InstrumentView track={track} instrument={instrument} />
+        <InstrumentView key={track.id} track={track} instrument={instrument} />
       </div>
 
-      <footer className="shrink-0 border-t border-border p-3">
+      <footer className="shrink-0 border-t border-border px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">
         <div className="flex justify-center gap-1.5">
           {tracks.map((t, i) => (
             <button

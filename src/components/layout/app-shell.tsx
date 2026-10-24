@@ -1,20 +1,9 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useUpcomingEvent } from "@/components/layout/band-shell-context";
 import { MobileHeader } from "@/components/layout/mobile-header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { Sidebar } from "@/components/layout/sidebar";
-import { UpcomingEventBanner } from "@/components/schedule/upcoming-event-banner";
-import { isUpcomingBannerHiddenPath } from "@/lib/paths";
 import type { Band, BandMember } from "@/types/database";
-
-function UpcomingBannerSlot({ bandSlug }: { bandSlug: string }) {
-  const pathname = usePathname();
-  const upcoming = useUpcomingEvent();
-  if (!upcoming || isUpcomingBannerHiddenPath(pathname)) return null;
-  return <UpcomingEventBanner event={upcoming} bandSlug={bandSlug} />;
-}
 
 export function AppShell({
   band,
@@ -61,7 +50,6 @@ export function AppShell({
               : "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-5 pb-mobile-main md:pb-5"
           }
         >
-          {!fullWidth && <UpcomingBannerSlot bandSlug={band.slug} />}
           {children}
         </main>
       </div>

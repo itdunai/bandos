@@ -27,6 +27,25 @@ export function PlaySetlistShell({
   const [isOnline, setIsOnline] = useState(true);
   const [cachedAt, setCachedAt] = useState<string | null>(null);
 
+  // Режим игры — полноэкранный оверлей: документ под ним не должен скроллиться,
+  // иначе на iOS жест «перетекает» на body и внутренняя прокрутка залипает.
+  useEffect(() => {
+    const root = document.documentElement;
+    const prev = {
+      overflow: root.style.overflow,
+      overscroll: root.style.overscrollBehavior,
+      bodyOverflow: document.body.style.overflow,
+    };
+    root.style.overflow = "hidden";
+    root.style.overscrollBehavior = "none";
+    document.body.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = prev.overflow;
+      root.style.overscrollBehavior = prev.overscroll;
+      document.body.style.overflow = prev.bodyOverflow;
+    };
+  }, []);
+
   useEffect(() => {
     const updateOnline = () => setIsOnline(navigator.onLine);
     updateOnline();

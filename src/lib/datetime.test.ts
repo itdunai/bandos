@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   datetimeLocalToIso,
+  parseFormDateTime,
   parseTimezoneOffsetMinutes,
 } from "@/lib/datetime";
 
@@ -40,5 +41,28 @@ describe("parseTimezoneOffsetMinutes", () => {
   it("falls back to 0 for invalid values", () => {
     expect(parseTimezoneOffsetMinutes(null)).toBe(0);
     expect(parseTimezoneOffsetMinutes("abc")).toBe(0);
+  });
+});
+
+describe("parseFormDateTime", () => {
+  it("accepts UTC ISO from the client as is", () => {
+    expect(parseFormDateTime("2026-08-27T16:00:00.000Z", 0)).toBe(
+      "2026-08-27T16:00:00.000Z"
+    );
+    expect(parseFormDateTime("2026-08-27T16:00Z", -480)).toBe(
+      "2026-08-27T16:00:00.000Z"
+    );
+  });
+
+  it("falls back to datetime-local wall time with offset", () => {
+    expect(parseFormDateTime("2026-08-27T19:00", -180)).toBe(
+      "2026-08-27T16:00:00.000Z"
+    );
+  });
+
+  it("returns null for empty or invalid values", () => {
+    expect(parseFormDateTime("", 0)).toBeNull();
+    expect(parseFormDateTime("2026-13-45T99:99Z", 0)).toBeNull();
+    expect(parseFormDateTime("garbage", 0)).toBeNull();
   });
 });
