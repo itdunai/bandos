@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   datetimeLocalToIso,
+  parseDateValue,
   parseFormDateTime,
   parseTimezoneOffsetMinutes,
+  todayDateString,
 } from "@/lib/datetime";
 
 describe("datetimeLocalToIso", () => {
@@ -64,5 +66,25 @@ describe("parseFormDateTime", () => {
     expect(parseFormDateTime("", 0)).toBeNull();
     expect(parseFormDateTime("2026-13-45T99:99Z", 0)).toBeNull();
     expect(parseFormDateTime("garbage", 0)).toBeNull();
+  });
+});
+
+describe("parseDateValue", () => {
+  it("treats DATE columns as local calendar days", () => {
+    const d = parseDateValue("2026-10-01");
+    expect([d.getFullYear(), d.getMonth(), d.getDate()]).toEqual([2026, 9, 1]);
+    expect(d.getHours()).toBe(0);
+  });
+
+  it("parses timestamps as instants", () => {
+    expect(parseDateValue("2026-08-27T16:00:00.000Z").toISOString()).toBe(
+      "2026-08-27T16:00:00.000Z"
+    );
+  });
+});
+
+describe("todayDateString", () => {
+  it("formats the local calendar day", () => {
+    expect(todayDateString(new Date(2026, 0, 5, 23, 30))).toBe("2026-01-05");
   });
 });

@@ -7,15 +7,19 @@ import { cn, formatDate } from "@/lib/utils";
 import type { Todo } from "@/types/database";
 import { Pencil, Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
+import { parseDateValue } from "@/lib/datetime";
+import { useIsClient } from "@/lib/use-is-client";
 
 function DueBadge({ dueDate, isDone }: { dueDate: string; isDone: boolean }) {
-  const due = new Date(dueDate);
+  // «Сегодня» — по часам пользователя; при SSR (UTC) срочность не подсвечиваем.
+  const isClient = useIsClient();
+  const due = parseDateValue(dueDate);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  due.setHours(0, 0, 0, 0);
 
-  const overdue = !isDone && due < today;
+  const overdue = isClient && !isDone && due < today;
   const soon =
+    isClient &&
     !isDone &&
     !overdue &&
     due.getTime() - today.getTime() <= 3 * 24 * 60 * 60 * 1000;

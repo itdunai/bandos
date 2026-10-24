@@ -1,8 +1,8 @@
 import { FormattedDocument } from "@/components/legal/formatted-document";
 import { SiteLogo } from "@/components/brand/site-logo";
-import { formatDate } from "@/lib/utils";
 import type { SitePage } from "@/lib/legal/site-pages";
 import Link from "next/link";
+import { LocalDateTime } from "@/components/ui/local-date-time";
 
 export function PrivacyPolicyView({ page }: { page: SitePage }) {
   return (
@@ -29,11 +29,10 @@ export function PrivacyPolicyView({ page }: { page: SitePage }) {
         {page.updated_at && (
           <p className="mt-2 text-xs text-text-muted">
             Обновлено{" "}
-            {formatDate(page.updated_at, {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
+            <LocalDateTime
+              value={page.updated_at}
+              options={{ day: "numeric", month: "long", year: "numeric" }}
+            />
           </p>
         )}
         <article className="mt-8">

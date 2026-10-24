@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState, useTransition } from "react";
 import { cn } from "@/lib/utils";
+import { todayDateString } from "@/lib/datetime";
 
 interface PerformanceOption {
   id: string;
@@ -321,7 +322,7 @@ export function FinancePanel({
                 <Input
                   name="transaction_at"
                   type="date"
-                  defaultValue={new Date().toISOString().slice(0, 10)}
+                  defaultValue={todayDateString()}
                   required
                 />
               </div>

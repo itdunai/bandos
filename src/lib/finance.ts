@@ -1,4 +1,5 @@
 import type { FinanceTransaction, FinanceTransactionType } from "@/types/database";
+import { parseDateValue } from "@/lib/datetime";
 
 export function formatMoney(amount: number | null | undefined): string {
   if (amount == null || Number.isNaN(amount)) return "—";
@@ -41,7 +42,7 @@ export function filterTransactionsByMonth(
   month: number
 ) {
   return transactions.filter((tx) => {
-    const d = new Date(tx.transaction_at);
+    const d = parseDateValue(tx.transaction_at);
     return d.getFullYear() === year && d.getMonth() === month;
   });
 }
@@ -52,7 +53,7 @@ export function getMonthOptions(transactions: FinanceTransaction[]) {
   keys.add(`${now.getFullYear()}-${now.getMonth()}`);
 
   for (const tx of transactions) {
-    const d = new Date(tx.transaction_at);
+    const d = parseDateValue(tx.transaction_at);
     keys.add(`${d.getFullYear()}-${d.getMonth()}`);
   }
 
@@ -70,7 +71,7 @@ export function monthlyTotals(
   const map = new Map<string, { income: number; expense: number }>();
 
   for (const tx of transactions) {
-    const d = new Date(tx.transaction_at);
+    const d = parseDateValue(tx.transaction_at);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     const row = map.get(key) ?? { income: 0, expense: 0 };
     const amount = Number(tx.amount);

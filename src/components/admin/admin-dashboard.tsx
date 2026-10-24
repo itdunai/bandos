@@ -1,5 +1,4 @@
 import { Card } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
 import type { AuditLogRow, PlatformStats } from "@/lib/platform/queries";
 import {
   Activity,
@@ -8,6 +7,7 @@ import {
   FileText,
 } from "lucide-react";
 import Link from "next/link";
+import { LocalDateTime } from "@/components/ui/local-date-time";
 
 export function AdminDashboard({
   stats,
@@ -136,12 +136,15 @@ export function AdminDashboard({
                     className="border-b border-border/50 last:border-0"
                   >
                     <td className="whitespace-nowrap px-3 py-2 text-xs text-text-muted">
-                      {formatDate(row.created_at, {
-                        day: "numeric",
-                        month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      <LocalDateTime
+                        value={row.created_at}
+                        options={{
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }}
+                      />
                     </td>
                     <td className="px-3 py-2">
                       <LevelBadge level={row.level} />

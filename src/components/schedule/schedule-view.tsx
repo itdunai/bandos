@@ -12,6 +12,8 @@ import { formatMoney } from "@/lib/finance";
 import { Calendar, ChevronLeft, ChevronRight, Mic2, Star } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
+import { PageLoader } from "@/components/ui/page-loader";
+import { useIsClient } from "@/lib/use-is-client";
 
 export interface ScheduleEvent {
   id: string;
@@ -128,17 +130,29 @@ function eventMoney(event: ScheduleEvent) {
   return null;
 }
 
-export function ScheduleView({
-  events,
-  bandSlug,
-  bandId,
-  isAdmin = false,
-}: {
+type ScheduleViewProps = {
   events: ScheduleEvent[];
   bandSlug: string;
   bandId: string;
   isAdmin?: boolean;
-}) {
+};
+
+/**
+ * Календарь целиком зависит от часового пояса пользователя («сегодня», день
+ * события), а сервер работает в UTC — поэтому рендерим только в браузере.
+ */
+export function ScheduleView(props: ScheduleViewProps) {
+  const isClient = useIsClient();
+  if (!isClient) return <PageLoader label="Загрузка графика…" />;
+  return <ScheduleCalendar {...props} />;
+}
+
+function ScheduleCalendar({
+  events,
+  bandSlug,
+  bandId,
+  isAdmin = false,
+}: ScheduleViewProps) {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());

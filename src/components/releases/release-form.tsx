@@ -19,6 +19,8 @@ import {
 } from "@/types/database";
 import { Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
+import { todayDateString } from "@/lib/datetime";
+import { useIsClient } from "@/lib/use-is-client";
 
 const selectClass =
   "w-full rounded-lg border border-border bg-bg-3 px-3 py-2 text-sm outline-none focus:border-accent";
@@ -47,6 +49,7 @@ export function ReleaseForm({
   const isEdit = !!release;
   const initialSongId = release?.song_id || defaultSongId || songs[0]?.id || "";
   const [songId, setSongId] = useState(initialSongId);
+  const isClient = useIsClient();
 
   const action = isEdit
     ? updateRelease.bind(null, release.id, bandId, bandSlug)
@@ -97,12 +100,13 @@ export function ReleaseForm({
           <div>
             <Label>Дата релиза *</Label>
             <Input
+              key={isClient ? "client" : "server"}
               name="released_at"
               type="date"
               required
               defaultValue={
                 release?.released_at?.slice(0, 10) ||
-                new Date().toISOString().slice(0, 10)
+                (isClient ? todayDateString() : "")
               }
             />
           </div>

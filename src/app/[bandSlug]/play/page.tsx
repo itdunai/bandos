@@ -9,11 +9,11 @@ import {
   getCurrentMember,
 } from "@/lib/band/queries";
 import { createClient } from "@/lib/supabase/server";
-import { formatDate } from "@/lib/utils";
 import { Play } from "lucide-react";
 import { CloudOff } from "lucide-react";
 import { bandPath } from "@/lib/paths";
 import { notFound } from "next/navigation";
+import { LocalDateTime } from "@/components/ui/local-date-time";
 
 export default async function PlayIndexPage({
   params,
@@ -99,7 +99,7 @@ export default async function PlayIndexPage({
                     <div className="min-w-0 flex-1">
                       <div className="font-medium">{setlist.name}</div>
                       <div className="text-xs text-text-secondary">
-                        {event.title} · {formatDate(event.starts_at)}
+                        {event.title} · <LocalDateTime value={event.starts_at} />
                       </div>
                     </div>
                     <Badge variant="amber">Концерт</Badge>

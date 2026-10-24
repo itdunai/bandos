@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { parseDateValue } from "@/lib/datetime";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -36,5 +37,5 @@ export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOpt
     day: "numeric",
     month: "short",
     ...options,
-  }).format(typeof date === "string" ? new Date(date) : date);
+  }).format(typeof date === "string" ? parseDateValue(date) : date);
 }

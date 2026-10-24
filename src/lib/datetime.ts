@@ -50,3 +50,23 @@ export function parseFormDateTime(
 
   return datetimeLocalToIso(trimmed, timezoneOffsetMinutes);
 }
+
+const DATE_ONLY_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+/**
+ * Строка даты из БД → Date. Колонки DATE (`YYYY-MM-DD`) — это календарный день
+ * без часового пояса: разбираем как локальную полночь, иначе `new Date()`
+ * считает их полночью UTC и западнее UTC показывается предыдущий день.
+ * TIMESTAMPTZ разбирается как обычно.
+ */
+export function parseDateValue(value: string): Date {
+  const m = DATE_ONLY_RE.exec(value);
+  if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return new Date(value);
+}
+
+/** Сегодняшняя дата `YYYY-MM-DD` в часовом поясе текущей среды (вызывать в браузере). */
+export function todayDateString(now: Date = new Date()): string {
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}
