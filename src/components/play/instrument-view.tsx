@@ -84,7 +84,7 @@ export function InstrumentView({
 
       {track.structure && (instrument === "drums" || instrument === "other") && (
         <section>
-          <h3 className="mb-2 text-center text-[10px] uppercase tracking-widest text-text-muted">
+          <h3 className="mb-2 text-center text-[11px] uppercase tracking-widest text-text-muted">
             Структура
           </h3>
           <p className="text-center text-sm text-text-secondary">{track.structure}</p>
@@ -93,7 +93,7 @@ export function InstrumentView({
 
       {(instrument === "guitar" || instrument === "keys") && chords?.body && (
         <section className="flex-1">
-          <h3 className="mb-3 text-center text-[10px] uppercase tracking-widest text-text-muted">
+          <h3 className="mb-3 text-center text-[11px] uppercase tracking-widest text-text-muted">
             Аккорды
           </h3>
           <pre className="text-center font-mono text-2xl leading-relaxed text-accent whitespace-pre-wrap sm:text-3xl">
@@ -104,7 +104,7 @@ export function InstrumentView({
 
       {instrument === "bass" && tabs?.body && (
         <section className="flex-1">
-          <h3 className="mb-3 text-center text-[10px] uppercase tracking-widest text-text-muted">
+          <h3 className="mb-3 text-center text-[11px] uppercase tracking-widest text-text-muted">
             Табы
           </h3>
           <pre className="text-center font-mono text-lg leading-relaxed text-text-primary whitespace-pre-wrap">
@@ -115,7 +115,7 @@ export function InstrumentView({
 
       {instrument === "vocals" && lyrics?.body && (
         <section className="flex-1">
-          <h3 className="mb-3 text-center text-[10px] uppercase tracking-widest text-text-muted">
+          <h3 className="mb-3 text-center text-[11px] uppercase tracking-widest text-text-muted">
             Текст
           </h3>
           <pre className="text-center text-lg leading-relaxed text-text-primary whitespace-pre-wrap sm:text-xl">
@@ -126,7 +126,7 @@ export function InstrumentView({
 
       {showLyrics && canToggleLyrics && lyrics?.body && (
         <section className="flex-1 border-t border-border pt-4">
-          <h3 className="mb-3 text-center text-[10px] uppercase tracking-widest text-text-muted">
+          <h3 className="mb-3 text-center text-[11px] uppercase tracking-widest text-text-muted">
             Текст
           </h3>
           <pre className="text-center text-base leading-relaxed text-text-primary whitespace-pre-wrap sm:text-lg">

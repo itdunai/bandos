@@ -112,7 +112,7 @@ export default async function MembersPage({
               className="mb-2 h-12 w-12 text-base"
             />
             <div className="text-sm font-medium">{m.display_name}</div>
-            <div className="text-[11px] text-text-secondary">
+            <div className="text-xs text-text-secondary">
               {INSTRUMENT_LABELS[m.instrument as Instrument]}
             </div>
             <div className="mt-2">
@@ -132,7 +132,7 @@ export default async function MembersPage({
             </div>
 
             <div className="mt-3 w-full space-y-1.5 border-t border-border pt-3 text-left">
-              <div className="flex items-center gap-2 text-[11px]">
+              <div className="flex items-center gap-2 text-xs">
                 <Phone className="h-3 w-3 shrink-0 text-text-muted" />
                 {m.phone ? (
                   <a
@@ -145,7 +145,7 @@ export default async function MembersPage({
                   <span className="text-text-muted">—</span>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-[11px]">
+              <div className="flex items-center gap-2 text-xs">
                 <MessageCircle className="h-3 w-3 shrink-0 text-text-muted" />
                 {m.telegram ? (
                   <a

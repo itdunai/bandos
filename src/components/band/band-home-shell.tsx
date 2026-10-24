@@ -30,7 +30,7 @@ export function BandHomeShell({
   initialEdit: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(initialEdit && canEditProfile);
-  const bandPathBase = bandPath(band.slug);
+  const bandPathBase = bandPath(band.slug, "group");
 
   function enterEdit() {
     setIsEditing(true);

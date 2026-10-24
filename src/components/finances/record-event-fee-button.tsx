@@ -25,7 +25,7 @@ export function RecordEventFeeButton({
       size="sm"
       loading={pending}
       disabled={pending}
-      className={compact ? "h-6 px-2 text-[10px]" : "text-xs"}
+      className={compact ? "h-6 px-2 text-[11px]" : "text-xs"}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

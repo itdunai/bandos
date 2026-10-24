@@ -51,7 +51,7 @@ export function PublicPageShare({
   return (
     <div className="rounded-xl border border-border bg-bg-2 p-4">
       <h3 className="mb-1 text-sm font-medium">{title}</h3>
-      <p className="mb-3 text-[11px] text-text-muted">{hint}</p>
+      <p className="mb-3 text-xs text-text-muted">{hint}</p>
       <button
         type="button"
         onClick={copy}

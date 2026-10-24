@@ -47,8 +47,8 @@ export function BandSwitcher({
         aria-expanded={open}
         aria-haspopup="listbox"
       >
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-accent-dark">
-          <Guitar className="h-3.5 w-3.5 text-white" />
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-accent">
+          <Guitar className="h-3.5 w-3.5 text-accent-ink" />
         </div>
         <span
           className={cn(

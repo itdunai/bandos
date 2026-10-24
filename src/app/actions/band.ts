@@ -41,12 +41,12 @@ export async function updateBandProfile(
     .eq("id", bandId);
 
   if (error) {
-    await redirectWithToast(bandPath(bandSlug), error.message);
+    await redirectWithToast(bandPath(bandSlug, "group"), error.message);
     return;
   }
 
   revalidatePublicBandAndCatalog(bandSlug);
-  redirect(bandPath(bandSlug));
+  redirect(bandPath(bandSlug, "group"));
 }
 
 export async function setRepertoirePublic(

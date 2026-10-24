@@ -127,11 +127,11 @@ export function UpcomingEventChip({
     >
       <EventIcon type={event.event_type} className="h-4 w-4 shrink-0" />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 text-[11px] font-medium tabular-nums">
+        <div className="flex items-center gap-1.5 text-xs font-medium tabular-nums">
           {pulse}
           {when}
         </div>
-        <div className="truncate text-[11px] text-text-secondary">{event.title}</div>
+        <div className="truncate text-xs text-text-secondary">{event.title}</div>
       </div>
     </Link>
   );

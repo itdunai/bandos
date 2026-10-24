@@ -28,7 +28,7 @@ export function PrivacyPolicyForm({
       </div>
       <div>
         <Label htmlFor="privacy-body">Текст</Label>
-        <p className="mb-2 text-[11px] text-text-muted">
+        <p className="mb-2 text-xs text-text-muted">
           Разметка: **жирный**, *курсив*, ## заголовок, списки. Данные в
           [квадратных скобках] замените на реквизиты оператора. HTML не
           поддерживается.

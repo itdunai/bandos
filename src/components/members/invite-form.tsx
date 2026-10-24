@@ -51,7 +51,7 @@ export function InviteForm({ bandId }: { bandId: string }) {
   return (
     <div className="h-full rounded-xl border border-border bg-bg-2 p-4">
       <h3 className="mb-1 text-sm font-medium">Пригласить участника</h3>
-      <p className="mb-3 text-[11px] text-text-muted">
+      <p className="mb-3 text-xs text-text-muted">
         Только администратор может приглашать и назначать права
       </p>
       <form onSubmit={handleSubmit} className="space-y-3">
@@ -80,7 +80,7 @@ export function InviteForm({ bandId }: { bandId: string }) {
           onClick={copyLink}
           className="mt-3 w-full rounded-lg bg-bg-3 p-2 text-left transition-colors hover:bg-bg hover:ring-1 hover:ring-accent/30"
         >
-          <p className="mb-1 text-[11px] text-text-muted">
+          <p className="mb-1 text-xs text-text-muted">
             Нажмите, чтобы скопировать ссылку:
           </p>
           <code className="flex items-start gap-2 break-all text-xs text-accent">

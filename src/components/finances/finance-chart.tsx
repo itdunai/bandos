@@ -44,12 +44,12 @@ export function FinanceChart({
                   title={`Расход: ${formatMoney(month.expense)}`}
                 />
               </div>
-              <span className="text-[10px] text-text-muted">{label}</span>
+              <span className="text-[11px] text-text-muted">{label}</span>
             </div>
           );
         })}
       </div>
-      <div className="mt-3 flex gap-4 text-[11px] text-text-muted">
+      <div className="mt-3 flex gap-4 text-xs text-text-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-sm bg-green/80" />
           Доход

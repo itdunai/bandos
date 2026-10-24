@@ -21,6 +21,7 @@ export async function toggleTodo(todoId: string, bandSlug: string, isDone: boole
   const { supabase } = await requireTodoMember(todoId);
   await supabase.from("todos").update({ is_done: isDone }).eq("id", todoId);
   revalidatePath(bandPath(bandSlug, "todos"));
+  revalidatePath(bandPath(bandSlug));
 }
 
 export async function createTodo(bandId: string, bandSlug: string, formData: FormData) {

@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# design concepts (local only)
+/redesign-concept.html
+/redesign-*.png

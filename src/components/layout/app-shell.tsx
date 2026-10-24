@@ -10,6 +10,7 @@ export function AppShell({
   member,
   memberCount,
   title,
+  subtitle,
   children,
   actions,
   fullWidth,
@@ -18,6 +19,7 @@ export function AppShell({
   member: BandMember | null;
   memberCount: number;
   title: string;
+  subtitle?: React.ReactNode;
   children: React.ReactNode;
   actions?: React.ReactNode;
   fullWidth?: boolean;
@@ -31,10 +33,13 @@ export function AppShell({
       <div className="flex min-h-screen min-w-0 flex-1 flex-col md:min-h-0 md:overflow-hidden">
         <MobileHeader band={band} member={member} />
         {!fullWidth && (
-          <header className="flex shrink-0 flex-col gap-2 border-b border-border px-5 py-3.5 md:flex-row md:items-center md:justify-between">
-            <h1 className="w-full min-w-0 text-base font-medium md:w-auto">
-              {title}
-            </h1>
+          <header className="flex shrink-0 flex-col gap-3 px-5 pb-2 pt-5 md:flex-row md:items-end md:justify-between md:px-8 md:pt-7">
+            <div className="w-full min-w-0 md:w-auto">
+              <h1 className="heading-poster text-xl md:text-[28px]">{title}</h1>
+              {subtitle && (
+                <div className="mt-1.5 text-sm text-text-secondary">{subtitle}</div>
+              )}
+            </div>
             {actions && (
               <div className="flex w-full flex-wrap gap-2 md:w-auto md:justify-end">
                 {actions}
@@ -47,7 +52,7 @@ export function AppShell({
           className={
             fullWidth
               ? "min-h-0 min-w-0 flex-1 overflow-x-hidden"
-              : "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-5 pb-mobile-main md:pb-5"
+              : "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-5 pb-mobile-main md:px-8 md:pb-8 md:pt-5"
           }
         >
           {children}

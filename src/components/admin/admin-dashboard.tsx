@@ -101,7 +101,7 @@ export function AdminDashboard({
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[11px] text-text-muted">
+        <p className="mt-2 text-xs text-text-muted">
           Общий статус: {allHealthy ? "OK" : "есть проблемы"}
         </p>
       </section>
@@ -120,7 +120,7 @@ export function AdminDashboard({
           <div className="overflow-hidden rounded-xl border border-border">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-border bg-bg-2 text-[11px] uppercase tracking-wider text-text-muted">
+                <tr className="border-b border-border bg-bg-2 text-xs uppercase tracking-wider text-text-muted">
                   <th className="px-3 py-2 font-medium">Время</th>
                   <th className="px-3 py-2 font-medium">Уровень</th>
                   <th className="px-3 py-2 font-medium">Событие</th>
@@ -167,7 +167,7 @@ export function AdminDashboard({
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <Card className="p-4">
-      <div className="text-[11px] uppercase tracking-wider text-text-muted">
+      <div className="text-xs uppercase tracking-wider text-text-muted">
         {label}
       </div>
       <div className="mt-1 text-2xl font-medium">{value}</div>
@@ -183,7 +183,7 @@ function LevelBadge({ level }: { level: AuditLogRow["level"] }) {
   };
   return (
     <span
-      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium uppercase ${styles[level]}`}
+      className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium uppercase ${styles[level]}`}
     >
       {level}
     </span>

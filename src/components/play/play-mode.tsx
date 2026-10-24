@@ -71,7 +71,7 @@ export function PlayMode({
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-bg">
       <header className="shrink-0 border-b border-border px-4 py-3">
-        <div className="text-center text-[11px] uppercase tracking-wider text-text-muted">
+        <div className="text-center text-xs uppercase tracking-wider text-text-muted">
           {setlistName}
         </div>
         <div className="mt-1 flex items-center justify-between gap-2">
@@ -126,7 +126,7 @@ export function PlayMode({
             />
           ))}
         </div>
-        <p className="mt-2 text-center text-[10px] text-text-muted md:hidden">
+        <p className="mt-2 text-center text-[11px] text-text-muted md:hidden">
           Свайп влево/вправо — переключение треков
         </p>
       </footer>

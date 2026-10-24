@@ -45,7 +45,7 @@ export default async function InviteJoinPage({
           <p className="mt-1 text-xs text-text-secondary">
             Создайте аккаунт, чтобы присоединиться к группе
           </p>
-          <div className="mt-2 flex justify-center gap-2 text-[11px] text-text-muted">
+          <div className="mt-2 flex justify-center gap-2 text-xs text-text-muted">
             <span>
               {invitation.permission_preset === "custom"
                 ? "Свои права"

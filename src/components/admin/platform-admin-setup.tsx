@@ -50,7 +50,7 @@ export function PlatformAdminSetup({
         <p>
           <strong className="text-text-primary">Вариант B:</strong> SQL в Supabase:
         </p>
-        <pre className="overflow-x-auto rounded-lg bg-bg-3 p-2 text-[11px] text-text-primary">
+        <pre className="overflow-x-auto rounded-lg bg-bg-3 p-2 text-xs text-text-primary">
           {`UPDATE public.profiles\nSET is_platform_admin = true\nWHERE id = (\n  SELECT id FROM auth.users WHERE email = '${userEmail}'\n);`}
         </pre>
       </div>

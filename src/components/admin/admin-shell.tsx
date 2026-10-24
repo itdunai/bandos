@@ -18,7 +18,7 @@ export function AdminShell({
             <SiteLogo className="h-8" />
             <div>
               <div className="text-sm font-medium">Admin</div>
-              <div className="text-[10px] text-text-muted">{userEmail}</div>
+              <div className="text-[11px] text-text-muted">{userEmail}</div>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -35,7 +35,7 @@ export function AdminShell({
               Политика
             </Link>
             <div
-              className="rounded-md border border-border bg-bg px-2 py-1 text-[10px] text-text-muted"
+              className="rounded-md border border-border bg-bg px-2 py-1 text-[11px] text-text-muted"
               title="Версия текущего деплоя"
             >
               build: {buildSha}

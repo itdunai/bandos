@@ -73,7 +73,7 @@ export function PlaySetlistShell({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div
-        className={`shrink-0 border-b px-4 py-2 text-center text-[11px] ${
+        className={`shrink-0 border-b px-4 py-2 text-center text-xs ${
           isOnline
             ? "border-border bg-bg-2 text-text-muted"
             : "border-amber/30 bg-amber/10 text-amber"

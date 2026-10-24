@@ -17,7 +17,7 @@ export function HomeHero({ ctaSlot }: { ctaSlot: ReactNode }) {
 
       <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:py-24">
         <div className="max-w-2xl">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-accent">
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium uppercase tracking-wider text-accent">
             <Guitar className="h-3.5 w-3.5" />
             Для кавер- и авторских групп
           </p>

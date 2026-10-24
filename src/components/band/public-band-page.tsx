@@ -82,8 +82,8 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
               />
             </div>
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent-dark">
-              <Guitar className="h-5 w-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
+              <Guitar className="h-5 w-5 text-accent-ink" />
             </div>
           )}
           <div>

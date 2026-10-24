@@ -86,7 +86,7 @@ export default async function RegisterPage({
           Войти
         </Link>
       </p>
-      <p className="mt-2 text-center text-[11px] text-text-muted">
+      <p className="mt-2 text-center text-xs text-text-muted">
         Хотите завести группу?{" "}
         <Link href="/login" className="text-accent hover:underline">
           Войдите

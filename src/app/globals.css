@@ -1,20 +1,48 @@
 @import "tailwindcss";
 
+/*
+ * Дизайн-система «Афиша»: Unbounded в заголовках, Golos Text в тексте,
+ * острые углы, акцент заливкой. Две темы на одних токенах —
+ * тёмная (по умолчанию) и светлая: <html data-theme="light">.
+ */
 :root {
+  color-scheme: dark;
   --bg: #0d0d0f;
   --bg-2: #16161a;
   --bg-3: #1e1e24;
   --bg-4: #26262e;
   --border: #2e2e38;
+  --border-strong: #3d3d4a;
   --text-primary: #f0f0f4;
-  --text-secondary: #9090a8;
-  --text-muted: #5a5a72;
+  --text-secondary: #a5a5bc;
+  --text-muted: #7d7d96;
   --accent: #a78bfa;
   --accent-dark: #7c5fe8;
+  --accent-ink: #0d0d0f;
   --green: #34d399;
   --amber: #fbbf24;
   --red: #f87171;
   --blue: #60a5fa;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f4f9;
+  --bg-2: #ffffff;
+  --bg-3: #efedf6;
+  --bg-4: #e3e0ee;
+  --border: #e0dcea;
+  --border-strong: #c9c3db;
+  --text-primary: #0d0d0f;
+  --text-secondary: #4b4a5e;
+  --text-muted: #6a6880;
+  --accent: #7c5fe8;
+  --accent-dark: #6a4bdc;
+  --accent-ink: #ffffff;
+  --green: #0c8a5f;
+  --amber: #a8650b;
+  --red: #cf3b3b;
+  --blue: #2a66d0;
 }
 
 @theme inline {
@@ -23,17 +51,32 @@
   --color-bg-3: var(--bg-3);
   --color-bg-4: var(--bg-4);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-accent: var(--accent);
   --color-accent-dark: var(--accent-dark);
+  --color-accent-ink: var(--accent-ink);
   --color-green: var(--green);
   --color-amber: var(--amber);
   --color-red: var(--red);
   --color-blue: var(--blue);
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans: var(--font-golos), system-ui, sans-serif;
+  --font-display: var(--font-unbounded), var(--font-golos), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* Острые углы «Афиши» поверх стандартной шкалы Tailwind */
+@theme {
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+  --radius-2xl: 8px;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.4;
 }
 
 html {
@@ -44,9 +87,31 @@ body {
   background: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: 15px;
   overflow-x: hidden;
   max-width: 100%;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  /* Заголовок-«афиша»: капс, плотный трекинг */
+  .heading-poster {
+    font-family: var(--font-display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+  }
 }
 
 html.navigating {

@@ -67,10 +67,10 @@ export function BandReleasesBlock({
                 )}
               </div>
               <div className="space-y-0.5 p-1.5">
-                <p className="truncate text-[11px] font-medium group-hover:text-accent sm:text-xs">
+                <p className="truncate text-xs font-medium group-hover:text-accent">
                   {release.title}
                 </p>
-                <p className="truncate text-[9px] text-text-muted sm:text-[10px]">
+                <p className="truncate text-[9px] text-text-muted sm:text-[11px]">
                   {formatDate(release.released_at, {
                     day: "numeric",
                     month: "short",

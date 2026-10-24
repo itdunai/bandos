@@ -27,7 +27,7 @@ function DueBadge({ dueDate, isDone }: { dueDate: string; isDone: boolean }) {
   return (
     <span
       className={cn(
-        "shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium",
+        "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
         overdue && "bg-red/12 text-red",
         soon && !overdue && "bg-amber/12 text-amber",
         !overdue && !soon && "bg-bg-3 text-text-muted"
@@ -143,7 +143,7 @@ function TodoItem({
             </p>
           )}
           {todo.notes && (
-            <p className="mt-1 text-[11px] text-text-muted italic">
+            <p className="mt-1 text-xs text-text-muted italic">
               {todo.notes}
             </p>
           )}

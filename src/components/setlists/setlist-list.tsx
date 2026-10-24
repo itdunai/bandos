@@ -80,7 +80,7 @@ export function SetlistList({
               <ListMusic className="h-4 w-4" />
             </div>
             <div className="text-sm font-medium leading-snug line-clamp-2">{sl.name}</div>
-            <div className="mt-1 text-[10px] text-text-secondary">
+            <div className="mt-1 text-[11px] text-text-secondary">
               {metaLine(sl.itemCount, sl.durationSec)}
             </div>
           </Link>

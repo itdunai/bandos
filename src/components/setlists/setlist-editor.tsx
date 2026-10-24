@@ -80,10 +80,10 @@ function SortableItem({
       <div className="min-w-0 flex-1">
         <div className="text-sm font-medium">{item.title}</div>
         {item.subtitle && (
-          <div className="text-[11px] text-text-secondary">{item.subtitle}</div>
+          <div className="text-xs text-text-secondary">{item.subtitle}</div>
         )}
         {item.notes && (
-          <div className="text-[11px] text-accent">{item.notes}</div>
+          <div className="text-xs text-accent">{item.notes}</div>
         )}
       </div>
       <button

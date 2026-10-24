@@ -155,7 +155,7 @@ export function FinancePanel({
             {formatMoney(summary.openingBalance)}
           </div>
           {isAdmin && (
-            <p className="mt-1 text-[10px] text-text-muted">Нажмите, чтобы изменить</p>
+            <p className="mt-1 text-[11px] text-text-muted">Нажмите, чтобы изменить</p>
           )}
         </Card>
         <Card className="p-4">
@@ -404,11 +404,11 @@ export function FinancePanel({
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm font-medium">{tx.title}</span>
-                    <span className="text-[11px] text-text-muted">
+                    <span className="text-xs text-text-muted">
                       {FINANCE_TYPE_LABELS[tx.transaction_type]}
                     </span>
                     {tx.event_id && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-bg-3 px-2 py-0.5 text-[10px] text-accent">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-bg-3 px-2 py-0.5 text-[11px] text-accent">
                         <Mic2 className="h-3 w-3" />
                         Концерт
                       </span>
@@ -419,7 +419,7 @@ export function FinancePanel({
                       {tx.notes}
                     </p>
                   )}
-                  <p className="mt-1 text-[11px] text-text-muted">
+                  <p className="mt-1 text-xs text-text-muted">
                     {formatDate(tx.transaction_at, {
                       day: "numeric",
                       month: "long",

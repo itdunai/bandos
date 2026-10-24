@@ -2,36 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Calendar,
-  ClipboardList,
-  Disc3,
-  Info,
-  LogOut,
-  Plus,
-  Timer,
-  Users,
-  Wallet,
-  X,
-} from "lucide-react";
+import { LogOut, Plus, X } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
+import {
+  BAND_NAV,
+  isNavItemActive,
+  isNavItemVisible,
+  navItemHref,
+} from "@/components/layout/band-nav";
 import { BuildVersionLabel } from "@/components/layout/build-version-label";
-import { canViewFinances } from "@/lib/band/permissions";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { cn } from "@/lib/utils";
 import type { BandMember } from "@/types/database";
-import { bandPath } from "@/lib/paths";
 import { useEffect } from "react";
-
-const MENU_ITEMS = [
-  { href: "todos", label: "Дела", icon: ClipboardList },
-  { href: "", label: "О группе", icon: Info, isHome: true },
-  { href: "members", label: "Участники", icon: Users },
-  { href: "finances", label: "Финансы", icon: Wallet },
-  { href: "releases", label: "Релизы", icon: Disc3 },
-  { href: "schedule", label: "График", icon: Calendar },
-  { href: "metronome", label: "Метроном", icon: Timer },
-] as const;
 
 export function MobileMenu({
   bandSlug,
@@ -70,7 +54,7 @@ export function MobileMenu({
       />
       <aside className="fixed right-0 top-0 z-[61] flex h-full w-[min(280px,85vw)] flex-col border-l border-border bg-bg-2 shadow-xl md:hidden">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <span className="text-sm font-medium">Меню</span>
+          <span className="font-display text-sm font-bold uppercase">Меню</span>
           <button
             type="button"
             onClick={onClose}
@@ -80,45 +64,43 @@ export function MobileMenu({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <nav className="flex-1 overflow-y-auto py-2">
-          {MENU_ITEMS.map((item) => {
-            if (
-              item.href === "finances" &&
-              member &&
-              !canViewFinances(member)
-            ) {
-              return null;
-            }
+        <nav className="flex-1 overflow-y-auto px-2 py-2">
+          {BAND_NAV.map((group, gi) => (
+            <div key={group.section ?? gi} className={cn(gi > 0 && "mt-2")}>
+              {group.section && (
+                <div className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
+                  {group.section}
+                </div>
+              )}
+              {group.items.map((item) => {
+                if (!isNavItemVisible(item, member)) return null;
+                const href = navItemHref(bandSlug, item);
+                const active = isNavItemActive(pathname, href, !item.href);
+                const Icon = item.icon;
 
-            const href =
-              "isHome" in item && item.isHome
-                ? bandPath(bandSlug)
-                : bandPath(bandSlug, item.href);
-            const active =
-              "isHome" in item && item.isHome
-                ? pathname === href
-                : pathname === href || pathname.startsWith(`${href}/`);
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href || "home"}
-                href={href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 text-sm transition-colors",
-                  active
-                    ? "bg-bg-3 text-accent"
-                    : "text-text-secondary hover:bg-bg-3 hover:text-text-primary"
-                )}
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                {item.label}
-              </Link>
-            );
-          })}
+                return (
+                  <Link
+                    key={item.href || "home"}
+                    href={href}
+                    onClick={onClose}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors",
+                      active
+                        ? "bg-accent text-accent-ink"
+                        : "text-text-secondary hover:bg-bg-3 hover:text-text-primary"
+                    )}
+                  >
+                    <Icon className="h-5 w-5 shrink-0" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         <div className="space-y-1 border-t border-border p-3">
+          <ThemeToggle className="mb-2" />
           <Link
             href="/new-band"
             onClick={onClose}
@@ -132,13 +114,13 @@ export function MobileMenu({
               type="submit"
               variant="ghost"
               loadingLabel="Выход…"
-              className="flex h-auto w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
+              className="flex h-auto w-full items-center justify-start gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
             >
               <LogOut className="h-4 w-4 shrink-0" />
               Выйти
             </SubmitButton>
           </form>
-          <BuildVersionLabel className="px-3 pt-1 text-[10px] text-text-muted" />
+          <BuildVersionLabel className="px-3 pt-1 text-[11px] text-text-muted" />
         </div>
       </aside>
     </>

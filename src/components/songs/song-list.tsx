@@ -220,13 +220,13 @@ export function SongList({
                   <div className="flex h-7 w-7 items-center justify-center rounded-md bg-bg-3 text-accent">
                     <Music className="h-3.5 w-3.5" />
                   </div>
-                  <Badge variant={STATUS_VARIANT[song.status]} className="text-[10px]">
+                  <Badge variant={STATUS_VARIANT[song.status]} className="text-[11px]">
                     {SONG_STATUS_LABELS[song.status]}
                   </Badge>
                 </div>
                 <div className="text-sm font-medium leading-snug line-clamp-2">{song.title}</div>
                 {meta(song) && (
-                  <div className="mt-1 text-[10px] text-text-secondary line-clamp-1">{meta(song)}</div>
+                  <div className="mt-1 text-[11px] text-text-secondary line-clamp-1">{meta(song)}</div>
                 )}
               </Link>
             ))}
@@ -234,7 +234,7 @@ export function SongList({
         </>
       )}
 
-      <p className="text-center text-[11px] text-text-muted">
+      <p className="text-center text-xs text-text-muted">
         {filtered.length} из {songs.length}
       </p>
     </div>
@@ -272,7 +272,7 @@ function SongMobileList({
             </div>
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-medium">{song.title}</div>
-              <div className="truncate text-[11px] text-text-secondary">
+              <div className="truncate text-xs text-text-secondary">
                 {meta(song)}
               </div>
             </div>

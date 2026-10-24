@@ -56,7 +56,7 @@ export function PermissionPresetFields({
                 />
                 <span className="min-w-0">
                   <span className="block text-sm font-medium">{meta.label}</span>
-                  <span className="block text-[11px] text-text-muted">
+                  <span className="block text-xs text-text-muted">
                     {meta.description}
                   </span>
                 </span>
@@ -68,7 +68,7 @@ export function PermissionPresetFields({
 
       {preset === "custom" && (
         <div className="rounded-lg border border-dashed border-border px-3 py-2">
-          <p className="mb-2 text-[11px] text-text-muted">Разрешения:</p>
+          <p className="mb-2 text-xs text-text-muted">Разрешения:</p>
           <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {BAND_PERMISSIONS.map((key) => (
               <label

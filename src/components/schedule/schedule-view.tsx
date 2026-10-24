@@ -261,7 +261,7 @@ function ScheduleCalendar({
             {WEEKDAYS.map((day) => (
               <div
                 key={day}
-                className="py-1 text-center text-[10px] font-medium uppercase tracking-wider text-text-muted sm:text-xs"
+                className="py-1 text-center text-[11px] font-medium uppercase tracking-wider text-text-muted sm:text-xs"
               >
                 {day}
               </div>
@@ -394,7 +394,7 @@ function ScheduleCalendar({
             })}
           </div>
         </div>
-        <p className="mt-2 text-center text-[10px] text-text-muted md:hidden">
+        <p className="mt-2 text-center text-[11px] text-text-muted md:hidden">
           Нажмите на день с точками — события появятся в списке ниже
         </p>
       </div>
@@ -468,7 +468,7 @@ function EmptyFutureDayCell({
         {day}
       </span>
       <span className="absolute inset-0 hidden items-center justify-center px-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 md:flex">
-        <span className="rounded-md bg-accent px-2 py-1 text-center text-[10px] font-medium leading-tight text-white">
+        <span className="rounded-md bg-accent px-2 py-1 text-center text-[11px] font-medium leading-tight text-accent-ink">
           Новое событие
         </span>
       </span>
@@ -525,11 +525,11 @@ function CalendarEventTile({
               isRehearsal ? "text-accent" : isPerformance ? "text-amber" : "text-text-muted"
             )}
           />
-          <span className="truncate text-[11px] font-medium leading-tight">
+          <span className="truncate text-xs font-medium leading-tight">
             {event.title}
           </span>
         </div>
-        <div className="mt-0.5 truncate text-[10px] text-text-secondary">
+        <div className="mt-0.5 truncate text-[11px] text-text-secondary">
           {formatTime(event.starts_at)}
           {event.location && ` · ${event.location}`}
           {money ? ` · ${formatMoney(money)}` : ""}
@@ -630,7 +630,7 @@ function EventCard({
           >
             {date.getDate()}
           </div>
-          <div className="mt-0.5 text-[10px] uppercase text-text-muted">
+          <div className="mt-0.5 text-[11px] uppercase text-text-muted">
             {formatDate(date, { month: "short" })}
           </div>
         </div>

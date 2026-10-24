@@ -15,6 +15,7 @@ export function revalidatePublicBand(bandSlug: string) {
   revalidatePath(`/rider/${bandSlug}`);
   revalidatePath(`/repertoire/${bandSlug}`);
   revalidatePath(bandPath(bandSlug));
+  revalidatePath(bandPath(bandSlug, "group"));
 }
 
 export function revalidatePublicBandAndCatalog(bandSlug: string) {

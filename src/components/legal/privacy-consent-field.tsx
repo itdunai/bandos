@@ -4,7 +4,7 @@ export function PrivacyConsentField({ id = "privacy_consent" }: { id?: string })
   return (
     <label
       htmlFor={id}
-      className="flex items-start gap-2 text-[11px] leading-relaxed text-text-secondary"
+      className="flex items-start gap-2 text-xs leading-relaxed text-text-secondary"
     >
       <input
         id={id}

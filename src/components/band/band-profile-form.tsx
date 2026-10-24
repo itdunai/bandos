@@ -67,11 +67,11 @@ export function BandProfileForm({
         </div>
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div className="rounded-lg bg-bg-3 px-3 py-2">
-            <div className="text-[11px] text-text-muted">Треков в библиотеке</div>
+            <div className="text-xs text-text-muted">Треков в библиотеке</div>
             <div className="text-lg font-medium">{tracksCount}</div>
           </div>
           <div className="rounded-lg bg-bg-3 px-3 py-2">
-            <div className="text-[11px] text-text-muted">Участников</div>
+            <div className="text-xs text-text-muted">Участников</div>
             <div className="text-lg font-medium">{membersCount}</div>
           </div>
         </div>

@@ -56,7 +56,7 @@ export function MemberPermissionsEditor({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-center gap-1.5 text-[11px] text-accent hover:underline"
+        className="flex w-full items-center justify-center gap-1.5 text-xs text-accent hover:underline"
       >
         <Shield className="h-3 w-3" />
         {open ? "Скрыть права" : `Права: ${presetBadgeLabel(member)}`}
@@ -68,9 +68,9 @@ export function MemberPermissionsEditor({
             defaultPreset={preset}
             defaultPermissions={permissions}
           />
-          {error && <p className="text-[11px] text-red">{error}</p>}
+          {error && <p className="text-xs text-red">{error}</p>}
           {saved && (
-            <p className="text-[11px] text-green">Сохранено</p>
+            <p className="text-xs text-green">Сохранено</p>
           )}
           <Button
             type="submit"
