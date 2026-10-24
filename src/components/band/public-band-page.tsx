@@ -105,7 +105,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
           </p>
         )}
 
-        {showRider && band.description && (
+        {band.description && (
           <p className="mb-6 whitespace-pre-wrap text-sm text-text-secondary">
             {band.description}
           </p>
