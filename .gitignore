@@ -44,3 +44,5 @@ next-env.d.ts
 # design concepts (local only)
 /redesign-concept.html
 /redesign-*.png
+/landing-concepts.html
+/landing-concept-*.png
