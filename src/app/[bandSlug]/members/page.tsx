@@ -93,116 +93,139 @@ export default async function MembersPage({
         </div>
       )}
 
-      {member && (
-        <div className="mb-6 grid gap-4 lg:grid-cols-2">
-          <Card className="h-full">
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-wide">Мой профиль</h3>
-            <MemberProfileForm
-              member={member}
-              bandSlug={band.slug}
-              avatarUrl={myAvatarUrl}
-            />
-          </Card>
-
-          {showInvite && <InviteForm bandId={band.id} />}
-
-          {telegramEnabled && (
-            <TelegramConnectCard
-              bandSlug={band.slug}
-              account={(telegramResult.data as TelegramAccountView | null) ?? null}
-              showBookings={hasPermission(member, "band_profile")}
-            />
-          )}
-        </div>
-      )}
-
-      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">Состав</h3>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {members?.map((m, i) => {
-          const profile = m.profiles as { avatar_url: string | null } | null;
-          const avatarUrl = profile?.avatar_url ?? null;
-
-          return (
-          <div
-            key={m.id}
-            className="flex flex-col items-center rounded-xl border border-border bg-bg-2 p-4 text-center transition-colors hover:border-accent/50"
-          >
-            <Avatar
-              name={m.display_name ?? "?"}
-              src={avatarUrl}
-              color={AVATAR_COLORS[i % AVATAR_COLORS.length]}
-              className="mb-2 h-12 w-12 text-base"
-            />
-            <div className="text-sm font-medium">{m.display_name}</div>
-            <div className="text-xs text-text-secondary">
-              {INSTRUMENT_LABELS[m.instrument as Instrument]}
-            </div>
-            <div className="mt-2">
-              <Badge
-                variant={
-                  m.role === "admin"
-                    ? "purple"
-                    : m.permission_preset === "administrator"
-                      ? "purple"
-                      : m.permission_preset === "manager"
-                      ? "amber"
-                      : "blue"
-                }
-              >
-                {presetBadgeLabel(m)}
-              </Badge>
-            </div>
-
-            <div className="mt-3 w-full space-y-1.5 border-t border-border pt-3 text-left">
-              <div className="flex items-center gap-2 text-xs">
-                <Phone className="h-3 w-3 shrink-0 text-text-muted" />
-                {m.phone ? (
-                  <a
-                    href={`tel:${m.phone.replace(/\s/g, "")}`}
-                    className="truncate text-text-secondary hover:text-accent"
-                  >
-                    {m.phone}
-                  </a>
-                ) : (
-                  <span className="text-text-muted">—</span>
-                )}
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <MessageCircle className="h-3 w-3 shrink-0 text-text-muted" />
-                {m.telegram ? (
-                  <a
-                    href={telegramUrl(m.telegram)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate text-text-secondary hover:text-accent"
-                  >
-                    @{m.telegram.replace(/^@/, "")}
-                  </a>
-                ) : (
-                  <span className="text-text-muted">—</span>
-                )}
-              </div>
-            </div>
-
-            {showPermissions && m.role !== "admin" && (
-              <MemberPermissionsEditor
-                member={m}
-                bandId={band.id}
-                bandSlug={band.slug}
-              />
-            )}
-
-            {showPermissions && m.role !== "admin" && m.user_id !== member?.user_id && (
-              <ExcludeMemberButton
-                memberId={m.id}
-                memberName={m.display_name ?? "участника"}
-                bandId={band.id}
-                bandSlug={band.slug}
-              />
-            )}
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+        {/* Состав — главное на странице */}
+        <section className="min-w-0 self-start rounded-xl border border-border bg-bg-2">
+          <div className="flex items-center justify-between px-4 pb-2 pt-4 sm:px-5">
+            <h2 className="text-xs font-bold uppercase tracking-wide">Состав</h2>
+            <span className="text-xs text-text-muted">{members?.length ?? 0}</span>
           </div>
-          );
-        })}
+          <ul className="divide-y divide-border">
+            {members?.map((m, i) => {
+              const profile = m.profiles as { avatar_url: string | null } | null;
+              const avatarUrl = profile?.avatar_url ?? null;
+              const isMe = m.user_id === member?.user_id;
+              const canManage = showPermissions && m.role !== "admin";
+
+              return (
+                <li key={m.id} className="px-4 py-3.5 sm:px-5">
+                  <div className="flex items-center gap-3">
+                    <Avatar
+                      name={m.display_name ?? "?"}
+                      src={avatarUrl}
+                      color={AVATAR_COLORS[i % AVATAR_COLORS.length]}
+                      className="h-11 w-11 shrink-0 text-sm"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="truncate font-semibold">{m.display_name}</span>
+                        {isMe && <span className="text-xs text-text-muted">это вы</span>}
+                        <Badge
+                          variant={
+                            m.role === "admin" || m.permission_preset === "administrator"
+                              ? "purple"
+                              : m.permission_preset === "manager"
+                                ? "amber"
+                                : "blue"
+                          }
+                        >
+                          {presetBadgeLabel(m)}
+                        </Badge>
+                      </div>
+                      <div className="mt-0.5 text-sm text-text-secondary">
+                        {INSTRUMENT_LABELS[m.instrument as Instrument]}
+                      </div>
+                    </div>
+                    <div className="hidden shrink-0 flex-col items-end gap-1 text-sm sm:flex">
+                      {m.phone && (
+                        <a
+                          href={`tel:${m.phone.replace(/\s/g, "")}`}
+                          className="inline-flex items-center gap-1.5 text-text-secondary hover:text-accent"
+                        >
+                          <Phone className="h-3.5 w-3.5 text-text-muted" />
+                          {m.phone}
+                        </a>
+                      )}
+                      {m.telegram && (
+                        <a
+                          href={telegramUrl(m.telegram)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-text-secondary hover:text-accent"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5 text-text-muted" />
+                          @{m.telegram.replace(/^@/, "")}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Контакты на телефоне — под именем */}
+                  {(m.phone || m.telegram) && (
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 pl-14 text-sm sm:hidden">
+                      {m.phone && (
+                        <a
+                          href={`tel:${m.phone.replace(/\s/g, "")}`}
+                          className="inline-flex items-center gap-1.5 text-text-secondary"
+                        >
+                          <Phone className="h-3.5 w-3.5 text-text-muted" />
+                          {m.phone}
+                        </a>
+                      )}
+                      {m.telegram && (
+                        <a
+                          href={telegramUrl(m.telegram)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-text-secondary"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5 text-text-muted" />
+                          @{m.telegram.replace(/^@/, "")}
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {canManage && (
+                    <div className="mt-2 flex items-start gap-2 pl-12">
+                      <div className="min-w-0 flex-1">
+                        <MemberPermissionsEditor member={m} bandId={band.id} bandSlug={band.slug} />
+                      </div>
+                      {!isMe && (
+                        <ExcludeMemberButton
+                          memberId={m.id}
+                          memberName={m.display_name ?? "участника"}
+                          bandId={band.id}
+                          bandSlug={band.slug}
+                        />
+                      )}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        {/* Личное и приглашения */}
+        {member && (
+          <div className="flex min-w-0 flex-col gap-5">
+            <Card className="p-4 sm:p-5">
+              <h3 className="mb-3 text-xs font-bold uppercase tracking-wide">Мой профиль</h3>
+              <MemberProfileForm member={member} bandSlug={band.slug} avatarUrl={myAvatarUrl} />
+            </Card>
+
+            {telegramEnabled && (
+              <TelegramConnectCard
+                bandSlug={band.slug}
+                account={(telegramResult.data as TelegramAccountView | null) ?? null}
+                showBookings={hasPermission(member, "band_profile")}
+              />
+            )}
+
+            {showInvite && <InviteForm bandId={band.id} />}
+          </div>
+        )}
       </div>
     </AppShell>
   );

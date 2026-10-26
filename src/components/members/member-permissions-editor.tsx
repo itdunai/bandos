@@ -52,11 +52,11 @@ export function MemberPermissionsEditor({
   }
 
   return (
-    <div className="mt-3 w-full border-t border-border pt-3 text-left">
+    <div className="w-full text-left">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-center gap-1.5 text-xs text-accent hover:underline"
+        className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-accent/10"
       >
         <Shield className="h-3 w-3" />
         {open ? "Скрыть права" : `Права: ${presetBadgeLabel(member)}`}

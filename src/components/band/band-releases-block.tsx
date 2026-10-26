@@ -39,7 +39,7 @@ export function BandReleasesBlock({
         className={
           isPublic
             ? "grid grid-cols-2 gap-2 sm:grid-cols-4"
-            : "grid grid-cols-5 gap-2 sm:grid-cols-10"
+            : "grid grid-cols-3 gap-2 sm:grid-cols-4 xl:grid-cols-5"
         }
       >
         {releases.map((release) => {
@@ -70,7 +70,7 @@ export function BandReleasesBlock({
                 <p className="truncate text-xs font-medium group-hover:text-accent">
                   {release.title}
                 </p>
-                <p className="truncate text-[9px] text-text-muted sm:text-[11px]">
+                <p className="truncate text-[11px] text-text-muted">
                   {formatDate(release.released_at, {
                     day: "numeric",
                     month: "short",

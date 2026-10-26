@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { signUpAccount } from "@/app/actions/auth";
 import { SiteLogo } from "@/components/brand/site-logo";
@@ -7,6 +8,11 @@ import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
 import { Mail } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Регистрация",
+};
+
 
 export default async function RegisterPage({
   searchParams,

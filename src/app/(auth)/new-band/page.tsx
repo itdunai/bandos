@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createBand } from "@/app/actions/auth";
 import { SiteLogo } from "@/components/brand/site-logo";
@@ -7,6 +8,12 @@ import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { INSTRUMENT_LABELS, type Instrument } from "@/types/database";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Создать группу",
+  robots: { index: false, follow: false },
+};
+
 
 const INSTRUMENTS = Object.entries(INSTRUMENT_LABELS) as [Instrument, string][];
 

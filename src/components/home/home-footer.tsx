@@ -18,7 +18,7 @@ export function HomeFooter() {
           <Link href="/register" className="hover:text-text-primary">
             Регистрация
           </Link>
-          <Link href="#catalog" className="hover:text-text-primary">
+          <Link href="/#catalog" className="hover:text-text-primary">
             Каталог
           </Link>
         </div>

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { acceptInvitation } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,12 @@ import { fetchInvitationByToken } from "@/lib/invitation";
 import { createClient } from "@/lib/supabase/server";
 import { INSTRUMENT_LABELS } from "@/types/database";
 import { Mail, Users } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Приглашение в группу",
+  robots: { index: false, follow: false },
+};
+
 
 export default async function InvitePage({
   params,

@@ -28,7 +28,8 @@ export function ExcludeMemberButton({
       variant="default"
       loading={pending}
       disabled={pending}
-      className="mt-3 w-full text-red hover:border-red hover:text-red"
+      size="sm"
+      className="shrink-0 text-red hover:border-red hover:text-red"
       onClick={() => {
         if (
           !confirm(

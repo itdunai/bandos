@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { signUpFromInvite } from "@/app/actions/auth";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,12 @@ import { INSTRUMENT_LABELS } from "@/types/database";
 import type { PermissionPreset } from "@/types/database";
 import { Users } from "lucide-react";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Регистрация по приглашению",
+  robots: { index: false, follow: false },
+};
+
 
 export default async function InviteJoinPage({
   params,

@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { PrivacyPolicyForm } from "@/components/admin/privacy-policy-form";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { PlatformAdminSetup } from "@/components/admin/platform-admin-setup";
 import { getPrivacyPageUncached } from "@/lib/legal/site-pages";
 import { requirePlatformAdmin } from "@/lib/platform/admin";
+
+export const metadata: Metadata = {
+  title: "Политика конфиденциальности — редактирование",
+  robots: { index: false, follow: false },
+};
+
 
 export default async function AdminPrivacyPage() {
   const { supabase, user, hasDbFlag, needsDbPromotion } =

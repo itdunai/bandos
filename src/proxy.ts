@@ -11,10 +11,11 @@ export async function proxy(request: NextRequest) {
   return await updateSession(request);
 }
 
+// robots.txt, sitemap.xml, manifest, sw.js — публичные файлы для поисковиков и PWA.
 // api/telegram и api/cron вызываются без сессии (Telegram, планировщик) и
 // проверяют доступ сами — по секрету в заголовке.
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/health|api/telegram|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|sw.js|api/health|api/telegram|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

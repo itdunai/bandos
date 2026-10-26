@@ -48,10 +48,10 @@ const FEATURES = [
 
 export function HomeFeatures() {
   return (
-    <section className="border-b border-border bg-bg-2/50 py-14 sm:py-16">
+    <section id="features" className="scroll-mt-16 border-b border-border bg-bg-2/50 py-14 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-10 max-w-xl">
-          <h2 className="text-2xl font-medium sm:text-3xl">
+          <h2 className="heading-poster text-2xl sm:text-3xl">
             Что умеет BandOS
           </h2>
           <p className="mt-2 text-sm text-text-secondary sm:text-base">
@@ -69,8 +69,8 @@ export function HomeFeatures() {
               <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-accent/15 text-accent">
                 <Icon className="h-4 w-4" />
               </div>
-              <h3 className="text-sm font-medium">{title}</h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">
+              <h3 className="font-sans text-base font-semibold">{title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">
                 {description}
               </p>
             </div>

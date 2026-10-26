@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { BandShellProvider } from "@/components/layout/band-shell-context";
 import {
   getBandBySlug,
@@ -9,6 +10,19 @@ import { redirectForbidden } from "@/lib/forbidden";
 import { isReservedBandSlug } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ bandSlug: string }>;
+}): Promise<Metadata> {
+  const { bandSlug } = await params;
+  const band = isReservedBandSlug(bandSlug) ? null : await getBandBySlug(bandSlug);
+  return {
+    title: band ? { default: band.name, template: `%s · ${band.name}` } : "Группа",
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function BandLayout({
   children,

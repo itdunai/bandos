@@ -19,12 +19,22 @@ export function HomeHeader({
         </Link>
 
         <nav className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <Link
-            href="#catalog"
-            className="hidden text-xs text-text-secondary transition-colors hover:text-text-primary sm:inline"
-          >
-            Каталог групп
-          </Link>
+          <div className="hidden items-center gap-5 md:flex">
+            {[
+              ["#features", "Возможности"],
+              ["#how", "Как это работает"],
+              ["#catalog", "Каталог групп"],
+              ["#faq", "Вопросы"],
+            ].map(([href, label]) => (
+              <Link
+                key={href}
+                href={`/${href}`}
+                className="text-sm text-text-secondary transition-colors hover:text-text-primary"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
           {user ? (
             <>
               {firstBandSlug && (

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Golos_Text, Unbounded } from "next/font/google";
 import { BuildShaProvider } from "@/components/layout/build-sha-context";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
@@ -15,6 +15,14 @@ import {
 } from "@/lib/legal/cookie-consent";
 import { consumeToast } from "@/lib/redirect-with-toast";
 import { getSupabasePublicConfig } from "@/lib/supabase/public-config";
+import {
+  DEFAULT_OG_IMAGE,
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_NAME,
+  SITE_TITLE,
+  siteOrigin,
+} from "@/lib/seo";
 import { parseTheme, THEME_COOKIE } from "@/lib/theme";
 import { cookies } from "next/headers";
 import "./globals.css";
@@ -35,10 +43,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+function metadataBase(): URL | undefined {
+  try {
+    return new URL(siteOrigin());
+  } catch {
+    return undefined;
+  }
+}
+
 export const metadata: Metadata = {
-  title: "BandOS — всё для музыкальной группы в одном месте",
-  description:
-    "Репертуар, сет-листы, режим «Играем», график, финансы и публичная страница для заказчиков. Бесплатно для кавер- и авторских групп.",
+  metadataBase: metadataBase(),
+  title: {
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  applicationName: SITE_NAME,
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
@@ -46,12 +67,31 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "BandOS",
+    title: SITE_NAME,
   },
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE.url],
+  },
+  formatDetection: { telephone: false },
 };
 
-export const viewport = {
-  viewportFit: "cover" as const,
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0d0d0f" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f4f9" },
+  ],
 };
 
 export default async function RootLayout({

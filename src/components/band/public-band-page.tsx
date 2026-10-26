@@ -15,7 +15,11 @@ import {
   type SocialLinks,
   type SongType,
 } from "@/types/database";
-import { ExternalLink, Guitar, ListMusic, MapPin, Music, Users } from "lucide-react";
+import { ArrowLeft, ExternalLink, ListMusic, MapPin, Music, Users } from "lucide-react";
+import Link from "next/link";
+import { SiteLogo } from "@/components/brand/site-logo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { absoluteUrl, bandPageDescription } from "@/lib/seo";
 
 interface PublicSong {
   title: string;
@@ -51,6 +55,56 @@ export interface PublicBandPageData {
   releases?: PublicRelease[];
 }
 
+function plural(n: number, one: string, few: string, many: string) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}
+
+/** schema.org: MusicGroup + хлебные крошки. */
+function bandJsonLd(band: PublicBandPageData, sameAs: string[], songs: PublicSong[]) {
+  const url = absoluteUrl(`/rider/${band.slug}`);
+  const logo = band.logo_url?.startsWith("/") ? absoluteUrl(band.logo_url) : band.logo_url;
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "MusicGroup",
+      "@id": `${url}#band`,
+      name: band.name,
+      url,
+      description: bandPageDescription(band),
+      ...(band.genre ? { genre: band.genre } : {}),
+      ...(band.city
+        ? { location: { "@type": "Place", name: band.city, address: { "@type": "PostalAddress", addressLocality: band.city } } }
+        : {}),
+      ...(logo ? { logo, image: logo } : {}),
+      ...(sameAs.length ? { sameAs } : {}),
+      ...(songs.length
+        ? {
+            track: songs.slice(0, 50).map((s) => ({
+              "@type": "MusicRecording",
+              name: s.title,
+              ...(s.duration_sec
+                ? { duration: `PT${Math.floor(s.duration_sec / 60)}M${s.duration_sec % 60}S` }
+                : {}),
+            })),
+          }
+        : {}),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Главная", item: absoluteUrl("/") },
+        { "@type": "ListItem", position: 2, name: "Каталог групп", item: absoluteUrl("/#catalog") },
+        { "@type": "ListItem", position: 3, name: band.name, item: url },
+      ],
+    },
+  ];
+}
+
 export function PublicBandPage({ band }: { band: PublicBandPageData }) {
   const links = getSocialLinkList(band.social_links);
   const songs = band.songs ?? [];
@@ -72,57 +126,88 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
   return (
     <div className="min-h-screen overflow-x-hidden bg-bg text-text-primary">
       <ScrollToHash />
-      <div className="mx-auto max-w-3xl px-4 py-10">
-        <div className="mb-8 flex items-center gap-3">
-          {band.logo_url ? (
-            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
-              <SafeMediaImage
-                src={band.logo_url}
-                alt={band.name}
-                fill
-                className="object-cover"
-              />
+      <JsonLd data={bandJsonLd(band, links.map((l) => l.url), songs)} />
+
+      <header className="sticky top-0 z-30 border-b border-border/80 bg-bg/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
+          <Link href="/" aria-label="BandOS — на главную" className="flex shrink-0 items-center">
+            <SiteLogo className="h-6 sm:h-7" />
+          </Link>
+          <Link
+            href="/#catalog"
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Каталог групп
+          </Link>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-3xl px-4 pb-16 pt-6">
+        <nav aria-label="Навигация" className="mb-5 text-xs text-text-muted">
+          <ol className="flex flex-wrap items-center gap-1.5">
+            <li>
+              <Link href="/" className="hover:text-text-primary">Главная</Link>
+            </li>
+            <li aria-hidden>/</li>
+            <li>
+              <Link href="/#catalog" className="hover:text-text-primary">Каталог групп</Link>
+            </li>
+            <li aria-hidden>/</li>
+            <li className="truncate text-text-secondary" aria-current="page">{band.name}</li>
+          </ol>
+        </nav>
+
+        <section className="mb-8 rounded-xl border border-border bg-bg-2 p-5 sm:p-7">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+            {band.logo_url ? (
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border sm:h-24 sm:w-24">
+                <SafeMediaImage src={band.logo_url} alt={`Логотип группы ${band.name}`} fill className="object-cover" />
+              </div>
+            ) : (
+              <div
+                aria-hidden
+                className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-accent font-display text-2xl font-bold text-accent-ink sm:h-24 sm:w-24 sm:text-3xl"
+              >
+                {band.name
+                  .split(/\s+/)
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <h1 className="heading-poster text-2xl sm:text-[34px]">{band.name}</h1>
+              {(band.genre || band.city) && (
+                <p className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                  {band.genre && <span className="font-medium text-accent">{band.genre}</span>}
+                  {band.city && (
+                    <span className="flex items-center gap-1 text-text-secondary">
+                      <MapPin className="h-3.5 w-3.5" />
+                      {band.city}
+                    </span>
+                  )}
+                </p>
+              )}
+              {band.description && (
+                <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed text-text-secondary">
+                  {band.description}
+                </p>
+              )}
+              <div className="mt-4 flex flex-wrap gap-4 text-sm text-text-secondary">
+                <span className="flex items-center gap-1.5">
+                  <Music className="h-4 w-4" />
+                  {band.tracks_count} {plural(band.tracks_count, "трек", "трека", "треков")}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4" />
+                  {band.members_count} {plural(band.members_count, "участник", "участника", "участников")}
+                </span>
+              </div>
             </div>
-          ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent">
-              <Guitar className="h-5 w-5 text-accent-ink" />
-            </div>
-          )}
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
-              BandOS
-            </div>
-            <h1 className="text-xl font-medium">{band.name}</h1>
           </div>
-        </div>
-
-        {band.genre && (
-          <p className="mb-2 text-sm text-accent">{band.genre}</p>
-        )}
-
-        {band.city && (
-          <p className="mb-4 flex items-center gap-1.5 text-sm text-text-secondary">
-            <MapPin className="h-3.5 w-3.5" />
-            {band.city}
-          </p>
-        )}
-
-        {band.description && (
-          <p className="mb-6 whitespace-pre-wrap text-sm text-text-secondary">
-            {band.description}
-          </p>
-        )}
-
-        <div className="mb-8 flex gap-3 text-sm text-text-secondary">
-          <span className="flex items-center gap-1.5">
-            <Music className="h-4 w-4" />
-            {band.tracks_count} треков
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Users className="h-4 w-4" />
-            {band.members_count} участников
-          </span>
-        </div>
+        </section>
 
         {band.accept_bookings && (
           <div id="booking" className="mb-8 scroll-mt-6">
@@ -238,7 +323,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
             )}
           </section>
         )}
-      </div>
+      </main>
     </div>
   );
 }

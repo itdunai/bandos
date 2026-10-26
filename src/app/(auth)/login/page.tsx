@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { signIn } from "@/app/actions/auth";
 import { SiteLogo } from "@/components/brand/site-logo";
@@ -5,6 +6,12 @@ import { PrivacyConsentField } from "@/components/legal/privacy-consent-field";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Card } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+  title: "Вход",
+  robots: { index: false, follow: false },
+};
+
 
 export default async function LoginPage({
   searchParams,

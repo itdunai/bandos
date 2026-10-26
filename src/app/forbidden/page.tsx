@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SiteLogo } from "@/components/brand/site-logo";
@@ -6,6 +7,12 @@ import {
   getForbiddenMessage,
 } from "@/lib/forbidden";
 import { ArrowLeft, ShieldX } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Нет доступа",
+  robots: { index: false, follow: false },
+};
+
 
 export default async function ForbiddenPage({
   searchParams,
