@@ -1,3 +1,4 @@
+import { createServiceSupabaseClient } from "@/lib/supabase/service";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuditLevel = "info" | "warn" | "error";
@@ -10,10 +11,15 @@ export type AuditEventInput = {
   meta?: Record<string, unknown>;
 };
 
-/** Fire-and-forget: не блокирует основной поток при сбое логирования. */
+/**
+ * Fire-and-forget: не блокирует основной поток при сбое логирования.
+ * С service role пишем без ограничений (например, регистрация до подтверждения
+ * email — сессии ещё нет). Без него — от имени пользователя: RPC разрешает
+ * только собственный user_id.
+ */
 export async function logPlatformEvent(input: AuditEventInput) {
   try {
-    const supabase = await createClient();
+    const supabase = createServiceSupabaseClient() ?? (await createClient());
     await supabase.rpc("log_platform_event", {
       p_level: input.level,
       p_event: input.event,

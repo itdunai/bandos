@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { FinancePanel } from "@/components/finances/finance-panel";
-import { assertFinanceView } from "@/app/actions/finances";
+import { assertFinanceView } from "@/lib/band/finance-access";
 import { isBandAdmin } from "@/lib/band/permissions";
 import {
   getBandBySlug,

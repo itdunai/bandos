@@ -58,7 +58,15 @@ export async function addSetlistSong(
   bandSlug: string,
   songId: string
 ) {
-  const { supabase } = await requireSetlistMember(setlistId);
+  const { supabase, bandId } = await requireSetlistMember(setlistId);
+
+  const { data: song } = await supabase
+    .from("songs")
+    .select("id")
+    .eq("id", songId)
+    .eq("band_id", bandId)
+    .maybeSingle();
+  if (!song) return;
 
   const { data: items } = await supabase
     .from("setlist_items")
@@ -111,7 +119,11 @@ export async function removeSetlistItem(
   bandSlug: string
 ) {
   const { supabase } = await requireSetlistMember(setlistId);
-  await supabase.from("setlist_items").delete().eq("id", itemId);
+  await supabase
+    .from("setlist_items")
+    .delete()
+    .eq("id", itemId)
+    .eq("setlist_id", setlistId);
   revalidatePath(bandPath(bandSlug, "setlists", setlistId));
 }
 
@@ -121,6 +133,8 @@ export async function reorderSetlistItems(
   orderedIds: string[]
 ) {
   const { supabase } = await requireSetlistMember(setlistId);
+  // Каждый id — отдельный запрос: ограничиваем, чтобы не нагрузить БД.
+  if (!Array.isArray(orderedIds) || orderedIds.length > 300) return;
 
   await Promise.all(
     orderedIds.map((id, position) =>
@@ -144,7 +158,8 @@ export async function updateSetlistItemNotes(
   const { supabase } = await requireSetlistMember(setlistId);
   await supabase
     .from("setlist_items")
-    .update({ notes: notes.trim() || null })
-    .eq("id", itemId);
+    .update({ notes: notes.trim().slice(0, 500) || null })
+    .eq("id", itemId)
+    .eq("setlist_id", setlistId);
   revalidatePath(bandPath(bandSlug, "setlists", setlistId));
 }

@@ -68,9 +68,12 @@ export async function removeBandPhoto(
 
   if (readError) return { error: readError.message };
 
-  const photos = normalizePhotos(band?.photos).filter(
-    (url) => stripCacheParam(url) !== cleanUrl
-  );
+  const current = normalizePhotos(band?.photos);
+  // URL приходит от клиента: удаляем файл, только если он принадлежит этой группе.
+  if (!current.some((url) => stripCacheParam(url) === cleanUrl)) {
+    return { error: "Фото не найдено" };
+  }
+  const photos = current.filter((url) => stripCacheParam(url) !== cleanUrl);
 
   const { error } = await supabase
     .from("bands")

@@ -1,13 +1,9 @@
 "use server";
 
 import { requireBandAdmin } from "@/lib/band/assert-access";
-import { canViewFinances } from "@/lib/band/permissions";
-import { redirectForbidden } from "@/lib/forbidden";
-import { eventIncomeTitle, eventRentExpenseTitle } from "@/lib/finance";
+import { insertEventFeeIncome, insertEventRentExpense } from "@/lib/band/event-finance";
 import { bandPath } from "@/lib/paths";
-import { createClient } from "@/lib/supabase/server";
 import type { FinanceTransactionType } from "@/types/database";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 function parseAmount(raw: string): number | null {
@@ -112,97 +108,13 @@ export async function deleteFinanceTransaction(
   return {};
 }
 
-export async function insertEventFeeIncome(
-  bandId: string,
-  eventId: string,
-  userId: string
-): Promise<{ error?: string }> {
-  const supabase = await createClient();
-
-  const { data: event } = await supabase
-    .from("events")
-    .select("id, title, fee, event_type, starts_at, band_id")
-    .eq("id", eventId)
-    .eq("band_id", bandId)
-    .maybeSingle();
-
-  if (!event || event.event_type !== "performance" || !event.fee || event.fee <= 0) {
-    return { error: "У концерта нет гонорара" };
-  }
-
-  const { data: existing } = await supabase
-    .from("finance_transactions")
-    .select("id")
-    .eq("event_id", eventId)
-    .maybeSingle();
-
-  if (existing) return { error: "Гонорар уже учтён" };
-
-  const transactionAt = new Date(event.starts_at).toISOString().slice(0, 10);
-
-  const { error } = await supabase.from("finance_transactions").insert({
-    band_id: bandId,
-    transaction_type: "income",
-    amount: event.fee,
-    title: eventIncomeTitle(event.title),
-    event_id: eventId,
-    transaction_at: transactionAt,
-    created_by: userId,
-  });
-
-  if (error) return { error: error.message };
-  return {};
-}
-
-export async function insertEventRentExpense(
-  bandId: string,
-  eventId: string,
-  userId: string
-): Promise<{ error?: string }> {
-  const supabase = await createClient();
-
-  const { data: event } = await supabase
-    .from("events")
-    .select("id, title, rent, event_type, starts_at, band_id")
-    .eq("id", eventId)
-    .eq("band_id", bandId)
-    .maybeSingle();
-
-  if (!event || event.event_type !== "rehearsal" || !event.rent || event.rent <= 0) {
-    return { error: "У репетиции нет аренды" };
-  }
-
-  const { data: existing } = await supabase
-    .from("finance_transactions")
-    .select("id")
-    .eq("event_id", eventId)
-    .maybeSingle();
-
-  if (existing) return { error: "Аренда уже учтена" };
-
-  const transactionAt = new Date(event.starts_at).toISOString().slice(0, 10);
-
-  const { error } = await supabase.from("finance_transactions").insert({
-    band_id: bandId,
-    transaction_type: "expense",
-    amount: event.rent,
-    title: eventRentExpenseTitle(event.title),
-    event_id: eventId,
-    transaction_at: transactionAt,
-    created_by: userId,
-  });
-
-  if (error) return { error: error.message };
-  return {};
-}
-
 export async function recordEventFeeIncome(
   eventId: string,
   bandId: string,
   bandSlug: string
 ): Promise<{ error?: string }> {
-  const { user } = await requireBandAdmin(bandId);
-  const result = await insertEventFeeIncome(bandId, eventId, user.id);
+  const { supabase, user } = await requireBandAdmin(bandId);
+  const result = await insertEventFeeIncome(supabase, bandId, eventId, user.id);
 
   if (!result.error) {
     revalidatePath(bandPath(bandSlug, "finances"));
@@ -217,8 +129,8 @@ export async function recordEventRentExpense(
   bandId: string,
   bandSlug: string
 ): Promise<{ error?: string }> {
-  const { user } = await requireBandAdmin(bandId);
-  const result = await insertEventRentExpense(bandId, eventId, user.id);
+  const { supabase, user } = await requireBandAdmin(bandId);
+  const result = await insertEventRentExpense(supabase, bandId, eventId, user.id);
 
   if (!result.error) {
     revalidatePath(bandPath(bandSlug, "finances"));
@@ -228,24 +140,3 @@ export async function recordEventRentExpense(
   return result;
 }
 
-/** Page guard: members with finances view or admins */
-export async function assertFinanceView(bandId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: member } = await supabase
-    .from("band_members")
-    .select("*")
-    .eq("band_id", bandId)
-    .eq("user_id", user.id)
-    .eq("is_active", true)
-    .maybeSingle();
-
-  if (!member || !canViewFinances(member)) {
-    redirectForbidden({ reason: "no_permission", permission: "finances" });
-  }
-  return { supabase, user, member };
-}

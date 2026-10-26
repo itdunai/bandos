@@ -126,7 +126,7 @@ export async function updateSong(
   const { supabase } = await requireBandPermission(bandId, "songs");
   const data = parseSongForm(formData);
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("songs")
     .update({
       title: data.title,
@@ -141,12 +141,13 @@ export async function updateSong(
       source_url: data.source_url,
     })
     .eq("id", songId)
-    .eq("band_id", bandId);
+    .eq("band_id", bandId)
+    .select("id");
 
-  if (error) {
+  if (error || !updated?.length) {
     await redirectWithToast(
       bandPath(bandSlug, "songs", songId, "edit"),
-      error.message
+      error?.message ?? "Трек не найден"
     );
     return;
   }

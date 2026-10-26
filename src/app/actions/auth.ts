@@ -100,7 +100,7 @@ export async function signUpFromInvite(token: string, formData: FormData) {
   if (signUpError) {
     captureServerError(new Error(signUpError.message), {
       action: "auth.sign_up_from_invite",
-      extras: { token, email },
+      extras: { tokenPrefix: token.slice(0, 6), email },
     });
     const msg = formatAuthError(signUpError.message);
     if (isAlreadyRegisteredError(signUpError.message)) {
@@ -242,7 +242,7 @@ async function finishAcceptInvitation(token: string) {
   if (error) {
     captureServerError(new Error(error.message), {
       action: "auth.accept_invitation",
-      extras: { token },
+      extras: { tokenPrefix: token.slice(0, 6) },
     });
     redirect(`/invite/${token}?error=${encodeURIComponent(error.message)}`);
   }

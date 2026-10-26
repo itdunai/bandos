@@ -19,6 +19,10 @@ Band-scoped mutations must call helpers from `src/lib/band/assert-access.ts`:
 
 Use returned `auth.supabase` instead of creating a new client.
 
+Every export of a `"use server"` file is a public endpoint — keep internal helpers in `src/lib/`.
+Ids passed alongside a checked parent (item of a setlist, song added to a setlist, photo URL)
+must be bound to that parent / band in the query.
+
 ## Redirects and URLs
 
 - Post-auth paths: `sanitizeRedirectPath()` from `src/lib/safe-redirect.ts`

@@ -1,10 +1,11 @@
 "use server";
 
 import {
+  isBandAdmin,
   requireBandPermission,
   requireEventMember,
 } from "@/lib/band/assert-access";
-import { insertEventFeeIncome, insertEventRentExpense } from "@/app/actions/finances";
+import { insertEventFeeIncome, insertEventRentExpense } from "@/lib/band/event-finance";
 import {
   parseFormDateTime,
   parseTimezoneOffsetMinutes,
@@ -38,6 +39,22 @@ function parseEventForm(formData: FormData) {
   };
 }
 
+/** Сет-лист из формы должен принадлежать этой же группе — иначе отвязываем. */
+async function ownSetlistId(
+  supabase: Awaited<ReturnType<typeof requireBandPermission>>["supabase"],
+  bandId: string,
+  setlistId: string | null
+) {
+  if (!setlistId) return null;
+  const { data } = await supabase
+    .from("setlists")
+    .select("id")
+    .eq("id", setlistId)
+    .eq("band_id", bandId)
+    .maybeSingle();
+  return data?.id ?? null;
+}
+
 function validateEventForm(data: ReturnType<typeof parseEventForm>): string | null {
   if (!data.title || !data.starts_at) return "Заполните название и дату";
   if (data.ends_at && data.ends_at <= data.starts_at) {
@@ -47,7 +64,7 @@ function validateEventForm(data: ReturnType<typeof parseEventForm>): string | nu
 }
 
 export async function createEvent(bandId: string, bandSlug: string, formData: FormData) {
-  const { supabase, user } = await requireBandPermission(bandId, "schedule");
+  const { supabase, user, member } = await requireBandPermission(bandId, "schedule");
   const data = parseEventForm(formData);
 
   const invalid = validateEventForm(data);
@@ -66,7 +83,10 @@ export async function createEvent(bandId: string, bandSlug: string, formData: Fo
       ends_at: data.ends_at,
       location: data.location,
       notes: data.notes,
-      setlist_id: data.event_type === "performance" ? data.setlist_id : null,
+      setlist_id:
+        data.event_type === "performance"
+          ? await ownSetlistId(supabase, bandId, data.setlist_id)
+          : null,
       organizer: data.event_type === "performance" ? data.organizer : null,
       fee: data.event_type === "performance" ? data.fee : null,
       rent: data.event_type === "rehearsal" ? data.rent : null,
@@ -82,12 +102,13 @@ export async function createEvent(bandId: string, bandSlug: string, formData: Fo
     return;
   }
 
-  if (formData.get("record_in_finances") === "on") {
-    await insertEventFeeIncome(bandId, event.id, user.id);
+  // Касса — только админам (RLS тоже не даст, но не полагаемся на неё одну).
+  if (isBandAdmin(member) && formData.get("record_in_finances") === "on") {
+    await insertEventFeeIncome(supabase, bandId, event.id, user.id);
   }
 
-  if (formData.get("record_rent_in_finances") === "on") {
-    await insertEventRentExpense(bandId, event.id, user.id);
+  if (isBandAdmin(member) && formData.get("record_rent_in_finances") === "on") {
+    await insertEventRentExpense(supabase, bandId, event.id, user.id);
   }
 
   revalidatePath(bandPath(bandSlug, "schedule"));
@@ -101,7 +122,7 @@ export async function updateEvent(
   bandSlug: string,
   formData: FormData
 ) {
-  const { supabase, user } = await requireBandPermission(bandId, "schedule");
+  const { supabase, user, member } = await requireBandPermission(bandId, "schedule");
   const data = parseEventForm(formData);
 
   const invalid = validateEventForm(data);
@@ -122,7 +143,10 @@ export async function updateEvent(
       ends_at: data.ends_at,
       location: data.location,
       notes: data.notes,
-      setlist_id: data.event_type === "performance" ? data.setlist_id : null,
+      setlist_id:
+        data.event_type === "performance"
+          ? await ownSetlistId(supabase, bandId, data.setlist_id)
+          : null,
       organizer: data.event_type === "performance" ? data.organizer : null,
       fee: data.event_type === "performance" ? data.fee : null,
       rent: data.event_type === "rehearsal" ? data.rent : null,
@@ -138,12 +162,13 @@ export async function updateEvent(
     return;
   }
 
-  if (formData.get("record_in_finances") === "on") {
-    await insertEventFeeIncome(bandId, eventId, user.id);
+  // Касса — только админам (RLS тоже не даст, но не полагаемся на неё одну).
+  if (isBandAdmin(member) && formData.get("record_in_finances") === "on") {
+    await insertEventFeeIncome(supabase, bandId, eventId, user.id);
   }
 
-  if (formData.get("record_rent_in_finances") === "on") {
-    await insertEventRentExpense(bandId, eventId, user.id);
+  if (isBandAdmin(member) && formData.get("record_rent_in_finances") === "on") {
+    await insertEventRentExpense(supabase, bandId, eventId, user.id);
   }
 
   revalidatePath(bandPath(bandSlug, "schedule"));

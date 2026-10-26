@@ -40,7 +40,7 @@ describe("writeLocalMedia / readLocalMediaFile", () => {
 
     const read = await readLocalMediaFile("bands/b1/logo.webp");
     expect("buffer" in read).toBe(true);
-    if ("buffer" in read) {
+    if ("buffer" in read && read.buffer) {
       expect(read.buffer.toString()).toBe("webp-data");
       expect(read.contentType).toBe("image/webp");
     }
