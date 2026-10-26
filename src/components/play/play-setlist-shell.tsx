@@ -8,7 +8,8 @@ import {
   type PlayOfflineSession,
 } from "@/lib/play/offline-cache";
 import type { Instrument } from "@/types/database";
-import { CloudOff, Wifi } from "lucide-react";
+import { useWakeLock } from "@/lib/use-wake-lock";
+import { CloudOff, Sun, Wifi } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function PlaySetlistShell({
@@ -26,6 +27,7 @@ export function PlaySetlistShell({
 }) {
   const [isOnline, setIsOnline] = useState(true);
   const [cachedAt, setCachedAt] = useState<string | null>(null);
+  const screenAwake = useWakeLock();
 
   // Режим игры — полноэкранный оверлей: документ под ним не должен скроллиться,
   // иначе на iOS жест «перетекает» на body и внутренняя прокрутка залипает.
@@ -85,11 +87,13 @@ export function PlaySetlistShell({
             {cachedAt
               ? `Сохранено для офлайна · ${formatPlayCachedAt(cachedAt)}`
               : "Сохранение для офлайна…"}
+            {screenAwake && <ScreenAwakeHint />}
           </span>
         ) : (
           <span className="inline-flex items-center justify-center gap-1.5">
             <CloudOff className="h-3 w-3" />
             Офлайн — показываем сохранённый сет-лист
+            {screenAwake && <ScreenAwakeHint />}
           </span>
         )}
       </div>
@@ -99,5 +103,15 @@ export function PlaySetlistShell({
         instrument={instrument}
       />
     </div>
+  );
+}
+
+function ScreenAwakeHint() {
+  return (
+    <span className="inline-flex items-center gap-1" title="Экран не погаснет, пока открыт режим «Играем»">
+      <span aria-hidden>·</span>
+      <Sun className="h-3 w-3" />
+      экран не гаснет
+    </span>
   );
 }
