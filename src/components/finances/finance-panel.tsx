@@ -24,8 +24,8 @@ import type { FinanceTransaction } from "@/types/database";
 import {
   ArrowDownLeft,
   ArrowUpRight,
+  Calendar,
   Download,
-  Mic2,
   Trash2,
   Wallet,
 } from "lucide-react";
@@ -131,27 +131,27 @@ export function FinancePanel({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-4">
-          <div className="text-xs uppercase tracking-wider text-text-muted">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Card className="col-span-2 p-4 lg:col-span-1">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             Текущий баланс
           </div>
-          <div className="mt-1 flex items-center gap-2 text-2xl font-medium text-accent">
-            <Wallet className="h-5 w-5" />
+          <div className="mt-2 flex items-center gap-2 font-display text-[26px] font-bold leading-tight tabular-nums text-accent">
+            <Wallet className="h-5 w-5 shrink-0" />
             {formatMoney(summary.balance)}
           </div>
         </Card>
         <Card
           className={cn(
-            "p-4",
+            "col-span-2 p-4 lg:col-span-1",
             isAdmin && "cursor-pointer transition-colors hover:border-accent/50"
           )}
           onClick={isAdmin ? () => setOpeningBalanceOpen(true) : undefined}
         >
-          <div className="text-xs uppercase tracking-wider text-text-muted">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             Стартовый баланс
           </div>
-          <div className="mt-1 text-xl font-medium">
+          <div className="mt-2 font-display text-lg font-bold leading-tight tabular-nums sm:text-[22px]">
             {formatMoney(summary.openingBalance)}
           </div>
           {isAdmin && (
@@ -159,20 +159,20 @@ export function FinancePanel({
           )}
         </Card>
         <Card className="p-4">
-          <div className="flex items-center gap-1 text-xs uppercase tracking-wider text-text-muted">
+          <div className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             <ArrowDownLeft className="h-3 w-3 text-green" />
             Доходы
           </div>
-          <div className="mt-1 text-xl font-medium text-green">
+          <div className="mt-2 font-display text-lg font-bold leading-tight tabular-nums sm:text-[22px] text-green">
             +{formatMoney(summary.income)}
           </div>
         </Card>
         <Card className="p-4">
-          <div className="flex items-center gap-1 text-xs uppercase tracking-wider text-text-muted">
+          <div className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             <ArrowUpRight className="h-3 w-3 text-red" />
             Расходы
           </div>
-          <div className="mt-1 text-xl font-medium text-red">
+          <div className="mt-2 font-display text-lg font-bold leading-tight tabular-nums sm:text-[22px] text-red">
             −{formatMoney(summary.expense)}
           </div>
         </Card>
@@ -276,7 +276,7 @@ export function FinancePanel({
 
       {isAdmin && activeForm && (
         <Card className="p-4">
-          <h3 className="mb-3 text-sm font-medium">
+          <h3 className="mb-3 text-xs font-bold uppercase tracking-wide">
             {activeForm === "income" ? "Новый доход" : "Новый расход"}
           </h3>
           <form onSubmit={handleAddTransaction} className="space-y-3">
@@ -371,7 +371,7 @@ export function FinancePanel({
       )}
 
       <div>
-        <h3 className="mb-3 text-xs uppercase tracking-wider text-text-muted">
+        <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           Операции
         </h3>
         {filteredTransactions.length === 0 ? (
@@ -408,9 +408,9 @@ export function FinancePanel({
                       {FINANCE_TYPE_LABELS[tx.transaction_type]}
                     </span>
                     {tx.event_id && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-bg-3 px-2 py-0.5 text-[11px] text-accent">
-                        <Mic2 className="h-3 w-3" />
-                        Концерт
+                      <span className="inline-flex items-center gap-1 rounded-sm bg-bg-3 px-2 py-0.5 text-[11px] font-medium text-text-secondary">
+                        <Calendar className="h-3 w-3" />
+                        Из графика
                       </span>
                     )}
                   </div>

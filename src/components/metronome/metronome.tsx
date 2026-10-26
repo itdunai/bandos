@@ -284,7 +284,7 @@ export function Metronome({
         >
           {bpm}
         </div>
-        <div className="text-xs uppercase tracking-wider text-text-muted">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           BPM · {timeSignature}
         </div>
       </div>

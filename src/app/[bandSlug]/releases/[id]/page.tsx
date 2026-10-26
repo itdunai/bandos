@@ -118,7 +118,7 @@ export default async function ReleaseDetailPage({
 
           {row.notes && (
             <div className="mt-4">
-              <h3 className="mb-1 text-xs uppercase tracking-wider text-text-muted">
+              <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
                 Заметки
               </h3>
               <p className="whitespace-pre-wrap text-sm text-text-secondary">
@@ -128,7 +128,7 @@ export default async function ReleaseDetailPage({
           )}
 
           <div className="mt-4">
-            <h3 className="mb-2 text-xs uppercase tracking-wider text-text-muted">
+            <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
               Площадки
             </h3>
             {links.length === 0 ? (

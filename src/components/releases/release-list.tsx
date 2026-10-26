@@ -86,7 +86,7 @@ export function ReleaseList({
               </div>
               <div className="space-y-2 p-3">
                 <div>
-                  <h3 className="truncate font-medium group-hover:text-accent">
+                  <h3 className="truncate font-sans font-semibold group-hover:text-accent">
                     {release.title}
                   </h3>
                   <p className="text-xs text-text-muted">

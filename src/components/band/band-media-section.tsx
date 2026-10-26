@@ -41,7 +41,7 @@ export function BandMediaSection({
 
   return (
     <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-4">
-      <h2 className="text-sm font-medium">Фото и логотип</h2>
+      <h2 className="text-xs font-bold uppercase tracking-wide">Фото и логотип</h2>
 
       <ImageUploadField
         label="Логотип"

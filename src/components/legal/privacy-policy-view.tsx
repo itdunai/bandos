@@ -22,7 +22,7 @@ export function PrivacyPolicyView({ page }: { page: SitePage }) {
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6">
-        <p className="text-xs uppercase tracking-wider text-text-muted">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           Юридическая информация
         </p>
         <h1 className="mt-2 text-3xl font-medium leading-tight">{page.title}</h1>

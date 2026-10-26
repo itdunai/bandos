@@ -123,12 +123,9 @@ export default async function SongDetailPage({
     >
       <div className="rounded-xl border border-border bg-bg-2 p-4">
         <div className="mb-4 flex items-start justify-between">
-          <div>
-            <h2 className="text-lg font-medium">{song.title}</h2>
-            <p className="text-xs text-text-secondary">
-              {song.song_type === "original" ? "Авторская" : "Кавер"}
-            </p>
-          </div>
+          <p className="text-sm text-text-secondary">
+            {song.song_type === "original" ? "Авторская" : "Кавер"}
+          </p>
           <Badge variant={STATUS_VARIANT[song.status as SongStatus]}>
             {SONG_STATUS_LABELS[song.status as SongStatus]}
           </Badge>
@@ -168,7 +165,7 @@ export default async function SongDetailPage({
 
         {sourceUrl && (
           <div className="mb-4">
-            <h3 className="mb-1 text-xs uppercase tracking-wider text-text-muted">Источник</h3>
+            <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">Источник</h3>
             <a
               href={sourceUrl}
               target="_blank"
@@ -183,7 +180,7 @@ export default async function SongDetailPage({
 
         {song.structure && (
           <>
-            <h3 className="mb-1 text-xs uppercase tracking-wider text-text-muted">Структура</h3>
+            <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">Структура</h3>
             <p className="mb-4 text-sm text-text-secondary">{song.structure}</p>
           </>
         )}

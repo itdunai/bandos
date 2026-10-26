@@ -66,7 +66,7 @@ export function ReleaseForm({
   return (
     <form action={action} className="space-y-5">
       <section className="space-y-3 rounded-xl border border-border bg-bg-2 p-4">
-        <h2 className="text-sm font-medium">Основное</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wide">Основное</h2>
         <div>
           <Label>Трек *</Label>
           <select
@@ -132,7 +132,7 @@ export function ReleaseForm({
       </section>
 
       <section className="space-y-3 rounded-xl border border-border bg-bg-2 p-4">
-        <h2 className="text-sm font-medium">Ссылки на площадки</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wide">Ссылки на площадки</h2>
         <p className="text-xs text-text-muted">
           Заполните только те площадки, где трек уже вышел.
         </p>

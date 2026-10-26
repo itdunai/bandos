@@ -28,7 +28,7 @@ export function RepertoireShare({
 
   return (
     <div
-      className={`flex flex-col items-end gap-2 sm:flex-row sm:items-center ${pending ? "opacity-70" : ""}`}
+      className={`flex flex-wrap items-center gap-x-3 gap-y-2 ${pending ? "opacity-70" : ""}`}
     >
       <label className="flex items-center gap-2 text-xs text-text-secondary">
         {pending && <Spinner />}

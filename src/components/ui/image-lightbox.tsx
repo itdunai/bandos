@@ -171,7 +171,7 @@ export function PhotoGallery({
 
   return (
     <div className={className}>
-      {title && <h3 className="mb-2 text-sm font-medium">{title}</h3>}
+      {title && <h3 className="mb-2 text-xs font-bold uppercase tracking-wide">{title}</h3>}
       <PhotoGrid photos={photos} onPhotoClick={setLightboxIndex} />
       {lightboxIndex !== null && (
         <ImageLightbox

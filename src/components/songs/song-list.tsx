@@ -299,7 +299,7 @@ function SongTable({
     <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-border">
       <table className="w-full min-w-[640px] text-left text-sm">
         <thead>
-          <tr className="border-b border-border bg-bg-2 text-xs uppercase tracking-wider text-text-muted">
+          <tr className="border-b border-border bg-bg-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             <th className="px-4 py-3 font-medium">Название</th>
             <th className="px-4 py-3 font-medium">Тип</th>
             <th className="px-4 py-3 font-medium">Статус</th>

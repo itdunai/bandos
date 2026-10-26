@@ -50,7 +50,7 @@ export function InviteForm({ bandId }: { bandId: string }) {
 
   return (
     <div className="h-full rounded-xl border border-border bg-bg-2 p-4">
-      <h3 className="mb-1 text-sm font-medium">Пригласить участника</h3>
+      <h3 className="mb-1 text-xs font-bold uppercase tracking-wide">Пригласить участника</h3>
       <p className="mb-3 text-xs text-text-muted">
         Только администратор может приглашать и назначать права
       </p>

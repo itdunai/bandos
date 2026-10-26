@@ -76,7 +76,7 @@ export default async function PlayIndexPage({
 
       {performances && performances.length > 0 && (
         <section className="mb-6">
-          <h2 className="mb-2 text-xs uppercase tracking-wider text-text-muted">
+          <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             Ближайшие выступления
           </h2>
           <ul className="space-y-2">
@@ -112,7 +112,7 @@ export default async function PlayIndexPage({
       )}
 
       <section>
-        <h2 className="mb-2 text-xs uppercase tracking-wider text-text-muted">
+        <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           Все сет-листы
         </h2>
         {!allSetlists?.length ? (

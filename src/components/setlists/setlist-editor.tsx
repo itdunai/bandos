@@ -204,7 +204,12 @@ export function SetlistEditor({
         </Button>
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext
+        id={`setlist-${setlistId}`}
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
         <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
           <ul className="mb-4 space-y-1.5">
             {items.map((item, index) => (

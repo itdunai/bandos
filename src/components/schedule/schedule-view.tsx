@@ -9,7 +9,7 @@ import { EVENT_TYPE_LABELS } from "@/types/database";
 import { RecordEventFeeButton } from "@/components/finances/record-event-fee-button";
 import { RecordEventRentButton } from "@/components/finances/record-event-rent-button";
 import { formatMoney } from "@/lib/finance";
-import { Calendar, ChevronLeft, ChevronRight, Mic2, Star } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Mic2, Plus, Star } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { PageLoader } from "@/components/ui/page-loader";
@@ -95,6 +95,20 @@ function formatTime(iso: string) {
     minute: "2-digit",
   });
 }
+
+const MAX_DAY_CHIPS = 3;
+
+const DOT_CLASS: Record<EventType, string> = {
+  rehearsal: "bg-accent",
+  performance: "bg-amber",
+  other: "bg-text-muted",
+};
+
+const CHIP_CLASS: Record<EventType, string> = {
+  rehearsal: "border-accent bg-accent/12 text-text-primary hover:bg-accent/20",
+  performance: "border-amber bg-amber/12 text-text-primary hover:bg-amber/20",
+  other: "border-text-muted bg-bg-3 text-text-primary hover:bg-bg-4",
+};
 
 function getEventMeta(eventType: EventType) {
   if (eventType === "rehearsal") {
@@ -255,139 +269,103 @@ function ScheduleCalendar({
         </Button>
       </div>
 
-      <div className="mx-auto w-full max-w-[1000px]">
-        <div className="overflow-hidden rounded-xl border border-border bg-bg-2 p-2 sm:p-3">
-          <div className="mb-1 grid grid-cols-7 gap-1">
+      <div className="mx-auto w-full max-w-[1100px]">
+        <div className="overflow-hidden rounded-xl border border-border">
+          <div className="grid grid-cols-7 border-b border-border bg-bg-2">
             {WEEKDAYS.map((day) => (
               <div
                 key={day}
-                className="py-1 text-center text-[11px] font-medium uppercase tracking-wider text-text-muted sm:text-xs"
+                className="py-2 text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted"
               >
                 {day}
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-7 gap-1">
+          {/* gap-px на фоне border рисует тонкие линии сетки */}
+          <div className="grid grid-cols-7 gap-px bg-border">
             {calendarCells.map((day, i) => {
               if (day === null) {
-                return (
-                  <div
-                    key={`empty-${i}`}
-                    className="min-h-[44px] md:min-h-[72px]"
-                  />
-                );
+                return <div key={`empty-${i}`} className="min-h-[52px] bg-bg md:min-h-[104px]" />;
               }
 
               const dayEvents = eventsByDay.get(day) ?? [];
-              const hasEvents = dayEvents.length > 0;
               const isToday = isSameDay(today, year, month, day);
               const isSelected = selectedDay === day;
-              const hasPerformance = dayEvents.some(
-                (e) => e.event_type === "performance"
+              const isFuture = isFutureDay(today, year, month, day);
+              const isPast = !isToday && !isFuture;
+
+              const dayNumber = (
+                <span
+                  className={cn(
+                    "inline-flex h-6 min-w-6 items-center justify-center rounded-sm px-1 text-sm font-semibold tabular-nums",
+                    isToday
+                      ? "bg-accent text-accent-ink"
+                      : isSelected
+                        ? "text-accent"
+                        : isPast
+                          ? "text-text-muted"
+                          : "text-text-primary"
+                  )}
+                >
+                  {day}
+                </span>
               );
-              const hasRehearsal = dayEvents.some(
-                (e) => e.event_type === "rehearsal"
-              );
-              const hasOther = dayEvents.some((e) => e.event_type === "other");
-
-              if (!hasEvents) {
-                const isFuture = isFutureDay(today, year, month, day);
-
-                if (isFuture) {
-                  return (
-                    <EmptyFutureDayCell
-                      key={day}
-                      day={day}
-                      bandSlug={bandSlug}
-                      dateParam={formatDateParam(year, month, day)}
-                    />
-                  );
-                }
-
-                return (
-                  <div
-                    key={day}
-                    className={cn(
-                      "flex min-h-[44px] items-center justify-center rounded-lg md:min-h-[72px]",
-                      isToday && "ring-1 ring-accent/30"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "text-sm",
-                        isToday
-                          ? "font-medium text-accent"
-                          : "text-text-muted/40"
-                      )}
-                    >
-                      {day}
-                    </span>
-                  </div>
-                );
-              }
 
               return (
-                <div key={day} className="min-h-[44px] md:min-h-[72px]">
-                  {/* Мобилка: компактная ячейка с точками */}
+                <div
+                  key={day}
+                  className={cn(
+                    "group relative min-h-[52px] md:min-h-[104px]",
+                    isPast ? "bg-bg" : "bg-bg-2",
+                    isSelected && "ring-2 ring-inset ring-accent"
+                  )}
+                >
+                  {/* Мобилка: номер дня и точки событий */}
                   <button
                     type="button"
-                    onClick={() => selectDay(day)}
-                    className={cn(
-                      "flex h-full w-full flex-col items-center justify-center gap-1 rounded-lg border p-1 transition-colors md:hidden",
-                      isSelected
-                        ? "border-accent bg-accent/15"
-                        : "border-border bg-bg-3",
-                      isToday && !isSelected && "ring-1 ring-accent/50"
-                    )}
+                    onClick={() => dayEvents.length > 0 && selectDay(day)}
+                    className="flex h-full w-full flex-col items-center justify-center gap-1 p-1 md:hidden"
+                    aria-label={`${day}, событий: ${dayEvents.length}`}
                   >
-                    <span
-                      className={cn(
-                        "text-sm font-medium leading-none",
-                        isToday || isSelected ? "text-accent" : "text-text-primary"
-                      )}
-                    >
-                      {day}
-                    </span>
-                    <span className="flex gap-0.5">
-                      {hasRehearsal && (
-                        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-                      )}
-                      {hasPerformance && (
-                        <span className="h-1.5 w-1.5 rounded-full bg-amber" />
-                      )}
-                      {hasOther && (
-                        <span className="h-1.5 w-1.5 rounded-full bg-text-muted" />
-                      )}
+                    {dayNumber}
+                    <span className="flex h-1.5 gap-0.5">
+                      {dayEvents.slice(0, 3).map((e) => (
+                        <span key={e.id} className={cn("h-1.5 w-1.5 rounded-full", DOT_CLASS[e.event_type])} />
+                      ))}
                     </span>
                   </button>
 
-                  {/* Десктоп: плитки с деталями */}
-                  <div
-                    className={cn(
-                      "hidden h-full flex-col gap-1 rounded-lg border border-border bg-bg-3 p-1.5 md:flex",
-                      isToday && "ring-1 ring-accent/50"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "block w-full text-center text-xs font-medium leading-none",
-                        isToday ? "text-accent" : "text-text-muted"
+                  {/* Десктоп: номер дня и плашки событий */}
+                  <div className="hidden h-full flex-col gap-1 p-1.5 md:flex">
+                    <div className="flex items-center justify-between">
+                      {dayNumber}
+                      {isFuture && (
+                        <Link
+                          href={`${bandPath(bandSlug, "schedule", "new")}?date=${encodeURIComponent(formatDateParam(year, month, day))}`}
+                          className="flex h-6 w-6 items-center justify-center rounded-sm text-text-muted opacity-0 transition-opacity hover:bg-accent hover:text-accent-ink focus-visible:opacity-100 group-hover:opacity-100"
+                          aria-label={`Новое событие ${day} ${MONTHS[month].toLowerCase()}`}
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </Link>
                       )}
-                    >
-                      {day}
-                    </span>
-                    <div className="flex flex-1 flex-col gap-1">
-                      {dayEvents.map((event) => (
-                        <CalendarEventTile
-                          key={event.id}
-                          event={event}
-                          bandSlug={bandSlug}
-                          bandId={bandId}
-                          isAdmin={isAdmin}
-                          past={new Date(event.starts_at).getTime() < now}
-                        />
-                      ))}
                     </div>
+                    {dayEvents.slice(0, MAX_DAY_CHIPS).map((event) => (
+                      <CalendarEventTile
+                        key={event.id}
+                        event={event}
+                        bandSlug={bandSlug}
+                        past={new Date(event.starts_at).getTime() < now}
+                      />
+                    ))}
+                    {dayEvents.length > MAX_DAY_CHIPS && (
+                      <button
+                        type="button"
+                        onClick={() => selectDay(day)}
+                        className="text-left text-xs text-text-muted hover:text-accent"
+                      >
+                        ещё {dayEvents.length - MAX_DAY_CHIPS}
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -401,7 +379,7 @@ function ScheduleCalendar({
 
       <section ref={eventsListRef}>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="flex items-center gap-2 text-xs uppercase tracking-wider text-text-muted">
+          <h2 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             <Calendar className="h-3.5 w-3.5" />
             {selectedDay !== null
               ? `${selectedDay} ${MONTHS[month].toLowerCase()} ${year}`
@@ -446,128 +424,28 @@ function ScheduleCalendar({
   );
 }
 
-function EmptyFutureDayCell({
-  day,
-  bandSlug,
-  dateParam,
-}: {
-  day: number;
-  bandSlug: string;
-  dateParam: string;
-}) {
-  const href =
-    bandPath(bandSlug, "schedule", "new") +
-    `?date=${encodeURIComponent(dateParam)}`;
-
-  return (
-    <Link
-      href={href}
-      className="group relative flex min-h-[44px] items-center justify-center rounded-lg transition-colors hover:bg-bg-3 md:min-h-[72px]"
-    >
-      <span className="text-sm text-text-muted/40 transition-opacity group-hover:opacity-0">
-        {day}
-      </span>
-      <span className="absolute inset-0 hidden items-center justify-center px-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 md:flex">
-        <span className="rounded-md bg-accent px-2 py-1 text-center text-[11px] font-medium leading-tight text-accent-ink">
-          Новое событие
-        </span>
-      </span>
-    </Link>
-  );
-}
-
 function CalendarEventTile({
   event,
   bandSlug,
-  bandId,
-  isAdmin,
   past,
 }: {
   event: ScheduleEvent;
   bandSlug: string;
-  bandId: string;
-  isAdmin: boolean;
   past: boolean;
 }) {
-  const meta = getEventMeta(event.event_type);
-  const { Icon, shortLabel, isRehearsal, isPerformance } = meta;
-  const money = eventMoney(event);
-  const showFeeAction =
-    isAdmin &&
-    isPerformance &&
-    event.fee &&
-    event.fee > 0 &&
-    !event.finance_recorded;
-  const showRentAction =
-    isAdmin &&
-    isRehearsal &&
-    event.rent &&
-    event.rent > 0 &&
-    !event.finance_recorded;
-
   return (
-    <div
+    <Link
+      href={bandPath(bandSlug, "schedule", event.id, "edit")}
+      title={[event.title, event.location].filter(Boolean).join(" · ")}
       className={cn(
-        "rounded-md border px-2 py-1.5",
-        past ? "border-border/60 opacity-70" : "border-border",
-        isPerformance && !past && "border-amber/30 bg-amber/5",
-        isRehearsal && !past && "bg-bg-2"
+        "block truncate rounded-sm border-l-2 px-1.5 py-1 text-xs leading-tight transition-colors",
+        CHIP_CLASS[event.event_type],
+        past && "opacity-60"
       )}
     >
-      <Link
-        href={bandPath(bandSlug, "schedule", event.id, "edit")}
-        className="block transition-colors hover:text-accent"
-      >
-        <div className="flex items-center gap-1">
-          <Icon
-            className={cn(
-              "h-3 w-3 shrink-0",
-              isRehearsal ? "text-accent" : isPerformance ? "text-amber" : "text-text-muted"
-            )}
-          />
-          <span className="truncate text-xs font-medium leading-tight">
-            {event.title}
-          </span>
-        </div>
-        <div className="mt-0.5 truncate text-[11px] text-text-secondary">
-          {formatTime(event.starts_at)}
-          {event.location && ` · ${event.location}`}
-          {money ? ` · ${formatMoney(money)}` : ""}
-        </div>
-        <span
-          className={cn(
-            "mt-0.5 inline-block rounded px-1 py-px text-[8px] uppercase tracking-wide",
-            isRehearsal
-              ? "bg-accent/15 text-accent"
-              : isPerformance
-                ? "bg-amber/15 text-amber"
-                : "bg-bg-3 text-text-muted"
-          )}
-        >
-          {shortLabel}
-        </span>
-      </Link>
-      {showFeeAction && (
-        <div className="mt-1">
-          <RecordEventFeeButton
-            eventId={event.id}
-            bandId={bandId}
-            bandSlug={bandSlug}
-            compact
-          />
-        </div>
-      )}
-      {showRentAction && (
-        <div className="mt-1">
-          <RecordEventRentButton
-            eventId={event.id}
-            bandId={bandId}
-            bandSlug={bandSlug}
-            compact
-          />
-        </div>
-      )}
-    </div>
+      <span className="font-semibold tabular-nums">{formatTime(event.starts_at)}</span>{" "}
+      {event.title}
+    </Link>
   );
 }
 

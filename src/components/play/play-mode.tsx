@@ -71,7 +71,7 @@ export function PlayMode({
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-bg">
       <header className="shrink-0 border-b border-border px-4 py-3">
-        <div className="text-center text-xs uppercase tracking-wider text-text-muted">
+        <div className="text-center text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           {setlistName}
         </div>
         <div className="mt-1 flex items-center justify-between gap-2">
@@ -88,7 +88,7 @@ export function PlayMode({
             <div className="text-xs text-text-muted">
               {index + 1} / {tracks.length}
             </div>
-            <div className="truncate text-lg font-medium">{track.title}</div>
+            <div className="heading-poster mt-0.5 truncate text-lg sm:text-xl">{track.title}</div>
           </div>
           <Button
             variant="ghost"

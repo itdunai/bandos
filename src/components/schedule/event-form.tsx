@@ -59,7 +59,7 @@ export function EventForm({
     : createEvent.bind(null, bandId, bandSlug);
 
   return (
-    <form action={action} className="space-y-4">
+    <form action={action} className="max-w-2xl space-y-4">
       <div>
         <Label>Тип</Label>
         <select

@@ -22,7 +22,7 @@ export function BandReleasesBlock({
   return (
     <div className="rounded-xl border border-border bg-bg-2 p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="flex items-center gap-2 text-sm font-medium">
+        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
           <Disc3 className="h-4 w-4 text-text-muted" />
           Релизы
         </h3>

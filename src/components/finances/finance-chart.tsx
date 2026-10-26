@@ -2,6 +2,8 @@
 
 import { formatMoney } from "@/lib/finance";
 
+const BAR_MAX = 140;
+
 export function FinanceChart({
   data,
 }: {
@@ -16,11 +18,11 @@ export function FinanceChart({
 
   return (
     <div className="rounded-xl border border-border bg-bg-2 p-4">
-      <h3 className="mb-4 text-sm font-medium">Доходы и расходы по месяцам</h3>
+      <h3 className="mb-5 text-xs font-bold uppercase tracking-wide">Доходы и расходы по месяцам</h3>
       <div className="flex items-end justify-between gap-2 overflow-x-auto pb-1 w-full min-w-0 max-w-full">
         {data.map((month) => {
-          const incomeH = Math.round((month.income / max) * 72);
-          const expenseH = Math.round((month.expense / max) * 72);
+          const incomeH = Math.round((month.income / max) * BAR_MAX);
+          const expenseH = Math.round((month.expense / max) * BAR_MAX);
           const [, m] = month.key.split("-");
           const label = new Date(2000, Number(m) - 1, 1).toLocaleDateString(
             "ru-RU",
@@ -32,30 +34,30 @@ export function FinanceChart({
               key={month.key}
               className="flex min-w-[52px] flex-1 flex-col items-center gap-1"
             >
-              <div className="flex h-[76px] items-end gap-1">
+              <div className="flex items-end gap-1" style={{ height: BAR_MAX + 4 }}>
                 <div
-                  className="w-3 rounded-t bg-green/80"
+                  className="w-4 rounded-t-sm bg-green sm:w-6"
                   style={{ height: `${Math.max(incomeH, 2)}px` }}
                   title={`Доход: ${formatMoney(month.income)}`}
                 />
                 <div
-                  className="w-3 rounded-t bg-red/70"
+                  className="w-4 rounded-t-sm bg-red/70 sm:w-6"
                   style={{ height: `${Math.max(expenseH, 2)}px` }}
                   title={`Расход: ${formatMoney(month.expense)}`}
                 />
               </div>
-              <span className="text-[11px] text-text-muted">{label}</span>
+              <span className="mt-1 text-xs text-text-muted">{label.replace(".", "")}</span>
             </div>
           );
         })}
       </div>
       <div className="mt-3 flex gap-4 text-xs text-text-muted">
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-green/80" />
+          <span className="h-2.5 w-2.5 rounded-sm bg-green" />
           Доход
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-sm bg-red/70" />
+          <span className="h-2.5 w-2.5 rounded-sm bg-red/70" />
           Расход
         </span>
       </div>

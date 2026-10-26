@@ -41,7 +41,7 @@ export function TelegramConnectCard({
     <Card className="h-full p-4">
       <div className="mb-3 flex items-center gap-2">
         <Send className="h-4 w-4 text-accent" />
-        <h3 className="text-sm font-medium">Уведомления в Telegram</h3>
+        <h3 className="text-xs font-bold uppercase tracking-wide">Уведомления в Telegram</h3>
       </div>
       {account ? (
         <LinkedState bandSlug={bandSlug} account={account} showBookings={showBookings} />

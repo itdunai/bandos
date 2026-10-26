@@ -51,7 +51,7 @@ export function Modal({
       >
         {title && (
           <div className="mb-3 flex items-center justify-between gap-2">
-            <h2 id="modal-title" className="text-sm font-medium">
+            <h2 id="modal-title" className="text-xs font-bold uppercase tracking-wide">
               {title}
             </h2>
             <button

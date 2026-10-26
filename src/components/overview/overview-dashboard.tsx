@@ -58,8 +58,8 @@ function relativeDays(days: number) {
 }
 
 const DOT_CLASS: Record<EventType, string> = {
-  rehearsal: "bg-blue",
-  performance: "bg-accent",
+  rehearsal: "bg-accent",
+  performance: "bg-amber",
   other: "bg-text-muted",
 };
 

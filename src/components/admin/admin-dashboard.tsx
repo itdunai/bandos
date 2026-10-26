@@ -30,7 +30,7 @@ export function AdminDashboard({
       </div>
 
       <section>
-        <h2 className="mb-3 text-xs uppercase tracking-wider text-text-muted">
+        <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           Контент сайта
         </h2>
         <Link href="/admin/privacy" className="block">
@@ -49,7 +49,7 @@ export function AdminDashboard({
       </section>
 
       <section>
-        <h2 className="mb-3 text-xs uppercase tracking-wider text-text-muted">
+        <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           Статистика
         </h2>
         {stats ? (
@@ -75,7 +75,7 @@ export function AdminDashboard({
       </section>
 
       <section>
-        <h2 className="mb-3 flex items-center gap-2 text-xs uppercase tracking-wider text-text-muted">
+        <h2 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           <Activity className="h-3.5 w-3.5" />
           Здоровье
         </h2>
@@ -107,7 +107,7 @@ export function AdminDashboard({
       </section>
 
       <section>
-        <h2 className="mb-3 text-xs uppercase tracking-wider text-text-muted">
+        <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
           Журнал событий
         </h2>
         {auditLog.length === 0 ? (
@@ -120,7 +120,7 @@ export function AdminDashboard({
           <div className="overflow-hidden rounded-xl border border-border">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-border bg-bg-2 text-xs uppercase tracking-wider text-text-muted">
+                <tr className="border-b border-border bg-bg-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
                   <th className="px-3 py-2 font-medium">Время</th>
                   <th className="px-3 py-2 font-medium">Уровень</th>
                   <th className="px-3 py-2 font-medium">Событие</th>
@@ -167,7 +167,7 @@ export function AdminDashboard({
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <Card className="p-4">
-      <div className="text-xs uppercase tracking-wider text-text-muted">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
         {label}
       </div>
       <div className="mt-1 text-2xl font-medium">{value}</div>

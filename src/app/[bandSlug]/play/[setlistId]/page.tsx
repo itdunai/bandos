@@ -1,15 +1,12 @@
-import Link from "next/link";
 import { PlayFromCache } from "@/components/play/play-offline";
 import { PlaySetlistShell } from "@/components/play/play-setlist-shell";
 import type { PlayTrack } from "@/components/play/play-mode";
-import { Button } from "@/components/ui/button";
 import {
   getBandBySlug,
   getCurrentMember,
 } from "@/lib/band/queries";
 import { createClient } from "@/lib/supabase/server";
 import type { Instrument } from "@/types/database";
-import { ArrowLeft } from "lucide-react";
 import { bandPath } from "@/lib/paths";
 import { notFound } from "next/navigation";
 
@@ -124,14 +121,6 @@ export default async function PlaySetlistPage({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col overflow-hidden overscroll-none bg-bg">
-      <div className="absolute left-3 top-3 z-10">
-        <Link href={bandPath(band.slug, "play")}>
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="h-4 w-4" />
-            Назад
-          </Button>
-        </Link>
-      </div>
       <PlaySetlistShell
         bandSlug={band.slug}
         setlistId={setlistId}

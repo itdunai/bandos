@@ -9,7 +9,9 @@ import {
 } from "@/lib/play/offline-cache";
 import type { Instrument } from "@/types/database";
 import { useWakeLock } from "@/lib/use-wake-lock";
-import { CloudOff, Sun, Wifi } from "lucide-react";
+import { bandPath } from "@/lib/paths";
+import { ArrowLeft, CloudOff, Sun, Wifi } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export function PlaySetlistShell({
@@ -75,27 +77,39 @@ export function PlaySetlistShell({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div
-        className={`shrink-0 border-b px-4 py-2 text-center text-xs ${
+        className={`flex shrink-0 items-center gap-2 border-b px-2 py-1.5 text-xs ${
           isOnline
             ? "border-border bg-bg-2 text-text-muted"
             : "border-amber/30 bg-amber/10 text-amber"
         }`}
       >
-        {isOnline ? (
-          <span className="inline-flex items-center justify-center gap-1.5">
-            <Wifi className="h-3 w-3" />
-            {cachedAt
-              ? `Сохранено для офлайна · ${formatPlayCachedAt(cachedAt)}`
-              : "Сохранение для офлайна…"}
-            {screenAwake && <ScreenAwakeHint />}
-          </span>
-        ) : (
-          <span className="inline-flex items-center justify-center gap-1.5">
-            <CloudOff className="h-3 w-3" />
-            Офлайн — показываем сохранённый сет-лист
-            {screenAwake && <ScreenAwakeHint />}
-          </span>
-        )}
+        <Link
+          href={bandPath(bandSlug, "play", ...(isOnline ? [] : ["offline"]))}
+          className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-semibold text-text-primary transition-colors hover:bg-bg-3"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Назад
+        </Link>
+        <span className="flex min-w-0 flex-1 items-center justify-center gap-1.5 truncate">
+          {isOnline ? (
+            <>
+              <Wifi className="h-3 w-3 shrink-0" />
+              <span className="truncate">
+                {cachedAt
+                  ? `Сохранено для офлайна · ${formatPlayCachedAt(cachedAt)}`
+                  : "Сохранение для офлайна…"}
+              </span>
+            </>
+          ) : (
+            <>
+              <CloudOff className="h-3 w-3 shrink-0" />
+              <span className="truncate">Офлайн — показываем сохранённый сет-лист</span>
+            </>
+          )}
+          {screenAwake && <ScreenAwakeHint />}
+        </span>
+        {/* Противовес кнопке «Назад», чтобы статус оставался по центру */}
+        <span className="w-[76px] shrink-0" aria-hidden />
       </div>
       <PlayMode
         setlistName={setlistName}
@@ -108,7 +122,7 @@ export function PlaySetlistShell({
 
 function ScreenAwakeHint() {
   return (
-    <span className="inline-flex items-center gap-1" title="Экран не погаснет, пока открыт режим «Играем»">
+    <span className="hidden shrink-0 items-center gap-1 sm:inline-flex" title="Экран не погаснет, пока открыт режим «Играем»">
       <span aria-hidden>·</span>
       <Sun className="h-3 w-3" />
       экран не гаснет

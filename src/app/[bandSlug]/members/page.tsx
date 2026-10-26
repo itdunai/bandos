@@ -96,7 +96,7 @@ export default async function MembersPage({
       {member && (
         <div className="mb-6 grid gap-4 lg:grid-cols-2">
           <Card className="h-full">
-            <h3 className="mb-3 text-sm font-medium">Мой профиль</h3>
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wide">Мой профиль</h3>
             <MemberProfileForm
               member={member}
               bandSlug={band.slug}
@@ -116,7 +116,7 @@ export default async function MembersPage({
         </div>
       )}
 
-      <h3 className="mb-3 text-xs uppercase tracking-wider text-text-muted">Состав</h3>
+      <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">Состав</h3>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {members?.map((m, i) => {
           const profile = m.profiles as { avatar_url: string | null } | null;

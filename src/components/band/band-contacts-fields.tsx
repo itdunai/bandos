@@ -42,7 +42,7 @@ export function BandContactsFields({
   return (
     <section className="space-y-3 rounded-xl border border-border bg-bg-2 p-4">
       <div>
-        <h2 className="text-sm font-medium">Контакты для связи</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wide">Контакты для связи</h2>
         <p className="mt-1 text-xs text-text-muted">
           Имя и телефон — для заказчиков и площадок. Отображаются на публичной
           странице группы.

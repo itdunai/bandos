@@ -53,13 +53,13 @@ export default async function TodosPage({
     >
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Card>
-          <div className="text-xs uppercase tracking-wider text-text-muted">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             Не готово
           </div>
           <div className="text-2xl font-medium text-amber">{openCount}</div>
         </Card>
         <Card>
-          <div className="text-xs uppercase tracking-wider text-text-muted">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
             Готово
           </div>
           <div className="text-2xl font-medium text-green">{doneCount}</div>

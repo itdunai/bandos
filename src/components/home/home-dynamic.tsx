@@ -116,7 +116,7 @@ async function HomeUserBandsAuth() {
 
   return (
     <div className="mb-10 rounded-xl border border-accent/30 bg-accent/5 p-4 sm:p-5">
-      <h2 className="text-sm font-medium">Мои группы</h2>
+      <h2 className="text-xs font-bold uppercase tracking-wide">Мои группы</h2>
       <p className="mt-1 text-xs text-text-secondary">
         Быстрый переход в личный кабинет
       </p>

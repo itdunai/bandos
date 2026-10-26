@@ -6,7 +6,7 @@ export function BandContactsBlock({ contacts }: { contacts: BandContact[] }) {
 
   return (
     <div className="rounded-xl border border-border bg-bg-2 p-4">
-      <h3 className="mb-2 text-sm font-medium">Контакты для связи</h3>
+      <h3 className="mb-2 text-xs font-bold uppercase tracking-wide">Контакты для связи</h3>
       <ul className="space-y-2">
         {contacts.map((contact, index) => {
           const tel = contact.phone.replace(/\s/g, "");

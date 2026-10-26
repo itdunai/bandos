@@ -31,7 +31,7 @@ export function BandSocialLinksFields({ initial }: { initial: SocialLinks }) {
   return (
     <section className="space-y-3 rounded-xl border border-border bg-bg-2 p-4">
       <div>
-        <h2 className="text-sm font-medium">Соцсети и ссылки</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wide">Соцсети и ссылки</h2>
         <p className="mt-1 text-xs text-text-muted">
           Отображаются на публичной странице группы. Нет нужной соцсети — добавьте
           свою ссылку ниже.

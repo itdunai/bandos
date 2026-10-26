@@ -40,7 +40,7 @@ export function BandProfileForm({
 
       <form action={action} className="space-y-5">
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
-        <h2 className="text-sm font-medium">Основное</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wide">Основное</h2>
         <div>
           <Label>Название</Label>
           <Input name="name" required defaultValue={band.name} />
@@ -79,7 +79,7 @@ export function BandProfileForm({
 
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-medium">Техрайдер</h2>
+          <h2 className="text-xs font-bold uppercase tracking-wide">Техрайдер</h2>
           <ShareLinkButton path={riderSharePath} label="Поделиться" />
         </div>
         <MinimalEditor
@@ -99,7 +99,7 @@ export function BandProfileForm({
       </section>
 
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-2">
-        <h2 className="text-sm font-medium">Заявки на выступления</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wide">Заявки на выступления</h2>
         <label className="flex items-start gap-2 text-sm text-text-secondary">
           <input
             type="checkbox"

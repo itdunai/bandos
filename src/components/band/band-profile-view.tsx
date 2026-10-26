@@ -89,7 +89,7 @@ export function BandProfileView({
       {band.tech_rider && (
         <div className="rounded-xl border border-border bg-bg-2 p-4">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-medium">Техрайдер</h3>
+            <h3 className="text-xs font-bold uppercase tracking-wide">Техрайдер</h3>
             {band.rider_public && (
               <ShareLinkButton path={riderSharePath} label="Поделиться" />
             )}
@@ -100,7 +100,7 @@ export function BandProfileView({
 
       {linkEntries.length > 0 && (
         <div className="rounded-xl border border-border bg-bg-2 p-4">
-          <h3 className="mb-2 text-sm font-medium">Ссылки</h3>
+          <h3 className="mb-2 text-xs font-bold uppercase tracking-wide">Ссылки</h3>
           <ul className="space-y-1.5">
             {linkEntries.map((link) => (
               <li key={link.id}>

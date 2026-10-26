@@ -43,7 +43,7 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
   return (
     <form action={action} className="space-y-5">
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
-        <h2 className="text-sm font-medium">Основное</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wide">Основное</h2>
         <div>
           <Label>Название *</Label>
           <Input name="title" required defaultValue={song?.title} placeholder="Night Drive" />
@@ -120,7 +120,7 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
       </section>
 
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
-        <h2 className="text-sm font-medium">Материалы</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wide">Материалы</h2>
         <SongMaterialsFields
           chords={song?.chords}
           tabs={song?.tabs}

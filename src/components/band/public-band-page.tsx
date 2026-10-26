@@ -89,7 +89,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
             </div>
           )}
           <div>
-            <div className="text-xs uppercase tracking-wider text-text-muted">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
               BandOS
             </div>
             <h1 className="text-xl font-medium">{band.name}</h1>
@@ -154,7 +154,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
 
         {links.length > 0 && (
           <section className="mb-8 rounded-xl border border-border bg-bg-2 p-5">
-            <h2 className="mb-3 text-sm font-medium">Соцсети и ссылки</h2>
+            <h2 className="mb-3 text-xs font-bold uppercase tracking-wide">Соцсети и ссылки</h2>
             <ul className="flex flex-wrap gap-2">
               {links.map((link) => (
                 <li key={link.id}>
@@ -204,7 +204,7 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
               <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-border">
                 <table className="w-full min-w-[480px] text-left text-sm">
                   <thead>
-                    <tr className="border-b border-border bg-bg-2 text-xs uppercase tracking-wider text-text-muted">
+                    <tr className="border-b border-border bg-bg-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
                       <th className="px-4 py-3 font-medium">Название</th>
                       <th className="px-4 py-3 font-medium">Тип</th>
                       <th className="px-4 py-3 text-right font-medium">
