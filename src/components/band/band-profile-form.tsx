@@ -98,6 +98,23 @@ export function BandProfileForm({
         </label>
       </section>
 
+      <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-2">
+        <h2 className="text-sm font-medium">Заявки на выступления</h2>
+        <label className="flex items-start gap-2 text-sm text-text-secondary">
+          <input
+            type="checkbox"
+            name="accept_bookings"
+            defaultChecked={band.accept_bookings ?? false}
+            className="mt-0.5 rounded border-border accent-accent"
+          />
+          <span>
+            Показывать на публичной странице кнопку «Заказать выступление».
+            Заявки появятся в разделе «Заявки» и придут в Telegram тем, у кого
+            подключены уведомления.
+          </span>
+        </label>
+      </section>
+
       <BandContactsFields initial={contacts} />
 
       <BandSocialLinksFields initial={links} />

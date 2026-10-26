@@ -1,10 +1,11 @@
-import { canViewFinances } from "@/lib/band/permissions";
+import { canViewFinances, hasPermission } from "@/lib/band/permissions";
 import { bandPath } from "@/lib/paths";
 import type { BandMember } from "@/types/database";
 import {
   Calendar,
   ClipboardList,
   Disc3,
+  Inbox,
   Info,
   LayoutDashboard,
   ListMusic,
@@ -49,6 +50,7 @@ export const BAND_NAV: BandNavGroup[] = [
     section: "Группа",
     items: [
       { href: "group", label: "О группе", icon: Info },
+      { href: "bookings", label: "Заявки", icon: Inbox },
       { href: "members", label: "Участники", icon: Users },
       { href: "finances", label: "Финансы", icon: Wallet },
     ],
@@ -57,6 +59,7 @@ export const BAND_NAV: BandNavGroup[] = [
 
 export function isNavItemVisible(item: BandNavItem, member: BandMember | null) {
   if (item.href === "finances" && member && !canViewFinances(member)) return false;
+  if (item.href === "bookings" && (!member || !hasPermission(member, "band_profile"))) return false;
   return true;
 }
 

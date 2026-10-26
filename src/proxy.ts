@@ -11,8 +11,10 @@ export async function proxy(request: NextRequest) {
   return await updateSession(request);
 }
 
+// api/telegram и api/cron вызываются без сессии (Telegram, планировщик) и
+// проверяют доступ сами — по секрету в заголовке.
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|api/health|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/health|api/telegram|api/cron|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

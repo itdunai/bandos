@@ -15,10 +15,16 @@ export default async function NewEventPage({
   searchParams,
 }: {
   params: Promise<{ bandSlug: string }>;
-  searchParams: Promise<{ type?: string; error?: string; date?: string }>;
+  searchParams: Promise<{
+    type?: string;
+    error?: string;
+    date?: string;
+    title?: string;
+    location?: string;
+  }>;
 }) {
   const { bandSlug } = await params;
-  const { type, error, date } = await searchParams;
+  const { type, error, date, title, location } = await searchParams;
   const band = await getBandBySlug(bandSlug);
   if (!band) notFound();
 
@@ -69,6 +75,8 @@ export default async function NewEventPage({
         setlists={setlists ?? []}
         defaultType={defaultType}
         defaultStartsAt={defaultStartsAt}
+        defaultTitle={title?.slice(0, 120)}
+        defaultLocation={location?.slice(0, 200)}
         isAdmin={member ? isBandAdmin(member) : false}
       />
     </AppShell>

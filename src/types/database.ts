@@ -58,6 +58,7 @@ export interface Band {
   photos: string[];
   tech_rider: string | null;
   rider_public: boolean;
+  accept_bookings?: boolean;
   repertoire_public: boolean;
   social_links: SocialLinks;
   contacts?: BandContact[];
@@ -257,6 +258,28 @@ export const SONG_STATUS_LABELS: Record<SongStatus, string> = {
 export const SONG_TYPE_LABELS: Record<SongType, string> = {
   original: "Авторская",
   cover: "Кавер",
+};
+
+export type BookingStatus = "new" | "in_progress" | "agreed" | "declined";
+
+export interface BookingRequest {
+  id: string;
+  band_id: string;
+  name: string;
+  contact: string;
+  event_date: string | null;
+  city: string | null;
+  event_format: string | null;
+  message: string | null;
+  status: BookingStatus;
+  created_at: string;
+}
+
+export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
+  new: "Новая",
+  in_progress: "В работе",
+  agreed: "Договорились",
+  declined: "Отказ",
 };
 
 export const EVENT_TYPE_LABELS: Record<EventType, string> = {

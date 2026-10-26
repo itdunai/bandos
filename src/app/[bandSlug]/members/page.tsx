@@ -3,12 +3,17 @@ import { ExcludeMemberButton } from "@/components/members/exclude-member-button"
 import { InviteForm } from "@/components/members/invite-form";
 import { MemberPermissionsEditor } from "@/components/members/member-permissions-editor";
 import { MemberProfileForm } from "@/components/members/member-profile-form";
+import {
+  TelegramConnectCard,
+  type TelegramAccountView,
+} from "@/components/telegram/telegram-connect-card";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
   canInviteMembers,
   canManagePermissions,
+  hasPermission,
   presetBadgeLabel,
 } from "@/lib/band/permissions";
 import {
@@ -17,6 +22,7 @@ import {
   getCurrentMember,
 } from "@/lib/band/queries";
 import { createClient } from "@/lib/supabase/server";
+import { isTelegramConfigured } from "@/lib/telegram/bot";
 import { INSTRUMENT_LABELS, type Instrument } from "@/types/database";
 import { MessageCircle, Phone } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -46,7 +52,8 @@ export default async function MembersPage({
     createClient(),
   ]);
 
-  const [{ data: members }, profileResult] = await Promise.all([
+  const telegramEnabled = isTelegramConfigured();
+  const [{ data: members }, profileResult, telegramResult] = await Promise.all([
     supabase
       .from("band_members")
       .select("*, profiles(avatar_url)")
@@ -59,6 +66,13 @@ export default async function MembersPage({
           .select("avatar_url")
           .eq("id", member.user_id)
           .single()
+      : Promise.resolve({ data: null }),
+    member && telegramEnabled
+      ? supabase
+          .from("telegram_accounts")
+          .select("username, first_name, notify_events, notify_todos, notify_bookings")
+          .eq("user_id", member.user_id)
+          .maybeSingle()
       : Promise.resolve({ data: null }),
   ]);
 
@@ -91,6 +105,14 @@ export default async function MembersPage({
           </Card>
 
           {showInvite && <InviteForm bandId={band.id} />}
+
+          {telegramEnabled && (
+            <TelegramConnectCard
+              bandSlug={band.slug}
+              account={(telegramResult.data as TelegramAccountView | null) ?? null}
+              showBookings={hasPermission(member, "band_profile")}
+            />
+          )}
         </div>
       )}
 

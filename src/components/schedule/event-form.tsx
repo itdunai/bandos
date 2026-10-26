@@ -32,6 +32,8 @@ export function EventForm({
   setlists,
   defaultType = "rehearsal",
   defaultStartsAt,
+  defaultTitle,
+  defaultLocation,
   isAdmin = false,
   financeRecorded = false,
 }: {
@@ -41,6 +43,8 @@ export function EventForm({
   setlists: SetlistOption[];
   defaultType?: EventType;
   defaultStartsAt?: string;
+  defaultTitle?: string;
+  defaultLocation?: string;
   isAdmin?: boolean;
   financeRecorded?: boolean;
 }) {
@@ -74,7 +78,7 @@ export function EventForm({
         <Input
           name="title"
           required
-          defaultValue={event?.title}
+          defaultValue={event?.title ?? defaultTitle}
           placeholder={titlePlaceholder(eventType)}
         />
       </div>
@@ -102,7 +106,7 @@ export function EventForm({
       </div>
       <div>
         <Label>Место</Label>
-        <Input name="location" defaultValue={event?.location ?? ""} placeholder="Red Room Studio" />
+        <Input name="location" defaultValue={event?.location ?? defaultLocation ?? ""} placeholder="Red Room Studio" />
       </div>
       <div>
         <Label>Заметки</Label>

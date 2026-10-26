@@ -1,5 +1,6 @@
 import { BandContactsBlock } from "@/components/band/band-contacts-block";
 import { BandReleasesBlock } from "@/components/band/band-releases-block";
+import { BookingForm } from "@/components/band/booking-form";
 import { ScrollToHash } from "@/components/band/scroll-to-hash";
 import type { ReleaseListItem } from "@/components/releases/release-list";
 import { PhotoGallery } from "@/components/ui/image-lightbox";
@@ -40,6 +41,7 @@ export interface PublicBandPageData {
   photos: string[];
   rider_public: boolean;
   repertoire_public: boolean;
+  accept_bookings?: boolean;
   tech_rider: string | null;
   social_links: SocialLinks;
   contacts?: BandContact[];
@@ -121,6 +123,12 @@ export function PublicBandPage({ band }: { band: PublicBandPageData }) {
             {band.members_count} участников
           </span>
         </div>
+
+        {band.accept_bookings && (
+          <div id="booking" className="mb-8 scroll-mt-6">
+            <BookingForm bandSlug={band.slug} bandName={band.name} />
+          </div>
+        )}
 
         {photos.length > 0 && (
           <div className="mb-8">

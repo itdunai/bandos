@@ -25,6 +25,7 @@ export async function updateBandProfile(
   const city = (formData.get("city") as string).trim() || null;
   const techRider = (formData.get("tech_rider") as string).trim() || null;
   const riderPublic = formData.get("rider_public") === "on";
+  const acceptBookings = formData.get("accept_bookings") === "on";
 
   const { error } = await supabase
     .from("bands")
@@ -44,6 +45,12 @@ export async function updateBandProfile(
     await redirectWithToast(bandPath(bandSlug, "group"), error.message);
     return;
   }
+
+  // Отдельно: колонка появляется в миграции 028 — до неё профиль должен сохраняться.
+  await supabase
+    .from("bands")
+    .update({ accept_bookings: acceptBookings })
+    .eq("id", bandId);
 
   revalidatePublicBandAndCatalog(bandSlug);
   redirect(bandPath(bandSlug, "group"));

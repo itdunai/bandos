@@ -3,6 +3,8 @@ export async function register() {
     const { validateRuntimeEnv } = await import("./lib/env");
     validateRuntimeEnv();
     await import("./sentry.server.config");
+    const { startReminderScheduler } = await import("./lib/telegram/scheduler");
+    startReminderScheduler();
   }
 
   if (process.env.NEXT_RUNTIME === "edge") {
