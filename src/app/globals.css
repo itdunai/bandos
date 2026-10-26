@@ -143,3 +143,21 @@ html.cookie-consent-open body {
     padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* Бегущая строка на главной: дублированный ряд сдвигается на половину ширины */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 45s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+

@@ -5,43 +5,31 @@ import type { ReactNode } from "react";
 
 export function HomeAudiences({ ctaSlot }: { ctaSlot: ReactNode }) {
   return (
-    <section className="border-b border-border py-14 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <h2 className="heading-poster mb-8 text-2xl sm:text-3xl">
-          Для кого этот сервис
-        </h2>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-border bg-bg-2 p-6">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-accent/15 text-accent">
-              <Music className="h-5 w-5" />
-            </div>
-            <h3 className="font-sans text-lg font-semibold">Музыкантам и группам</h3>
-            <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-              Храните материалы в одном месте, готовьтесь к репетициям и
-              выступлениям, делитесь сет-листом на сцене. Приглашайте
-              участников и разграничивайте права — кто редактирует треки, кто
-              только смотрит.
-            </p>
-            {ctaSlot}
-          </div>
-
-          <div className="rounded-xl border border-border bg-bg-2 p-6">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-green/15 text-green">
-              <Mic2 className="h-5 w-5" />
-            </div>
-            <h3 className="font-sans text-lg font-semibold">Заказчикам и площадкам</h3>
-            <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-              Смотрите каталог групп: описание, жанр, город, репертуар и
-              техрайдер — без звонков «а пришлите райдер ещё раз». Связь через
-              контакты в профиле группы.
-            </p>
-            <Link href="#catalog" className="mt-4 inline-block">
-              <Button variant="default" size="sm">
-                Перейти в каталог
-              </Button>
-            </Link>
-          </div>
+    <section className="pb-20 sm:pb-28">
+      <div className="mx-auto grid max-w-6xl gap-5 px-4 sm:px-6 md:grid-cols-2">
+        <div className="rounded-md border border-border bg-bg-2 p-7">
+          <Music aria-hidden className="mb-5 h-7 w-7 text-accent" />
+          <h2 className="heading-poster text-2xl">Музыкантам</h2>
+          <p className="mt-3 leading-relaxed text-text-secondary">
+            Все материалы в одном месте, подготовка к репетициям и выступлениям,
+            сет-лист на сцене у каждого. Приглашайте участников и раздавайте
+            права — кто редактирует треки, кто только смотрит.
+          </p>
+          {ctaSlot}
+        </div>
+        <div className="rounded-md border border-border bg-bg-2 p-7">
+          <Mic2 aria-hidden className="mb-5 h-7 w-7 text-amber" />
+          <h2 className="heading-poster text-2xl">Заказчикам</h2>
+          <p className="mt-3 leading-relaxed text-text-secondary">
+            Каталог групп с описанием, жанром, городом, репертуаром и
+            техрайдером — без звонков «а пришлите райдер ещё раз». Заявку на
+            выступление можно отправить прямо со страницы группы.
+          </p>
+          <Link href="#catalog" className="mt-4 inline-block">
+            <Button variant="default" size="sm">
+              Перейти в каталог
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

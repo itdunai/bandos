@@ -12,6 +12,7 @@ import { HomeFeatures } from "@/components/home/home-features";
 import { HomeSteps } from "@/components/home/home-steps";
 import { HomeFooter } from "@/components/home/home-footer";
 import { HomeHero } from "@/components/home/home-hero";
+import { HomeMarquee } from "@/components/home/home-marquee";
 import { SiteLogo } from "@/components/brand/site-logo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getPublicBandsCatalog } from "@/lib/public-cache";
@@ -78,6 +79,7 @@ export default async function HomePage() {
       <HomeHeaderSlot />
       <main>
         <HomeHero ctaSlot={<HomeHeroCtaSlot />} />
+        <HomeMarquee />
         <HomeFeatures />
         <HomeSteps />
         <HomeAudiences ctaSlot={<HomeAudiencesCtaSlot />} />

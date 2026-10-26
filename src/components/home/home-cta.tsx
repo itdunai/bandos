@@ -2,19 +2,22 @@ import type { ReactNode } from "react";
 
 export function HomeCta({ ctaSlot }: { ctaSlot: ReactNode }) {
   return (
-    <section className="py-14 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="flex flex-col items-start gap-6 rounded-xl bg-[linear-gradient(135deg,var(--accent)_0%,var(--accent-dark)_100%)] p-8 text-accent-ink sm:p-10 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="heading-poster text-2xl sm:text-3xl">Соберите группу в BandOS</h2>
-            <p className="mt-2 max-w-xl opacity-85">
-              Репертуар, сет-листы и график — в одном месте для всех участников. Бесплатно.
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-3 [&_a:first-child>button]:border-accent-ink [&_a:first-child>button]:bg-accent-ink [&_a:first-child>button]:text-accent [&_a:not(:first-child)>button]:border-accent-ink/40 [&_a:not(:first-child)>button]:bg-transparent [&_a:not(:first-child)>button]:text-accent-ink">
-            {ctaSlot}
-          </div>
-        </div>
+    <section className="px-4 pb-6 sm:px-6">
+      <div className="relative mx-auto max-w-6xl overflow-hidden rounded-lg border border-border bg-bg-2 px-6 py-20 text-center sm:py-28">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,color-mix(in_srgb,var(--accent)_55%,transparent),transparent_60%)]"
+        />
+        <h2 className="heading-poster relative text-[44px] font-black leading-[0.86] sm:text-7xl lg:text-[96px]">
+          Ваша сцена
+          <br />
+          ждёт
+        </h2>
+        <p className="relative mx-auto mb-8 mt-6 max-w-lg text-lg text-text-secondary">
+          Соберите группу в BandOS — репертуар, сет-листы и график в одном месте
+          для всех участников.
+        </p>
+        <div className="relative flex flex-wrap justify-center gap-3">{ctaSlot}</div>
       </div>
     </section>
   );

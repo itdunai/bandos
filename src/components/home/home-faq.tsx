@@ -1,5 +1,4 @@
 import { JsonLd } from "@/components/seo/json-ld";
-import { ChevronDown } from "lucide-react";
 
 export const HOME_FAQ = [
   {
@@ -30,7 +29,7 @@ export const HOME_FAQ = [
 
 export function HomeFaq() {
   return (
-    <section id="faq" className="scroll-mt-16 border-b border-border py-14 sm:py-16">
+    <section id="faq" className="scroll-mt-16 pb-20 sm:pb-28">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -42,16 +41,21 @@ export function HomeFaq() {
           })),
         }}
       />
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <h2 className="heading-poster mb-8 text-2xl sm:text-3xl">Вопросы и ответы</h2>
-        <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-bg-2">
-          {HOME_FAQ.map(({ q, a }) => (
-            <details key={q} className="group">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-semibold transition-colors hover:bg-bg-3 [&::-webkit-details-marker]:hidden">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+        <h2 className="heading-poster text-[34px] leading-[0.92] sm:text-6xl">Вопросы</h2>
+        <div className="border-t border-border">
+          {HOME_FAQ.map(({ q, a }, i) => (
+            <details key={q} className="group border-b border-border py-5" open={i === 0}>
+              <summary className="flex cursor-pointer list-none items-start justify-between gap-5 text-lg font-semibold [&::-webkit-details-marker]:hidden">
                 {q}
-                <ChevronDown className="h-4 w-4 shrink-0 text-text-muted transition-transform group-open:rotate-180" />
+                <span
+                  aria-hidden
+                  className="font-display text-2xl leading-none text-accent transition-transform group-open:rotate-45"
+                >
+                  +
+                </span>
               </summary>
-              <p className="px-5 pb-5 text-sm leading-relaxed text-text-secondary">{a}</p>
+              <p className="mt-3 max-w-2xl leading-relaxed text-text-secondary">{a}</p>
             </details>
           ))}
         </div>
