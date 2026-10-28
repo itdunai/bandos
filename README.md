@@ -102,6 +102,7 @@ SUPABASE_SERVICE_ROLE_KEY=...     # webhook и рассылка работают
 # TELEGRAM_BOT_USERNAME=bandosfunapp   # необязательно, иначе берётся из getMe
 # TELEGRAM_SCHEDULER=off               # выключить встроенный таймер рассылки
 # TELEGRAM_API_BASE=https://...        # прокси Bot API, если api.telegram.org недоступен с хостинга
+# TELEGRAM_WEBHOOK_URL=https://.../webhook  # прокси для входящих, если Telegram не достаёт до хостинга
 ```
 
 3. После деплоя один раз зарегистрируйте webhook и команды бота:

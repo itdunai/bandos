@@ -32,7 +32,9 @@ export async function TelegramDiagnostics() {
           text: "Сервер связывается с Telegram, но Telegram не может доставить сообщения на сайт (webhook).",
           hint: !d.webhook?.matches
             ? "Webhook указывает не туда — нажмите «Перерегистрировать webhook»."
-            : "Telegram не дозванивается до сайта: см. ошибку ниже. Обычно это сеть/файрвол хостинга.",
+            : d.viaProxy
+              ? "Telegram не дозванивается до прокси или прокси до сайта: проверьте Worker и WEBHOOK_TARGET."
+              : "Telegram не дозванивается до сайта (сеть/файрвол хостинга). Можно пустить входящие через прокси: TELEGRAM_WEBHOOK_URL.",
         }
       : { tone: "green" as const, text: "Бот работает: связь с Telegram есть, webhook настроен.", hint: null };
 
@@ -86,6 +88,12 @@ export async function TelegramDiagnostics() {
               )}
             </dd>
           </div>
+          {d.webhook?.url && d.webhook.matches && (
+            <div className="truncate font-mono text-xs text-text-muted" title={d.webhook.url}>
+              {d.viaProxy ? "через прокси: " : ""}
+              {d.webhook.url}
+            </div>
+          )}
           {d.webhook?.url && !d.webhook.matches && (
             <div className="rounded-md bg-bg-3 px-3 py-2 font-mono text-xs">
               сейчас: {d.webhook.url}

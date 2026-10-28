@@ -12,6 +12,7 @@ export interface TelegramDiagnostics {
   config: { name: string; ok: boolean; hint?: string }[];
   apiBase: string;
   expectedWebhookUrl: string;
+  viaProxy: boolean;
   getMe: { ok: boolean; username?: string; error?: string; ms: number };
   webhook: {
     url: string | null;
@@ -24,8 +25,27 @@ export interface TelegramDiagnostics {
   sent24h: number | null;
 }
 
-export function expectedWebhookUrl(): string {
+/** Адрес webhook сайта (куда в итоге должны попадать сообщения). */
+export function siteWebhookUrl(): string {
   return `${getSiteUrl().replace(/\/$/, "")}/api/telegram/webhook`;
+}
+
+/**
+ * Адрес, который регистрируется в Telegram. По умолчанию — webhook сайта; если
+ * Telegram не может достучаться до хостинга, TELEGRAM_WEBHOOK_URL указывает на
+ * прокси (Cloudflare Worker), который пересылает сообщения на сайт.
+ */
+export function expectedWebhookUrl(): string {
+  const raw = process.env.TELEGRAM_WEBHOOK_URL?.trim();
+  if (raw) {
+    try {
+      const url = new URL(raw);
+      if (url.protocol === "https:") return url.toString();
+    } catch {
+      // некорректный адрес — используем webhook сайта
+    }
+  }
+  return siteWebhookUrl();
 }
 
 /** Полная проверка бота: настройки сервера, связь с Bot API, состояние webhook. */
@@ -43,6 +63,11 @@ export async function diagnoseTelegram(): Promise<TelegramDiagnostics> {
       hint: "16+ символов: A-Z a-z 0-9 _ -",
     },
     { name: "CRON_SECRET", ok: (process.env.CRON_SECRET?.trim().length ?? 0) >= 16, hint: "16+ символов" },
+    {
+      name: "TELEGRAM_WEBHOOK_URL",
+      ok: !!process.env.TELEGRAM_WEBHOOK_URL?.trim(),
+      hint: "необязательно: прокси для входящих, если Telegram не достаёт до хостинга",
+    },
     {
       name: "TELEGRAM_BOT_USERNAME",
       ok: !!process.env.TELEGRAM_BOT_USERNAME?.trim(),
@@ -94,6 +119,7 @@ export async function diagnoseTelegram(): Promise<TelegramDiagnostics> {
     config,
     apiBase: telegramApiBase(),
     expectedWebhookUrl: expectedWebhookUrl(),
+    viaProxy: expectedWebhookUrl() !== siteWebhookUrl(),
     getMe,
     webhook,
     linkedAccounts,
