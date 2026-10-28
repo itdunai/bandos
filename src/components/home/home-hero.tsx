@@ -58,13 +58,13 @@ export function HomeHero({ ctaSlot }: { ctaSlot: ReactNode }) {
       <div className="relative mx-auto max-w-6xl px-4 pb-14 pt-10 sm:px-6 sm:pt-14 lg:min-h-[620px] lg:pb-20">
         <Link
           href="#telegram"
-          className="mb-8 inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-bg-2/80 py-1 pl-1 pr-3 text-sm text-text-secondary backdrop-blur transition-colors hover:border-accent"
+          className="mb-8 inline-flex max-w-full items-center gap-2.5 rounded-2xl border border-border bg-bg-2/80 py-1.5 pl-1.5 pr-4 text-sm text-text-secondary backdrop-blur transition-colors hover:border-accent sm:rounded-full sm:py-1 sm:pl-1"
         >
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-accent-ink">
             <Send className="h-3 w-3" />
             Новое
           </span>
-          <span className="truncate">Напоминания и заявки в Telegram</span>
+          <span className="leading-snug">Напоминания и заявки в Telegram</span>
         </Link>
 
         <h1 className="flex items-center gap-2.5 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-amber sm:text-[13px]">

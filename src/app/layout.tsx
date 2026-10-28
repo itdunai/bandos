@@ -113,6 +113,7 @@ export default async function RootLayout({
     <html
       lang="ru"
       data-theme={theme}
+      data-scroll-behavior="smooth"
       className={`${golos.variable} ${unbounded.variable} ${geistMono.variable} h-full antialiased${showCookieBanner ? " cookie-consent-open" : ""}`}
     >
       <body className="min-h-full">

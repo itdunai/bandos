@@ -5,6 +5,7 @@ import { getUserBands } from "@/lib/band/queries";
 import { bandPath } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
 import { ArrowRight, Plus } from "lucide-react";
+import { HomeFooter } from "./home-footer";
 import { HomeHeader } from "./home-header";
 
 async function HomeHeaderAuth() {
@@ -143,6 +144,24 @@ export function HomeUserBandsSlot() {
   return (
     <Suspense fallback={null}>
       <HomeUserBandsAuth />
+    </Suspense>
+  );
+}
+
+async function HomeFooterAuth() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const userBands = user ? await getUserBands() : [];
+  return <HomeFooter user={!!user} firstBandSlug={userBands[0]?.slug} />;
+}
+
+/** Футер: для вошедшего — «Личный кабинет» вместо «Вход / Регистрация». */
+export function HomeFooterSlot() {
+  return (
+    <Suspense fallback={<HomeFooter />}>
+      <HomeFooterAuth />
     </Suspense>
   );
 }

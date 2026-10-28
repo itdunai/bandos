@@ -10,6 +10,8 @@ export function NavigationProgress() {
   const activeRef = useRef(false);
   const creepTimer = useRef<number | null>(null);
   const completeTimer = useRef<number | null>(null);
+  const watchdog = useRef<number | null>(null);
+  const completeRef = useRef<() => void>(() => {});
 
   const clearTimers = useCallback(() => {
     if (creepTimer.current) {
@@ -19,6 +21,10 @@ export function NavigationProgress() {
     if (completeTimer.current) {
       window.clearTimeout(completeTimer.current);
       completeTimer.current = null;
+    }
+    if (watchdog.current) {
+      window.clearTimeout(watchdog.current);
+      watchdog.current = null;
     }
   }, []);
 
@@ -32,6 +38,11 @@ export function NavigationProgress() {
     creepTimer.current = window.setInterval(() => {
       setProgress((p) => (p < 88 ? p + (88 - p) * 0.12 : p));
     }, 280);
+
+    // Страховка: если сервер перенаправил обратно на ту же страницу (например,
+    // /login для уже вошедшего → /), pathname не меняется и complete() не
+    // сработает — без этого курсор «ожидания» и полоска висели бы вечно.
+    watchdog.current = window.setTimeout(() => completeRef.current(), 8000);
   }, [clearTimers]);
 
   const complete = useCallback(() => {
@@ -46,6 +57,10 @@ export function NavigationProgress() {
       document.documentElement.classList.remove("navigating");
     }, 220);
   }, [clearTimers]);
+
+  useEffect(() => {
+    completeRef.current = complete;
+  }, [complete]);
 
   useEffect(() => {
     complete();

@@ -94,6 +94,13 @@ body {
 
 /* В слое base: утилиты (font-sans и т.п.) на конкретном заголовке его перекрывают. */
 @layer base {
+  /* Длинные варианты (названия треков) не должны раздувать select шире экрана */
+  select {
+    min-width: 0;
+    max-width: 100%;
+    text-overflow: ellipsis;
+  }
+
   h1,
   h2,
   h3 {
@@ -158,6 +165,49 @@ html.cookie-consent-open body {
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
+  }
+}
+
+/* Эквалайзер: лоадер страницы и спиннер в кнопках */
+@keyframes eq-bounce {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq-bounce 0.9s ease-in-out infinite;
+}
+
+@keyframes eq-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+
+.eq-fade {
+  animation: eq-fade-in 0.35s ease-out;
+}
+
+/* Плавная прокрутка к якорям (переходы между страницами — мгновенные, см. data-scroll-behavior) */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .eq-bar {
+    animation: none;
+    transform: scaleY(0.7);
   }
 }
 

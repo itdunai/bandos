@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { SiteLogo } from "@/components/brand/site-logo";
 import { LogIn, Plus } from "lucide-react";
 import { bandPath } from "@/lib/paths";
+import { HomeMobileMenu } from "@/components/home/home-mobile-menu";
+import { HOME_NAV } from "@/components/home/home-nav";
 
 export function HomeHeader({
   user,
@@ -15,17 +17,12 @@ export function HomeHeader({
     <header className="sticky top-0 z-40 border-b border-border/80 bg-bg/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <Link href="/" className="flex min-w-0 shrink items-center">
-          <SiteLogo className="h-7 max-w-[100px] sm:h-10 sm:max-w-none" priority />
+          <SiteLogo className="h-8 max-w-[170px] sm:h-10 sm:max-w-none" priority />
         </Link>
 
         <nav className="flex shrink-0 items-center gap-2 sm:gap-3">
           <div className="hidden items-center gap-5 md:flex">
-            {[
-              ["#features", "Возможности"],
-              ["#how", "Как это работает"],
-              ["#catalog", "Каталог групп"],
-              ["#faq", "Вопросы"],
-            ].map(([href, label]) => (
+            {HOME_NAV.map(([href, label]) => (
               <Link
                 key={href}
                 href={`/${href}`}
@@ -35,12 +32,14 @@ export function HomeHeader({
               </Link>
             ))}
           </div>
+          <HomeMobileMenu user={user} firstBandSlug={firstBandSlug} />
+          <div className="hidden items-center gap-2 md:flex">
           {user ? (
             <>
               {firstBandSlug && (
                 <Link href={bandPath(firstBandSlug)}>
                   <Button variant="default" size="sm">
-                    В личный кабинет
+                    Личный кабинет
                   </Button>
                 </Link>
               )}
@@ -66,6 +65,7 @@ export function HomeHeader({
               </Link>
             </>
           )}
+          </div>
         </nav>
       </div>
     </header>

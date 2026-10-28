@@ -235,14 +235,14 @@ export function SetlistEditor({
           <select
             value={selectedSong}
             onChange={(e) => setSelectedSong(e.target.value)}
-            className="flex-1 rounded-lg border border-border bg-bg-3 px-3 py-2 text-sm outline-none focus:border-accent"
+            className="w-full min-w-0 flex-1 truncate rounded-lg border border-border bg-bg-3 px-3 py-2 text-sm outline-none focus:border-accent"
           >
             <option value="">Выбрать трек...</option>
             {songs.map((s) => (
               <option key={s.id} value={s.id}>{s.title}</option>
             ))}
           </select>
-          <Button type="button" variant="accent" onClick={handleAddSong} disabled={!selectedSong}>
+          <Button type="button" variant="accent" onClick={handleAddSong} disabled={!selectedSong} className="shrink-0" aria-label="Добавить трек">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -251,9 +251,9 @@ export function SetlistEditor({
             value={customTitle}
             onChange={(e) => setCustomTitle(e.target.value)}
             placeholder="Вставка: Intro, бис..."
-            className="flex-1"
+            className="min-w-0 flex-1"
           />
-          <Button type="button" onClick={handleAddCustom} disabled={!customTitle.trim()}>
+          <Button type="button" onClick={handleAddCustom} disabled={!customTitle.trim()} className="shrink-0" aria-label="Добавить вставку">
             <Plus className="h-4 w-4" />
           </Button>
         </div>

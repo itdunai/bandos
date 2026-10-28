@@ -2,6 +2,7 @@ import { HomeAudiences } from "@/components/home/home-audiences";
 import { HomeCatalog } from "@/components/home/home-catalog";
 import {
   HomeAudiencesCtaSlot,
+  HomeFooterSlot,
   HomeHeaderSlot,
   HomeHeroCtaSlot,
   HomeUserBandsSlot,
@@ -10,7 +11,6 @@ import { HomeCta } from "@/components/home/home-cta";
 import { HomeFaq } from "@/components/home/home-faq";
 import { HomeFeatures } from "@/components/home/home-features";
 import { HomeSteps } from "@/components/home/home-steps";
-import { HomeFooter } from "@/components/home/home-footer";
 import { HomeHero } from "@/components/home/home-hero";
 import { HomeMarquee } from "@/components/home/home-marquee";
 import { SiteLogo } from "@/components/brand/site-logo";
@@ -87,7 +87,7 @@ export default async function HomePage() {
         <HomeFaq />
         <HomeCta ctaSlot={<HomeHeroCtaSlot />} />
       </main>
-      <HomeFooter />
+      <HomeFooterSlot />
     </div>
   );
 }

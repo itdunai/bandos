@@ -1,6 +1,12 @@
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
 
+const SIZES = {
+  sm: { box: "h-3.5 w-3.5 gap-[2px]", bar: "w-[3px]" },
+  md: { box: "h-5 w-5 gap-[3px]", bar: "w-1" },
+  lg: { box: "h-8 w-8 gap-1", bar: "w-1.5" },
+} as const;
+
+/** Мини-эквалайзер вместо крутящегося кружка: три «играющих» столбика цвета текста. */
 export function Spinner({
   className,
   size = "sm",
@@ -8,13 +14,12 @@ export function Spinner({
   className?: string;
   size?: "sm" | "md" | "lg";
 }) {
-  const sizeClass =
-    size === "lg" ? "h-8 w-8" : size === "md" ? "h-5 w-5" : "h-3.5 w-3.5";
-
+  const s = SIZES[size];
   return (
-    <Loader2
-      className={cn("animate-spin shrink-0", sizeClass, className)}
-      aria-hidden
-    />
+    <span aria-hidden className={cn("inline-flex shrink-0 items-end justify-center", s.box, className)}>
+      {[0, 1, 2].map((i) => (
+        <span key={i} className={cn("eq-bar h-full rounded-[1px] bg-current", s.bar)} style={{ animationDelay: `${i * -0.35}s` }} />
+      ))}
+    </span>
   );
 }
