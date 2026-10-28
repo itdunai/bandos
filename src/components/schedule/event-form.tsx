@@ -5,11 +5,10 @@ import { Button } from "@/components/ui/button";
 import { DateTimeField } from "@/components/ui/date-time-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { Textarea } from "@/components/ui/textarea";
 import type { Event, EventType } from "@/types/database";
-import { Trash2 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { AlertCircle, Trash2 } from "lucide-react";
+import { useRef, useState, useTransition, type FormEvent } from "react";
 
 interface SetlistOption {
   id: string;
@@ -53,13 +52,49 @@ export function EventForm({
   const [eventType, setEventType] = useState<EventType>(
     event?.event_type ?? defaultType
   );
+  const [saving, startSaving] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
+  // Смена даты начала → дата окончания подтягивается (см. DateTimeField.follow)
+  const [startChange, setStartChange] = useState({ date: "", prev: "", seq: 0 });
 
   const action = isEdit
     ? updateEvent.bind(null, event.id, bandId, bandSlug)
     : createEvent.bind(null, bandId, bandSlug);
 
+  function showError(message: string) {
+    setError(message);
+    window.requestAnimationFrame(() =>
+      errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+    );
+  }
+
+  /**
+   * Проверяем в браузере и отправляем без перезагрузки: при ошибке форма
+   * остаётся заполненной (раньше сервер делал редирект на пустую страницу).
+   */
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const title = String(formData.get("title") ?? "").trim();
+    const startsAt = String(formData.get("starts_at") ?? "");
+    const endsAt = String(formData.get("ends_at") ?? "");
+
+    if (!title) return showError("Укажите название");
+    if (!startsAt) return showError("Укажите дату и время начала");
+    if (endsAt && Date.parse(endsAt) <= Date.parse(startsAt)) {
+      return showError("Окончание должно быть позже начала — проверьте дату и время конца");
+    }
+
+    setError(null);
+    startSaving(async () => {
+      const result = await action(formData);
+      if (result?.error) showError(result.error);
+    });
+  }
+
   return (
-    <form action={action} className="max-w-2xl space-y-4">
+    <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
       <div>
         <Label>Тип</Label>
         <select
@@ -91,6 +126,9 @@ export function EventForm({
             required
             defaultIso={event?.starts_at}
             defaultLocal={defaultStartsAt}
+            onDateChange={(date, prev) =>
+              setStartChange((c) => ({ date, prev, seq: c.seq + 1 }))
+            }
           />
         </div>
         <div>
@@ -101,6 +139,7 @@ export function EventForm({
             defaultIso={event?.ends_at}
             defaultTime="21:00"
             fallbackDateFrom="starts_at"
+            follow={startChange}
           />
         </div>
       </div>
@@ -175,10 +214,21 @@ export function EventForm({
         </div>
       )}
 
+      {error && (
+        <div
+          ref={errorRef}
+          role="alert"
+          className="flex items-start gap-2 rounded-lg border border-red/30 bg-red/10 px-3 py-2.5 text-sm text-red"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          {error}
+        </div>
+      )}
+
       <div className="flex gap-2">
-        <SubmitButton type="submit" variant="accent" className="px-6 py-2" loadingLabel={isEdit ? "Сохранение…" : "Создание…"}>
-          {isEdit ? "Сохранить" : "Создать"}
-        </SubmitButton>
+        <Button type="submit" variant="accent" className="px-6 py-2" loading={saving} disabled={saving}>
+          {saving ? (isEdit ? "Сохранение…" : "Создание…") : isEdit ? "Сохранить" : "Создать"}
+        </Button>
         {isEdit && (
           <Button
             type="button"

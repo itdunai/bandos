@@ -75,6 +75,8 @@ export function DateTimeField({
   defaultTime = "18:00",
   required = false,
   fallbackDateFrom,
+  onDateChange,
+  follow,
 }: {
   name: string;
   id?: string;
@@ -90,6 +92,14 @@ export function DateTimeField({
    * без даты (для «Конца» — `starts_at`).
    */
   fallbackDateFrom?: string;
+  /** Пользователь сменил дату в этом поле: новая и прежняя дата. */
+  onDateChange?: (date: string, prev: string) => void;
+  /**
+   * Следовать за датой другого поля (для «Конца» — за «Началом»): дата
+   * подставляется, если здесь пусто или стояла прежняя дата того поля.
+   * `seq` меняется при каждой смене, чтобы реагировать и на повторы.
+   */
+  follow?: { date: string; prev: string; seq: number };
 }) {
   const isClient = useIsClient();
   const [edited, setEdited] = useState<Parts | null>(null);
@@ -102,6 +112,16 @@ export function DateTimeField({
     : EMPTY;
   const parts = edited ?? initial;
 
+  // Следование за другим полем — производное состояние (обновляем во время
+  // рендера, без эффекта): реагируем только на новое событие `seq`.
+  const [followSeq, setFollowSeq] = useState(follow?.seq ?? 0);
+  if (follow && follow.seq !== followSeq) {
+    setFollowSeq(follow.seq);
+    if (follow.date && (!parts.date || parts.date === follow.prev)) {
+      setEdited({ date: follow.date, hour: parts.hour || dh, minute: parts.minute || dm });
+    }
+  }
+
   function update(patch: Partial<Parts>, target: HTMLElement) {
     const next = { ...parts, ...patch };
     if (patch.date && !next.hour) next.hour = dh;
@@ -111,6 +131,7 @@ export function DateTimeField({
     }
     if (patch.hour && !next.minute) next.minute = "00";
     setEdited(next);
+    if (next.date !== parts.date) onDateChange?.(next.date, parts.date);
   }
 
   const minutes =

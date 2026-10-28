@@ -12,7 +12,6 @@ import {
 } from "@/lib/datetime";
 import { bandPath } from "@/lib/paths";
 import { revalidatePath } from "next/cache";
-import { redirectWithToast } from "@/lib/redirect-with-toast";
 import { redirect } from "next/navigation";
 
 function parseEventForm(formData: FormData) {
@@ -63,15 +62,19 @@ function validateEventForm(data: ReturnType<typeof parseEventForm>): string | nu
   return null;
 }
 
-export async function createEvent(bandId: string, bandSlug: string, formData: FormData) {
+/** Ошибка формы события: показывается в форме, введённые данные не теряются. */
+export type EventFormResult = { error: string } | undefined;
+
+export async function createEvent(
+  bandId: string,
+  bandSlug: string,
+  formData: FormData
+): Promise<EventFormResult> {
   const { supabase, user, member } = await requireBandPermission(bandId, "schedule");
   const data = parseEventForm(formData);
 
   const invalid = validateEventForm(data);
-  if (invalid) {
-    await redirectWithToast(bandPath(bandSlug, "schedule", "new"), invalid);
-    return;
-  }
+  if (invalid) return { error: invalid };
 
   const { data: event, error } = await supabase
     .from("events")
@@ -95,11 +98,7 @@ export async function createEvent(bandId: string, bandSlug: string, formData: Fo
     .single();
 
   if (error || !event) {
-    await redirectWithToast(
-      bandPath(bandSlug, "schedule", "new"),
-      error?.message ?? "Ошибка"
-    );
-    return;
+    return { error: error?.message ?? "Не удалось сохранить событие" };
   }
 
   // Касса — только админам (RLS тоже не даст, но не полагаемся на неё одну).
@@ -121,18 +120,12 @@ export async function updateEvent(
   bandId: string,
   bandSlug: string,
   formData: FormData
-) {
+): Promise<EventFormResult> {
   const { supabase, user, member } = await requireBandPermission(bandId, "schedule");
   const data = parseEventForm(formData);
 
   const invalid = validateEventForm(data);
-  if (invalid) {
-    await redirectWithToast(
-      bandPath(bandSlug, "schedule", eventId, "edit"),
-      invalid
-    );
-    return;
-  }
+  if (invalid) return { error: invalid };
 
   const { error } = await supabase
     .from("events")
@@ -154,13 +147,7 @@ export async function updateEvent(
     .eq("id", eventId)
     .eq("band_id", bandId);
 
-  if (error) {
-    await redirectWithToast(
-      bandPath(bandSlug, "schedule", eventId, "edit"),
-      error.message
-    );
-    return;
-  }
+  if (error) return { error: error.message };
 
   // Касса — только админам (RLS тоже не даст, но не полагаемся на неё одну).
   if (isBandAdmin(member) && formData.get("record_in_finances") === "on") {
