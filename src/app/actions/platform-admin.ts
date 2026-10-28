@@ -1,6 +1,7 @@
 "use server";
 
-import { isEmailPlatformAdmin } from "@/lib/platform/admin";
+import { isEmailPlatformAdmin, requirePlatformAdmin } from "@/lib/platform/admin";
+import { revalidatePath } from "next/cache";
 import { captureServerError } from "@/lib/monitoring/sentry";
 import { createClient } from "@supabase/supabase-js";
 import { createClient as createServerClient } from "@/lib/supabase/server";
@@ -48,4 +49,12 @@ export async function bootstrapPlatformAdmin(): Promise<{ ok: boolean; error?: s
     return { ok: false, error: error.message };
   }
   return { ok: true };
+}
+
+/** Отметить сообщение обратной связи обработанным / вернуть в новые. */
+export async function setFeedbackStatus(feedbackId: string, status: "new" | "done") {
+  const { supabase } = await requirePlatformAdmin("/admin");
+  if (status !== "new" && status !== "done") return;
+  await supabase.from("feedback").update({ status }).eq("id", feedbackId);
+  revalidatePath("/admin");
 }

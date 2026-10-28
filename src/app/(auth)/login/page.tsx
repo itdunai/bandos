@@ -45,7 +45,15 @@ export default async function LoginPage({
           <Input name="email" type="email" required autoComplete="email" />
         </div>
         <div>
-          <label className="mb-1 block text-xs text-text-secondary">Пароль</label>
+          <div className="mb-1 flex items-baseline justify-between">
+            <label className="block text-xs text-text-secondary">Пароль</label>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-accent hover:underline"
+            >
+              Забыли пароль?
+            </Link>
+          </div>
           <Input
             name="password"
             type="password"

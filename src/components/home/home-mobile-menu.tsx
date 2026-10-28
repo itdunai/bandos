@@ -3,7 +3,7 @@
 import { HOME_NAV } from "@/components/home/home-nav";
 import { Button } from "@/components/ui/button";
 import { bandPath } from "@/lib/paths";
-import { LayoutDashboard, LogIn, Menu, Plus, X } from "lucide-react";
+import { LayoutDashboard, LogIn, Menu, Plus, UserCog, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -103,6 +103,12 @@ export function HomeMobileMenu({
                     <Button variant="accent" size="lg" className="w-full">
                       <Plus className="h-4 w-4" />
                       Создать группу
+                    </Button>
+                  </Link>
+                  <Link href="/account" onClick={() => setOpen(false)}>
+                    <Button variant="ghost" size="lg" className="w-full">
+                      <UserCog className="h-4 w-4" />
+                      Аккаунт
                     </Button>
                   </Link>
                 </>

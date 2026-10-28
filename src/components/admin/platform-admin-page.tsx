@@ -10,19 +10,23 @@ import { requirePlatformAdmin } from "@/lib/platform/admin";
 import {
   checkPlatformHealth,
   getPlatformAuditLog,
+  getPlatformFeedback,
   getPlatformStats,
 } from "@/lib/platform/queries";
+import { FeedbackList } from "@/components/admin/feedback-list";
 
 export async function PlatformAdminPage({ nextPath }: { nextPath: string }) {
   const { supabase, user, hasDbFlag, needsDbPromotion } =
     await requirePlatformAdmin(nextPath);
   const buildSha = process.env.BUILD_SHA ?? "dev";
 
-  const [stats, auditLog, health] = await Promise.all([
+  const [stats, auditLog, feedback, health] = await Promise.all([
     hasDbFlag ? getPlatformStats(supabase) : Promise.resolve(null),
     hasDbFlag ? getPlatformAuditLog(supabase) : Promise.resolve([]),
+    hasDbFlag ? getPlatformFeedback(supabase) : Promise.resolve([]),
     checkPlatformHealth(supabase),
   ]);
+  const newFeedback = feedback.filter((f) => f.status === "new").length;
 
   return (
     <AdminShell userEmail={user.email ?? "—"} buildSha={buildSha}>
@@ -35,6 +39,14 @@ export async function PlatformAdminPage({ nextPath }: { nextPath: string }) {
         stats={stats}
         auditLog={auditLog}
         health={health}
+        feedbackSlot={
+          <>
+            <p className="mb-2 text-xs text-text-secondary">
+              Новых: {newFeedback}
+            </p>
+            <FeedbackList items={feedback} />
+          </>
+        }
         telegramSlot={
           <Suspense fallback={<TelegramDiagnosticsSkeleton />}>
             <TelegramDiagnostics />

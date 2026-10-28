@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SiteLogo } from "@/components/brand/site-logo";
-import { LogIn, Plus } from "lucide-react";
+import { LogIn, Plus, UserCog } from "lucide-react";
 import { bandPath } from "@/lib/paths";
 import { HomeMobileMenu } from "@/components/home/home-mobile-menu";
 import { HOME_NAV } from "@/components/home/home-nav";
@@ -47,6 +47,11 @@ export function HomeHeader({
                 <Button variant="accent" size="sm">
                   <Plus className="h-3.5 w-3.5" />
                   Создать группу
+                </Button>
+              </Link>
+              <Link href="/account" title="Аккаунт" aria-label="Аккаунт">
+                <Button variant="ghost" size="icon">
+                  <UserCog className="h-4 w-4" />
                 </Button>
               </Link>
             </>

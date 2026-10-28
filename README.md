@@ -42,11 +42,15 @@
    - `supabase/migrations/025_band_contacts.sql`
    - `supabase/migrations/026_event_other_rent.sql`
    - `supabase/migrations/027_privilege_escalation_guards.sql` — **обязательно**: запрет самоназначения прав (platform admin, роль/права в группе)
+   - `supabase/migrations/028_telegram_and_bookings.sql`
+   - `supabase/migrations/029_security_hardening_2.sql`
+   - `supabase/migrations/030_account_deletion_and_feedback.sql` — удаление аккаунта (`/account`), обратная связь (`/feedback`, список в `/admin`)
 3. **Authentication → Providers → Email** — включите Email
 4. Для локальной разработки отключите «Confirm email» (или подтверждайте вручную)
 5. **Authentication → URL Configuration**:
    - Site URL: `http://bandos.loc`
-   - Redirect URLs: `http://bandos.loc/auth/callback`
+   - Redirect URLs: `http://bandos.loc/auth/callback**`
+6. **Production**: свой SMTP и шаблоны писем — см. [docs/email-setup.md](docs/email-setup.md)
 
 ### 2. Переменные окружения
 
@@ -237,8 +241,4 @@ E2E_EMAIL=user@example.com E2E_PASSWORD=secret E2E_BAND_SLUG=gorizont npm run te
 
 ## Демо-данные
 
-После регистрации скопируйте `band_id` и раскомментируйте блок в `supabase/migrations/003_seed_demo.sql`.
-
-## Прототип
-
-Визуальный референс: `bandos_prototype.html`
+Новая группа сразу получает 4 трека с пометкой «(пример)», «Пример сет-листа» и чек-лист первых шагов в «Делах» — см. `src/lib/band/demo-content.ts`.

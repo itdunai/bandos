@@ -22,6 +22,14 @@ export function formatAuthError(message: string): string {
     return "Неверный email или пароль";
   }
 
+  if (lower.includes("should be different from the old password")) {
+    return "Новый пароль должен отличаться от старого";
+  }
+
+  if (lower.includes("password should be at least")) {
+    return "Пароль слишком короткий — минимум 6 символов";
+  }
+
   if (lower.includes("email not confirmed")) {
     return "Подтвердите email по ссылке из письма, затем войдите снова";
   }

@@ -1,6 +1,7 @@
 "use server";
 
 import { tryBandAdmin } from "@/lib/band/assert-access";
+import { seedDemoContent } from "@/lib/band/demo-content";
 import {
   parsePermissionsPayload,
   parsePresetInput,
@@ -12,6 +13,7 @@ import { captureServerError } from "@/lib/monitoring/sentry";
 import { logPlatformEventAsync } from "@/lib/platform/audit";
 import { revalidatePublicCatalog } from "@/lib/public-revalidate";
 import { bandPath } from "@/lib/paths";
+import { redirectWithToast } from "@/lib/redirect-with-toast";
 import { sanitizeRedirectPath } from "@/lib/safe-redirect";
 import { getSiteUrl } from "@/lib/site-url";
 import type { MemberRole } from "@/types/database";
@@ -42,7 +44,8 @@ export async function signUpAccount(formData: FormData) {
     password,
     options: {
       data: { display_name: displayName },
-      emailRedirectTo: `${siteUrl}/auth/callback`,
+      // ?next= обязателен: шаблоны писем дописывают &token_hash=… к RedirectTo
+      emailRedirectTo: `${siteUrl}/auth/callback?next=/`,
     },
   });
 
@@ -164,6 +167,8 @@ export async function createBand(formData: FormData) {
     redirect(`/new-band?error=${encodeURIComponent(bandError.message)}`);
   }
 
+  await seedDemoContent(supabase, bandId as string);
+
   logPlatformEventAsync({
     level: "info",
     event: "band.created",
@@ -224,6 +229,74 @@ export async function signIn(formData: FormData) {
   }
 
   redirect("/");
+}
+
+/** Письмо со ссылкой на смену пароля. Ответ одинаковый — не раскрываем, есть ли аккаунт. */
+export async function requestPasswordReset(formData: FormData) {
+  const email = ((formData.get("email") as string) || "").trim();
+  if (!email) {
+    redirect(`/forgot-password?error=${encodeURIComponent("Укажите email")}`);
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${getSiteUrl()}/auth/callback?next=/reset-password`,
+  });
+
+  if (error) {
+    captureServerError(new Error(error.message), {
+      action: "auth.request_password_reset",
+      extras: { email },
+    });
+    // Лимит писем — единственная ошибка, о которой стоит сказать пользователю
+    if (error.message.toLowerCase().includes("rate limit")) {
+      redirect(
+        `/forgot-password?error=${encodeURIComponent(formatAuthError(error.message))}`
+      );
+    }
+  }
+
+  redirect(`/forgot-password?sent=1&email=${encodeURIComponent(email)}`);
+}
+
+/** Новый пароль после перехода по ссылке из письма (сессия recovery уже есть). */
+export async function updatePassword(formData: FormData) {
+  const password = (formData.get("password") as string) || "";
+  const confirm = (formData.get("password_confirm") as string) || "";
+
+  if (password.length < 6) {
+    redirect(
+      `/reset-password?error=${encodeURIComponent("Пароль должен быть не короче 6 символов")}`
+    );
+  }
+  if (password !== confirm) {
+    redirect(`/reset-password?error=${encodeURIComponent("Пароли не совпадают")}`);
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    redirect(
+      `/forgot-password?error=${encodeURIComponent("Ссылка устарела — запросите новую")}`
+    );
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    captureServerError(new Error(error.message), {
+      action: "auth.update_password",
+      userId: user.id,
+    });
+    redirect(`/reset-password?error=${encodeURIComponent(formatAuthError(error.message))}`);
+  }
+
+  logPlatformEventAsync({
+    level: "info",
+    event: "user.password_reset",
+    userId: user.id,
+  });
+
+  await redirectWithToast("/", "Пароль изменён", "success");
 }
 
 export async function signOut() {

@@ -89,3 +89,29 @@ export async function checkPlatformHealth(supabase: SupabaseClient) {
 
   return checks;
 }
+
+export interface FeedbackRow {
+  id: string;
+  kind: "bug" | "idea" | "question" | "other";
+  message: string;
+  page: string | null;
+  email: string | null;
+  status: "new" | "done";
+  created_at: string;
+  bands: { name: string; slug: string } | null;
+}
+
+export async function getPlatformFeedback(
+  supabase: SupabaseClient,
+  limit = 50
+): Promise<FeedbackRow[]> {
+  const { data, error } = await supabase
+    .from("feedback")
+    .select("id, kind, message, page, email, status, created_at, bands(name, slug)")
+    .order("status", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error || !data) return [];
+  return data as unknown as FeedbackRow[];
+}

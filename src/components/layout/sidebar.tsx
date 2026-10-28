@@ -4,7 +4,7 @@ import { signOut } from "@/app/actions/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { LogOut, Play, Plus } from "lucide-react";
+import { LogOut, MessageSquare, Play, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { bandPath } from "@/lib/paths";
 import { Avatar } from "@/components/ui/avatar";
@@ -102,18 +102,24 @@ export function Sidebar({
         <ThemeToggle />
         {member && (
           <div className="flex items-center gap-2.5 px-1">
-            <Avatar
-              name={member.display_name ?? "?"}
-              className="h-8 w-8 text-xs"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium">
-                {member.display_name}
+            <Link
+              href="/account"
+              title="Аккаунт"
+              className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg hover:text-accent"
+            >
+              <Avatar
+                name={member.display_name ?? "?"}
+                className="h-8 w-8 text-xs"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium">
+                  {member.display_name}
+                </div>
+                <div className="truncate text-xs text-text-muted">
+                  {INSTRUMENT_LABELS[member.instrument]}
+                </div>
               </div>
-              <div className="truncate text-xs text-text-muted">
-                {INSTRUMENT_LABELS[member.instrument]}
-              </div>
-            </div>
+            </Link>
             <form action={signOut}>
               <SubmitButton
                 type="submit"
@@ -135,6 +141,14 @@ export function Sidebar({
           >
             <Plus className="h-3.5 w-3.5 shrink-0" />
             Создать группу
+          </Link>
+          <Link
+            href={`/feedback?from=${encodeURIComponent(pathname)}`}
+            className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary"
+            title="Обратная связь"
+          >
+            <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+            Отзыв
           </Link>
           <BuildVersionLabel className="truncate text-[11px] text-text-muted" />
         </div>

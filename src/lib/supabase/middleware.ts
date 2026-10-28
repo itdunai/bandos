@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isPublicPath } from "@/lib/supabase/public-routes";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -30,19 +31,9 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
-  const isPublicRoute =
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/register") ||
-    pathname.startsWith("/invite") ||
-    pathname.startsWith("/auth/callback") ||
-    pathname.startsWith("/rider/") ||
-    pathname.startsWith("/repertoire/") ||
-    pathname === "/privacy" ||
-    pathname.startsWith("/privacy/");
-
   const isNewBandRoute = pathname === "/new-band";
 
-  if (!user && !isPublicRoute && pathname !== "/") {
+  if (!user && !isPublicPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     // pathname может содержать кириллицу — кодируем для Location

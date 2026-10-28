@@ -324,3 +324,49 @@ export async function notifyNewBooking(bookingId: string) {
 
   await Promise.all(recipients.map((r) => sendOnce(db, "booking_new", b.id, r, html)));
 }
+
+/* ------------------------------ Обратная связь ---------------------------- */
+
+const FEEDBACK_KIND_LABELS: Record<string, string> = {
+  bug: "🐞 Ошибка",
+  idea: "💡 Идея",
+  question: "❓ Вопрос",
+  other: "💬 Сообщение",
+};
+
+/** Новое сообщение обратной связи — админам платформы с привязанным Telegram. */
+export async function notifyNewFeedback(feedbackId: string) {
+  if (!isTelegramConfigured()) return;
+  const db = createServiceSupabaseClient();
+  if (!db) return;
+
+  const { data: f } = await db
+    .from("feedback")
+    .select("id, kind, message, page, email, bands(name)")
+    .eq("id", feedbackId)
+    .maybeSingle();
+  if (!f) return;
+
+  // telegram_accounts ссылается на auth.users, не на profiles — embed недоступен
+  const { data: admins } = await db.from("profiles").select("id").eq("is_platform_admin", true);
+  const adminIds = (admins ?? []).map((a) => a.id as string);
+  if (!adminIds.length) return;
+
+  const { data: accounts } = await db
+    .from("telegram_accounts")
+    .select("chat_id")
+    .in("user_id", adminIds);
+  const chatIds = (accounts ?? []).map((a) => a.chat_id as number).filter(Boolean);
+  if (!chatIds.length) return;
+
+  const band = one(f.bands as { name: string } | { name: string }[] | null);
+  const lines = [
+    `<b>${FEEDBACK_KIND_LABELS[f.kind] ?? FEEDBACK_KIND_LABELS.other}</b> · BandOS`,
+    `👤 ${escapeHtml(f.email ?? "—")}${band ? ` · ${escapeHtml(band.name)}` : ""}`,
+  ];
+  if (f.page) lines.push(`📄 ${escapeHtml(f.page)}`);
+  lines.push("", escapeHtml(f.message.slice(0, 2000)), "", `<a href="${link("/admin")}">Открыть в админке</a>`);
+  const html = lines.join("\n");
+
+  await Promise.all(chatIds.map((chatId) => sendTelegramMessage(chatId, html)));
+}

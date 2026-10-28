@@ -13,11 +13,13 @@ export function AdminDashboard({
   stats,
   auditLog,
   health,
+  feedbackSlot,
   telegramSlot,
 }: {
   stats: PlatformStats | null;
   auditLog: AuditLogRow[];
   health: { name: string; ok: boolean; detail?: string }[];
+  feedbackSlot?: React.ReactNode;
   telegramSlot?: React.ReactNode;
 }) {
   const allHealthy = health.every((c) => c.ok);
@@ -49,6 +51,15 @@ export function AdminDashboard({
           </Card>
         </Link>
       </section>
+
+      {feedbackSlot && (
+        <section>
+          <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
+            Обратная связь
+          </h2>
+          {feedbackSlot}
+        </section>
+      )}
 
       {telegramSlot && (
         <section>
