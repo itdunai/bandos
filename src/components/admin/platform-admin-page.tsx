@@ -1,6 +1,11 @@
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { PlatformAdminSetup } from "@/components/admin/platform-admin-setup";
+import {
+  TelegramDiagnostics,
+  TelegramDiagnosticsSkeleton,
+} from "@/components/admin/telegram-diagnostics";
+import { Suspense } from "react";
 import { requirePlatformAdmin } from "@/lib/platform/admin";
 import {
   checkPlatformHealth,
@@ -26,7 +31,16 @@ export async function PlatformAdminPage({ nextPath }: { nextPath: string }) {
           <PlatformAdminSetup userEmail={user.email ?? ""} />
         </div>
       )}
-      <AdminDashboard stats={stats} auditLog={auditLog} health={health} />
+      <AdminDashboard
+        stats={stats}
+        auditLog={auditLog}
+        health={health}
+        telegramSlot={
+          <Suspense fallback={<TelegramDiagnosticsSkeleton />}>
+            <TelegramDiagnostics />
+          </Suspense>
+        }
+      />
     </AdminShell>
   );
 }

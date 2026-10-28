@@ -13,10 +13,12 @@ export function AdminDashboard({
   stats,
   auditLog,
   health,
+  telegramSlot,
 }: {
   stats: PlatformStats | null;
   auditLog: AuditLogRow[];
   health: { name: string; ok: boolean; detail?: string }[];
+  telegramSlot?: React.ReactNode;
 }) {
   const allHealthy = health.every((c) => c.ok);
 
@@ -47,6 +49,15 @@ export function AdminDashboard({
           </Card>
         </Link>
       </section>
+
+      {telegramSlot && (
+        <section>
+          <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
+            Telegram-бот
+          </h2>
+          {telegramSlot}
+        </section>
+      )}
 
       <section>
         <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
