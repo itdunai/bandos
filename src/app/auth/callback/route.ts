@@ -1,6 +1,7 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeRedirectPath } from "@/lib/safe-redirect";
+import { getSiteUrl } from "@/lib/site-url";
 import { NextResponse } from "next/server";
 
 const OTP_TYPES: EmailOtpType[] = [
@@ -19,7 +20,9 @@ const OTP_TYPES: EmailOtpType[] = [
  * - ?code= — PKCE (стандартные шаблоны), только в том же браузере.
  */
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  // Не origin запроса: за прокси/в Docker это внутренний адрес вида 0.0.0.0:3000
+  const origin = getSiteUrl().replace(/\/$/, "");
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;

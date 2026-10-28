@@ -9,6 +9,7 @@ vi.mock("@/lib/supabase/server", () => ({
 import { GET } from "@/app/auth/callback/route";
 
 const ORIGIN = "https://bandos.example";
+vi.stubEnv("NEXT_PUBLIC_SITE_URL", ORIGIN);
 
 async function location(query: string) {
   const res = await GET(new Request(`${ORIGIN}/auth/callback?${query}`));
@@ -65,5 +66,15 @@ describe("GET /auth/callback — PKCE code", () => {
   it("sends a failed recovery exchange back to forgot-password", async () => {
     exchangeCodeForSession.mockResolvedValue({ error: { message: "bad verifier" } });
     expect(await location("code=xyz&next=/reset-password")).toMatch(/\/forgot-password\?error=/);
+  });
+});
+
+describe("GET /auth/callback — behind a proxy", () => {
+  it("redirects to the public site, not the internal request host", async () => {
+    verifyOtp.mockResolvedValue({ error: null });
+    const res = await GET(
+      new Request("http://0.0.0.0:3000/auth/callback?next=%2Finvite%2Ftok&token_hash=abc&type=email")
+    );
+    expect(res.headers.get("location")).toBe(`${ORIGIN}/invite/tok`);
   });
 });
