@@ -141,7 +141,6 @@ export function InstrumentView({
             key={`${track.title}-${track.bpm}-${track.time_signature}`}
             initialBpm={track.bpm ?? 120}
             initialTimeSignature={track.time_signature ?? "4/4"}
-            compact
           />
         </section>
       )}
