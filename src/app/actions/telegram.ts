@@ -27,7 +27,12 @@ export async function createTelegramLink(
   if (error || typeof token !== "string") return { error: "Не удалось создать ссылку" };
 
   const botUsername = await getBotUsername();
-  if (!botUsername) return { error: "Бот недоступен, попробуйте позже" };
+  if (!botUsername) {
+    return {
+      error:
+        "Сервер не смог связаться с Telegram. Попробуйте позже — или администратору: задайте TELEGRAM_BOT_USERNAME",
+    };
+  }
   return { url: `https://t.me/${botUsername}?start=${token}`, botUsername };
 }
 

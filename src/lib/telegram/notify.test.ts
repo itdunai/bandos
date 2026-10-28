@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { localParts, relativeDay, safeTimeZone } from "@/lib/telegram/notify";
-import { escapeHtml, secretsEqual } from "@/lib/telegram/bot";
+import { escapeHtml, secretsEqual, telegramApiBase } from "@/lib/telegram/bot";
+import { afterEach, vi } from "vitest";
 
 describe("localParts", () => {
   it("returns the calendar day and hour in the recipient's timezone", () => {
@@ -47,5 +48,24 @@ describe("bot helpers", () => {
     expect(secretsEqual("short", "abcdef1234567890")).toBe(false);
     expect(secretsEqual(null, "abcdef1234567890")).toBe(false);
     expect(secretsEqual("", "")).toBe(false);
+  });
+});
+
+describe("telegramApiBase", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("defaults to api.telegram.org", () => {
+    vi.stubEnv("TELEGRAM_API_BASE", "");
+    expect(telegramApiBase()).toBe("https://api.telegram.org");
+  });
+
+  it("accepts an https proxy and trims the trailing slash", () => {
+    vi.stubEnv("TELEGRAM_API_BASE", "https://tg-proxy.example.workers.dev/");
+    expect(telegramApiBase()).toBe("https://tg-proxy.example.workers.dev");
+  });
+
+  it("rejects non-https values", () => {
+    vi.stubEnv("TELEGRAM_API_BASE", "http://evil.example");
+    expect(telegramApiBase()).toBe("https://api.telegram.org");
   });
 });

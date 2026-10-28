@@ -101,12 +101,19 @@ CRON_SECRET=...                   # 16+ символов, для служебн�
 SUPABASE_SERVICE_ROLE_KEY=...     # webhook и рассылка работают без пользователя
 # TELEGRAM_BOT_USERNAME=bandosfunapp   # необязательно, иначе берётся из getMe
 # TELEGRAM_SCHEDULER=off               # выключить встроенный таймер рассылки
+# TELEGRAM_API_BASE=https://...        # прокси Bot API, если api.telegram.org недоступен с хостинга
 ```
 
 3. После деплоя один раз зарегистрируйте webhook и команды бота:
 
 ```bash
 curl -X POST https://<домен>/api/telegram/setup -H "Authorization: Bearer <CRON_SECRET>"
+```
+
+Диагностика связи сервера с Telegram (доступен ли Bot API, время ответа, ошибки webhook):
+
+```bash
+curl -X POST https://<домен>/api/telegram/diag -H "Authorization: Bearer <CRON_SECRET>"
 ```
 
 Рассылку запускает сам сервер — раз в 10 минут (`src/lib/telegram/scheduler.ts`), внешний cron не нужен. Повторные запуски безопасны: отправленное фиксируется в `notification_log`. Для ручного запуска: `POST /api/cron/reminders` с тем же заголовком.

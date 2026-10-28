@@ -1,8 +1,24 @@
 import { timingSafeEqual } from "node:crypto";
+import { captureServerError } from "@/lib/monitoring/sentry";
 
 /** Минимальная обёртка над Telegram Bot API (без зависимостей). */
 
-const API = "https://api.telegram.org";
+const DEFAULT_API = "https://api.telegram.org";
+
+/**
+ * Базовый адрес Bot API. Можно переопределить TELEGRAM_API_BASE — например, если
+ * с хостинга api.telegram.org недоступен и запросы идут через прокси.
+ */
+export function telegramApiBase(): string {
+  const raw = process.env.TELEGRAM_API_BASE?.trim();
+  if (!raw) return DEFAULT_API;
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" ? url.origin + url.pathname.replace(/\/$/, "") : DEFAULT_API;
+  } catch {
+    return DEFAULT_API;
+  }
+}
 
 export function telegramBotToken(): string | null {
   return process.env.TELEGRAM_BOT_TOKEN?.trim() || null;
@@ -27,7 +43,7 @@ export async function callTelegram<T = unknown>(
   if (!token) return { ok: false, description: "TELEGRAM_BOT_TOKEN не задан" };
 
   try {
-    const res = await fetch(`${API}/bot${token}/${method}`, {
+    const res = await fetch(`${telegramApiBase()}/bot${token}/${method}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -36,7 +52,10 @@ export async function callTelegram<T = unknown>(
     });
     return (await res.json()) as TelegramResult<T>;
   } catch (e) {
-    return { ok: false, description: e instanceof Error ? e.message : "fetch failed" };
+    // Сетевой сбой (таймаут, блокировка) — не ответ Telegram. Фиксируем, чтобы было видно в Sentry.
+    const description = e instanceof Error ? `${e.name}: ${e.message}` : "fetch failed";
+    captureServerError(e, { action: `telegram.${method}`, extras: { apiBase: telegramApiBase() } });
+    return { ok: false, description, error_code: 0 };
   }
 }
 
