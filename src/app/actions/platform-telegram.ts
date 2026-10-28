@@ -26,7 +26,7 @@ export async function adminSendTelegramTest(): Promise<{ ok: boolean; message: s
     .eq("user_id", user.id)
     .maybeSingle();
   if (!data?.chat_id) {
-    return { ok: false, message: "Ваш Telegram не подключён: «Участники» → «Мой профиль» → «Подключить Telegram»" };
+    return { ok: false, message: "Ваш Telegram не подключён: «Аккаунт» → «Подключить Telegram»" };
   }
 
   const res = await sendTelegramMessage(

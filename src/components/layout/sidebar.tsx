@@ -15,7 +15,6 @@ import {
   isNavItemVisible,
   navItemHref,
 } from "@/components/layout/band-nav";
-import { BuildVersionLabel } from "@/components/layout/build-version-label";
 import {
   useUpcomingEvent,
   useUserBands,
@@ -39,6 +38,7 @@ export function Sidebar({
   const upcoming = useUpcomingEvent();
   const playHref = bandPath(band.slug, "play");
   const playActive = isNavItemActive(pathname, playHref, false);
+  const accountHref = bandPath(band.slug, "account");
 
   return (
     <aside className="flex h-dvh w-[232px] shrink-0 flex-col border-r border-border bg-bg">
@@ -100,10 +100,26 @@ export function Sidebar({
 
       <div className="mt-auto space-y-3 border-t border-border p-3">
         <ThemeToggle />
+        <div className="space-y-0.5">
+          <Link
+            href="/new-band"
+            className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm text-accent transition-colors hover:bg-bg-3"
+          >
+            <Plus className="h-4 w-4 shrink-0" />
+            Создать группу
+          </Link>
+          <Link
+            href={`/feedback?from=${encodeURIComponent(pathname)}`}
+            className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
+          >
+            <MessageSquare className="h-4 w-4 shrink-0" />
+            Обратная связь
+          </Link>
+        </div>
         {member && (
-          <div className="flex items-center gap-2.5 px-1">
+          <div className="flex items-center gap-2 px-1">
             <Link
-              href="/account"
+              href={accountHref}
               title="Аккаунт"
               className="flex min-w-0 flex-1 items-center gap-2.5 rounded-lg hover:text-accent"
             >
@@ -134,24 +150,6 @@ export function Sidebar({
             </form>
           </div>
         )}
-        <div className="flex items-center justify-between gap-2 px-1">
-          <Link
-            href="/new-band"
-            className="flex items-center gap-1.5 text-xs text-accent hover:underline"
-          >
-            <Plus className="h-3.5 w-3.5 shrink-0" />
-            Создать группу
-          </Link>
-          <Link
-            href={`/feedback?from=${encodeURIComponent(pathname)}`}
-            className="flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary"
-            title="Обратная связь"
-          >
-            <MessageSquare className="h-3.5 w-3.5 shrink-0" />
-            Отзыв
-          </Link>
-          <BuildVersionLabel className="truncate text-[11px] text-text-muted" />
-        </div>
       </div>
     </aside>
   );

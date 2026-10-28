@@ -12,6 +12,10 @@ export const RESERVED_BAND_SLUGS = new Set([
   "rider",
   "repertoire",
   "privacy",
+  "account",
+  "feedback",
+  "forgot-password",
+  "reset-password",
 ]);
 
 export function isReservedBandSlug(slug: string): boolean {

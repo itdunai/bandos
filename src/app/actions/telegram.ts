@@ -66,6 +66,6 @@ export async function unlinkTelegram(bandSlug: string): Promise<{ ok: boolean }>
   if (chatId) {
     await sendTelegramMessage(chatId, "Уведомления BandOS отключены из профиля.");
   }
-  revalidatePath(bandPath(bandSlug, "members"));
+  revalidatePath(bandPath(bandSlug, "account"));
   return { ok: true };
 }

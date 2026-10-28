@@ -17,7 +17,10 @@ export function ThemeToggle({ className }: { className?: string }) {
     <div
       role="radiogroup"
       aria-label="Тема оформления"
-      className={cn("flex rounded-lg border border-border bg-bg-3 p-0.5", className)}
+      className={cn(
+        "inline-flex shrink-0 rounded-lg border border-border bg-bg-3 p-0.5",
+        className
+      )}
     >
       {OPTIONS.map(({ value, label, Icon }) => {
         const active = theme === value;
@@ -27,16 +30,17 @@ export function ThemeToggle({ className }: { className?: string }) {
             type="button"
             role="radio"
             aria-checked={active}
+            aria-label={label}
+            title={label}
             onClick={() => setTheme(value)}
             className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-medium transition-colors",
+              "flex h-7 w-7 items-center justify-center rounded-md transition-colors",
               active
                 ? "bg-accent text-accent-ink"
                 : "text-text-secondary hover:text-text-primary"
             )}
           >
             <Icon className="h-3.5 w-3.5" />
-            {label}
           </button>
         );
       })}

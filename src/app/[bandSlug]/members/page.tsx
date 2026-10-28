@@ -2,18 +2,11 @@ import { AppShell } from "@/components/layout/app-shell";
 import { ExcludeMemberButton } from "@/components/members/exclude-member-button";
 import { InviteForm } from "@/components/members/invite-form";
 import { MemberPermissionsEditor } from "@/components/members/member-permissions-editor";
-import { MemberProfileForm } from "@/components/members/member-profile-form";
-import {
-  TelegramConnectCard,
-  type TelegramAccountView,
-} from "@/components/telegram/telegram-connect-card";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import {
   canInviteMembers,
   canManagePermissions,
-  hasPermission,
   presetBadgeLabel,
 } from "@/lib/band/permissions";
 import {
@@ -21,10 +14,11 @@ import {
   getBandMemberCount,
   getCurrentMember,
 } from "@/lib/band/queries";
+import { bandPath } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
-import { isTelegramConfigured } from "@/lib/telegram/bot";
 import { INSTRUMENT_LABELS, type Instrument } from "@/types/database";
 import { MessageCircle, Phone } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const AVATAR_COLORS = ["accent", "blue", "green", "amber"] as const;
@@ -52,33 +46,15 @@ export default async function MembersPage({
     createClient(),
   ]);
 
-  const telegramEnabled = isTelegramConfigured();
-  const [{ data: members }, profileResult, telegramResult] = await Promise.all([
-    supabase
-      .from("band_members")
-      .select("*, profiles(avatar_url)")
-      .eq("band_id", band.id)
-      .eq("is_active", true)
-      .order("created_at"),
-    member
-      ? supabase
-          .from("profiles")
-          .select("avatar_url")
-          .eq("id", member.user_id)
-          .single()
-      : Promise.resolve({ data: null }),
-    member && telegramEnabled
-      ? supabase
-          .from("telegram_accounts")
-          .select("username, first_name, notify_events, notify_todos, notify_bookings")
-          .eq("user_id", member.user_id)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-  ]);
+  const { data: members } = await supabase
+    .from("band_members")
+    .select("*, profiles(avatar_url)")
+    .eq("band_id", band.id)
+    .eq("is_active", true)
+    .order("created_at");
 
   const showInvite = member ? canInviteMembers(member) : false;
   const showPermissions = member ? canManagePermissions(member) : false;
-  const myAvatarUrl = profileResult.data?.avatar_url ?? null;
 
   return (
     <AppShell
@@ -93,7 +69,11 @@ export default async function MembersPage({
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+      <div
+        className={
+          showInvite ? "grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]" : "max-w-3xl"
+        }
+      >
         {/* Состав — главное на странице */}
         <section className="min-w-0 self-start rounded-xl border border-border bg-bg-2">
           <div className="flex items-center justify-between px-4 pb-2 pt-4 sm:px-5">
@@ -119,7 +99,14 @@ export default async function MembersPage({
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <span className="truncate font-semibold">{m.display_name}</span>
-                        {isMe && <span className="text-xs text-text-muted">это вы</span>}
+                        {isMe && (
+                          <Link
+                            href={bandPath(band.slug, "account")}
+                            className="text-xs text-text-muted hover:text-accent"
+                          >
+                            это вы · профиль
+                          </Link>
+                        )}
                         <Badge
                           variant={
                             m.role === "admin" || m.permission_preset === "administrator"
@@ -207,23 +194,9 @@ export default async function MembersPage({
           </ul>
         </section>
 
-        {/* Личное и приглашения */}
-        {member && (
+        {showInvite && (
           <div className="flex min-w-0 flex-col gap-5">
-            <Card className="p-4 sm:p-5">
-              <h3 className="mb-3 text-xs font-bold uppercase tracking-wide">Мой профиль</h3>
-              <MemberProfileForm member={member} bandSlug={band.slug} avatarUrl={myAvatarUrl} />
-            </Card>
-
-            {telegramEnabled && (
-              <TelegramConnectCard
-                bandSlug={band.slug}
-                account={(telegramResult.data as TelegramAccountView | null) ?? null}
-                showBookings={hasPermission(member, "band_profile")}
-              />
-            )}
-
-            {showInvite && <InviteForm bandId={band.id} />}
+            <InviteForm bandId={band.id} />
           </div>
         )}
       </div>

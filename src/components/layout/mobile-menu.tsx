@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, MessageSquare, Plus, UserCog, X } from "lucide-react";
+import { LogOut, MessageSquare, Plus, X } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
 import {
   BAND_NAV,
@@ -116,14 +116,6 @@ export function MobileMenu({
           >
             <MessageSquare className="h-4 w-4 shrink-0" />
             Обратная связь
-          </Link>
-          <Link
-            href="/account"
-            onClick={onClose}
-            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
-          >
-            <UserCog className="h-4 w-4 shrink-0" />
-            Аккаунт
           </Link>
           <form action={signOut}>
             <SubmitButton

@@ -73,7 +73,7 @@ export async function updateMemberProfile(
   const { supabase, member: self } = await requireBandMember(target.band_id);
 
   if (target.user_id !== user.id && self.role !== "admin") {
-    await redirectWithToast(bandPath(bandSlug, "members"), "Нет доступа");
+    await redirectWithToast(bandPath(bandSlug, "account"), "Нет доступа");
     return;
   }
 
@@ -93,12 +93,12 @@ export async function updateMemberProfile(
     .eq("id", memberId);
 
   if (error) {
-    await redirectWithToast(bandPath(bandSlug, "members"), error.message);
+    await redirectWithToast(bandPath(bandSlug, "account"), error.message);
     return;
   }
 
-  revalidatePath(bandPath(bandSlug, "members"));
-  redirect(bandPath(bandSlug, "members"));
+  revalidatePath(bandPath(bandSlug, "account"));
+  redirect(bandPath(bandSlug, "account"));
 }
 
 export async function excludeMember(

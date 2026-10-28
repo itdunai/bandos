@@ -11,6 +11,7 @@ import {
   ListMusic,
   Music,
   Timer,
+  UserCog,
   Users,
   Wallet,
   type LucideIcon,
@@ -54,6 +55,10 @@ export const BAND_NAV: BandNavGroup[] = [
       { href: "members", label: "Участники", icon: Users },
       { href: "finances", label: "Финансы", icon: Wallet },
     ],
+  },
+  {
+    section: "Личное",
+    items: [{ href: "account", label: "Аккаунт", icon: UserCog }],
   },
 ];
 
