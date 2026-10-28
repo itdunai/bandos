@@ -43,7 +43,6 @@ export const BAND_NAV: BandNavGroup[] = [
     items: [
       { href: "songs", label: "Треки", icon: Music },
       { href: "setlists", label: "Сет-листы", icon: ListMusic },
-      { href: "releases", label: "Релизы", icon: Disc3 },
       { href: "metronome", label: "Метроном", icon: Timer },
     ],
   },
@@ -51,6 +50,7 @@ export const BAND_NAV: BandNavGroup[] = [
     section: "Группа",
     items: [
       { href: "group", label: "О группе", icon: Info },
+      { href: "releases", label: "Релизы", icon: Disc3 },
       { href: "bookings", label: "Заявки", icon: Inbox },
       { href: "members", label: "Участники", icon: Users },
       { href: "finances", label: "Финансы", icon: Wallet },

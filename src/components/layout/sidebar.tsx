@@ -81,21 +81,22 @@ export function Sidebar({
                 </Link>
               );
             })}
+            {group.section === "Музыка" && (
+              <Link
+                href={playHref}
+                className={cn(
+                  "mt-2 flex items-center justify-center gap-2 rounded-lg py-2.5 font-display text-xs font-bold uppercase tracking-wide transition-colors",
+                  playActive
+                    ? "bg-accent-dark text-accent-ink"
+                    : "bg-accent text-accent-ink hover:bg-accent-dark"
+                )}
+              >
+                <Play className="h-3.5 w-3.5 fill-current" />
+                Играем
+              </Link>
+            )}
           </div>
         ))}
-
-        <Link
-          href={playHref}
-          className={cn(
-            "mt-4 flex items-center justify-center gap-2 rounded-lg py-2.5 font-display text-xs font-bold uppercase tracking-wide transition-colors",
-            playActive
-              ? "bg-accent-dark text-accent-ink"
-              : "bg-accent text-accent-ink hover:bg-accent-dark"
-          )}
-        >
-          <Play className="h-3.5 w-3.5 fill-current" />
-          Играем
-        </Link>
       </nav>
 
       <div className="mt-auto space-y-3 border-t border-border p-3">
