@@ -32,13 +32,16 @@ export async function getPlatformStats(
 
 export async function getPlatformAuditLog(
   supabase: SupabaseClient,
-  limit = 50
+  limit = 50,
+  level?: AuditLogRow["level"]
 ): Promise<AuditLogRow[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from("platform_audit_log")
     .select("id, level, event, user_id, band_id, meta, created_at")
     .order("created_at", { ascending: false })
     .limit(limit);
+  if (level) query = query.eq("level", level);
+  const { data, error } = await query;
 
   if (error || !data) return [];
   return data as AuditLogRow[];

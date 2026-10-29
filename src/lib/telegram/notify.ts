@@ -365,7 +365,7 @@ export async function notifyNewFeedback(feedbackId: string) {
     `👤 ${escapeHtml(f.email ?? "—")}${band ? ` · ${escapeHtml(band.name)}` : ""}`,
   ];
   if (f.page) lines.push(`📄 ${escapeHtml(f.page)}`);
-  lines.push("", escapeHtml(f.message.slice(0, 2000)), "", `<a href="${link("/admin")}">Открыть в админке</a>`);
+  lines.push("", escapeHtml(f.message.slice(0, 2000)), "", `<a href="${link("/admin/feedback")}">Открыть в админке</a>`);
   const html = lines.join("\n");
 
   await Promise.all(chatIds.map((chatId) => sendTelegramMessage(chatId, html)));

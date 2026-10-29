@@ -3,7 +3,7 @@ import { PrivacyPolicyForm } from "@/components/admin/privacy-policy-form";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { PlatformAdminSetup } from "@/components/admin/platform-admin-setup";
 import { getPrivacyPageUncached } from "@/lib/legal/site-pages";
-import { requirePlatformAdmin } from "@/lib/platform/admin";
+import { loadAdminPage } from "@/lib/platform/admin-page";
 
 export const metadata: Metadata = {
   title: "Политика конфиденциальности — редактирование",
@@ -12,13 +12,17 @@ export const metadata: Metadata = {
 
 
 export default async function AdminPrivacyPage() {
-  const { supabase, user, hasDbFlag, needsDbPromotion } =
-    await requirePlatformAdmin("/admin/privacy");
+  const { supabase, user, hasDbFlag, needsDbPromotion, buildSha, newFeedback } =
+    await loadAdminPage("/admin/privacy");
   const page = await getPrivacyPageUncached(supabase);
-  const buildSha = process.env.BUILD_SHA ?? "dev";
 
   return (
-    <AdminShell userEmail={user.email ?? "—"} buildSha={buildSha}>
+    <AdminShell
+      userEmail={user.email ?? "—"}
+      buildSha={buildSha}
+      section="privacy"
+      newFeedback={newFeedback}
+    >
       {needsDbPromotion && (
         <div className="mb-6">
           <PlatformAdminSetup userEmail={user.email ?? ""} />

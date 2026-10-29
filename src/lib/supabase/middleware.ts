@@ -62,5 +62,26 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Активность для метрики (DAU/удержание): раз в сутки на браузер — кука с датой
+  if (user) {
+    const today = new Date().toISOString().slice(0, 10);
+    if (request.cookies.get(ACTIVITY_COOKIE)?.value !== today) {
+      try {
+        await supabase.rpc("touch_activity");
+      } catch {
+        // метрика не должна мешать открыть страницу
+      }
+      supabaseResponse.cookies.set(ACTIVITY_COOKIE, today, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 48,
+      });
+    }
+  }
+
   return supabaseResponse;
 }
+
+const ACTIVITY_COOKIE = "bandos_seen";

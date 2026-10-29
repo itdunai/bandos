@@ -10,7 +10,7 @@ import { revalidatePath } from "next/cache";
 export async function adminRegisterTelegramWebhook(): Promise<{ ok: boolean; message: string }> {
   await requirePlatformAdmin("/admin");
   const result = await registerTelegramWebhook();
-  revalidatePath("/admin");
+  revalidatePath("/admin/system");
   return result;
 }
 
