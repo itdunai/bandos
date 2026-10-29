@@ -5,6 +5,7 @@ import {
   ListMusic,
   Play,
   Send,
+  Timer,
   Users,
   Wallet,
   type LucideIcon,
@@ -30,6 +31,14 @@ const FEATURES: {
       "На сцене каждый видит своё: аккорды, табы или текст. Работает без интернета, экран не гаснет.",
   },
   {
+    id: "metronome",
+    icon: Timer,
+    title: "Метроном",
+    description:
+      "Темп и размер берутся из трека или сет-листа. Акценты по долям, восьмые и триоли, отсчёт перед стартом, разгон темпа для занятий.",
+    isNew: true,
+  },
+  {
     icon: Calendar,
     title: "График и дела",
     description:
@@ -41,7 +50,6 @@ const FEATURES: {
     title: "Уведомления в Telegram",
     description:
       "Бот напомнит о репетиции и концерте за сутки, о сроке по делу — и сразу пришлёт новую заявку от заказчика.",
-    isNew: true,
   },
   {
     icon: Wallet,
