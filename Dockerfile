@@ -27,6 +27,17 @@ RUN npm run build
 
 FROM base AS runner
 WORKDIR /app
+# pg_dump для резервных копий (/admin/system). Клиент 17 снимает дамп и с PG 15.
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates \
+  && install -d /usr/share/postgresql-common/pgdg \
+  && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+     -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+  && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(. /etc/os-release && echo $VERSION_CODENAME)-pgdg main" \
+     > /etc/apt/sources.list.d/pgdg.list \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends postgresql-client-17 \
+  && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0

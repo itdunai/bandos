@@ -45,6 +45,7 @@
    - `supabase/migrations/028_telegram_and_bookings.sql`
    - `supabase/migrations/029_security_hardening_2.sql`
    - `supabase/migrations/030_account_deletion_and_feedback.sql` — удаление аккаунта (`/account`), обратная связь (`/feedback`, список в `/admin`)
+   - `supabase/migrations/031_feedback_tickets_and_metrics.sql` — обращения со статусом и ответом, учёт посещений и метрика `/admin`
 3. **Authentication → Providers → Email** — включите Email
 4. Для локальной разработки отключите «Confirm email» (или подтверждайте вручную)
 5. **Authentication → URL Configuration**:
@@ -83,6 +84,12 @@ PLATFORM_ADMIN_EMAILS=your@email.com
 2. Откройте `/admin` под своим аккаунтом
 3. Если статистика пустая — выполните SQL из подсказки на странице или нажмите «Выдать права в БД»
 4. Политика конфиденциальности: публичная страница `/privacy`, редактирование `/admin/privacy`. В шаблоне замените данные в `[квадратных скобках]` на реквизиты оператора.
+
+Разделы: **Обзор** (активность, воронка, удержание, группы), **Обращения** (статус и ответ автору), **Система** (здоровье, резервные копии, Telegram-бот, журнал), **Политика**.
+
+### Резервные копии
+
+Без платного тарифа Supabase: сервер сам делает `pg_dump` — ежедневно шифрованная копия админам в Telegram, вручную — скачать из `/admin/system`. Нужны `SUPABASE_DB_URL` и `BACKUP_PASSPHRASE`; настройка и восстановление — [docs/backups.md](docs/backups.md).
 
 **Если `/admin` отдаёт 404 на Timeweb:**
 

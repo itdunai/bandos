@@ -5,6 +5,8 @@ export async function register() {
     await import("./sentry.server.config");
     const { startReminderScheduler } = await import("./lib/telegram/scheduler");
     startReminderScheduler();
+    const { startBackupScheduler } = await import("./lib/backup/scheduler");
+    startBackupScheduler();
   }
 
   if (process.env.NEXT_RUNTIME === "edge") {

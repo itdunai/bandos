@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { AdminSectionTitle, AuditLogTable, HealthList } from "@/components/admin/admin-system";
+import { BackupCard } from "@/components/admin/backup-card";
+import { Card } from "@/components/ui/card";
 import {
   TelegramDiagnostics,
   TelegramDiagnosticsSkeleton,
@@ -43,13 +45,20 @@ export default async function AdminSystemPage({
         <div>
           <h1 className="text-2xl font-medium">Система</h1>
           <p className="mt-1 text-sm text-text-secondary">
-            Здоровье сервиса, Telegram-бот и журнал событий
+            Здоровье сервиса, резервные копии, Telegram-бот и журнал событий
           </p>
         </div>
 
         <section>
           <AdminSectionTitle>Здоровье · {allHealthy ? "всё в порядке" : "есть проблемы"}</AdminSectionTitle>
           <HealthList health={health} />
+        </section>
+
+        <section>
+          <AdminSectionTitle>Резервные копии</AdminSectionTitle>
+          <Suspense fallback={<Card className="h-48 animate-pulse p-4" />}>
+            <BackupCard />
+          </Suspense>
         </section>
 
         <section>

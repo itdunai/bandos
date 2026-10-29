@@ -99,3 +99,14 @@ export async function updateFeedbackTicket(
   revalidatePath("/admin", "layout");
   return { ok: true, notified };
 }
+
+/** Сделать копию прямо сейчас и отправить админам в Telegram. */
+export async function runBackupNow(): Promise<{ ok: boolean; message: string }> {
+  await requirePlatformAdmin("/admin/system");
+  const { runTelegramBackup } = await import("@/lib/backup/job");
+  const res = await runTelegramBackup("manual");
+  revalidatePath("/admin/system");
+  return res.ok
+    ? { ok: true, message: `Копия ${res.file} отправлена в Telegram` }
+    : { ok: false, message: res.error };
+}

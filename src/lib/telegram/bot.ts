@@ -98,3 +98,35 @@ export function secretsEqual(a: string | null | undefined, b: string | null | un
   const bb = Buffer.from(b);
   return ab.length === bb.length && timingSafeEqual(ab, bb);
 }
+
+/** Файл в чат (multipart). Лимит Bot API — 50 МБ. */
+export async function sendTelegramDocument(
+  chatId: number,
+  file: { name: string; data: Buffer },
+  captionHtml?: string
+): Promise<TelegramResult<unknown>> {
+  const token = telegramBotToken();
+  if (!token) return { ok: false, description: "TELEGRAM_BOT_TOKEN не задан" };
+
+  const form = new FormData();
+  form.set("chat_id", String(chatId));
+  form.set("document", new Blob([new Uint8Array(file.data)]), file.name);
+  if (captionHtml) {
+    form.set("caption", captionHtml);
+    form.set("parse_mode", "HTML");
+  }
+
+  try {
+    const res = await fetch(`${telegramApiBase()}/bot${token}/sendDocument`, {
+      method: "POST",
+      body: form,
+      cache: "no-store",
+      signal: AbortSignal.timeout(120_000),
+    });
+    return (await res.json()) as TelegramResult<unknown>;
+  } catch (e) {
+    const description = e instanceof Error ? `${e.name}: ${e.message}` : "fetch failed";
+    captureServerError(e, { action: "telegram.sendDocument", extras: { apiBase: telegramApiBase() } });
+    return { ok: false, description, error_code: 0 };
+  }
+}
