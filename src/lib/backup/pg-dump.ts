@@ -1,4 +1,5 @@
 import { spawn, type ChildProcessByStdio } from "node:child_process";
+import { existsSync } from "node:fs";
 import type { Readable } from "node:stream";
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
 
@@ -46,9 +47,26 @@ export function pgEnvFromUrl(url: string): Record<string, string> {
   };
 }
 
+/**
+ * Сам бинарник, а не обёртка Debian /usr/bin/pg_dump (pg_wrapper на perl ищет
+ * кластеры и может отказать в контейнере без сервера). PG_DUMP_PATH — свой путь.
+ */
+const PG_DUMP_CANDIDATES = [
+  "/usr/lib/postgresql/17/bin/pg_dump",
+  "/usr/lib/postgresql/16/bin/pg_dump",
+  "/usr/local/bin/pg_dump",
+];
+
+function pgDumpBinary(): string {
+  const custom = process.env.PG_DUMP_PATH?.trim();
+  if (custom) return custom;
+  return PG_DUMP_CANDIDATES.find((p) => existsSync(p)) ?? "pg_dump";
+}
+
 function run(args: string[], env: Record<string, string> = {}): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const child: ChildProcessByStdio<null, Readable, Readable> = spawn("pg_dump", args, {
+    const bin = pgDumpBinary();
+    const child: ChildProcessByStdio<null, Readable, Readable> = spawn(bin, args, {
       // Только PATH и libpq — секреты приложения процессу pg_dump не нужны
       env: { NODE_ENV: process.env.NODE_ENV, PATH: process.env.PATH ?? "", ...env },
       stdio: ["ignore", "pipe", "pipe"],
@@ -76,7 +94,7 @@ function run(args: string[], env: Record<string, string> = {}): Promise<Buffer> 
       clearTimeout(timer);
       reject(
         (e as NodeJS.ErrnoException).code === "ENOENT"
-          ? new Error("pg_dump не установлен на сервере")
+          ? new Error(`pg_dump не найден (${bin}) — образ собран не из Dockerfile или без клиента PostgreSQL`)
           : e
       );
     });
@@ -89,12 +107,12 @@ function run(args: string[], env: Record<string, string> = {}): Promise<Buffer> 
   });
 }
 
-/** Версия pg_dump или null, если его нет. */
-export async function pgDumpVersion(): Promise<string | null> {
+/** Версия pg_dump или причина, почему он недоступен. */
+export async function pgDumpVersion(): Promise<{ version: string } | { error: string }> {
   try {
-    return (await run(["--version"])).toString().trim();
-  } catch {
-    return null;
+    return { version: (await run(["--version"])).toString().trim() };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : String(e) };
   }
 }
 

@@ -25,9 +25,16 @@ function Row({ ok, label, hint }: { ok: boolean; label: string; hint?: string })
 /** «Резервные копии» в /admin/system: готовность, последняя копия, ручной запуск. */
 export async function BackupCard() {
   const setup = backupSetup();
-  const [version, { last, stale }] = await Promise.all([pgDumpVersion(), backupStatus()]);
+  const [pgDump, { last, stale }] = await Promise.all([pgDumpVersion(), backupStatus()]);
+  const version = "version" in pgDump ? pgDump.version : null;
   const canDump = setup.databaseUrl && !!version;
   const auto = canDump && setup.passphrase && setup.telegram;
+  const missing = [
+    !setup.databaseUrl && "SUPABASE_DB_URL",
+    !version && "pg_dump",
+    !setup.passphrase && "BACKUP_PASSPHRASE",
+    !setup.telegram && "Telegram-бот",
+  ].filter(Boolean);
 
   return (
     <Card className="space-y-4 p-4">
@@ -59,7 +66,7 @@ export async function BackupCard() {
         <Row
           ok={!!version}
           label={version ?? "pg_dump на сервере"}
-          hint={version ? undefined : "Ставится в Docker-образе — пересоберите после деплоя"}
+          hint={"error" in pgDump ? pgDump.error : undefined}
         />
         <Row
           ok={setup.passphrase}
@@ -85,7 +92,9 @@ export async function BackupCard() {
             Скачать копию сейчас
           </a>
         ) : null}
-        {auto && <BackupNowButton />}
+        <BackupNowButton
+          disabledReason={auto ? undefined : `Не готово: ${missing.join(", ")}`}
+        />
       </div>
       <p className="text-xs text-text-muted">
         В копии — данные приложения и аккаунты (схемы public, auth, storage). Файлы (лого, фото,
