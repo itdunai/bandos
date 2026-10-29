@@ -1,3 +1,4 @@
+import type { FeedbackKind, FeedbackStatus } from "@/lib/feedback/tickets";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface PlatformStats {
@@ -92,26 +93,40 @@ export async function checkPlatformHealth(supabase: SupabaseClient) {
 
 export interface FeedbackRow {
   id: string;
-  kind: "bug" | "idea" | "question" | "other";
+  kind: FeedbackKind;
   message: string;
   page: string | null;
   email: string | null;
-  status: "new" | "done";
+  status: FeedbackStatus;
+  admin_reply: string | null;
+  replied_at: string | null;
   created_at: string;
   bands: { name: string; slug: string } | null;
 }
 
 export async function getPlatformFeedback(
   supabase: SupabaseClient,
-  limit = 50
+  limit = 100
 ): Promise<FeedbackRow[]> {
-  const { data, error } = await supabase
-    .from("feedback")
-    .select("id, kind, message, page, email, status, created_at, bands(name, slug)")
-    .order("status", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  const query = (columns: string) =>
+    supabase
+      .from("feedback")
+      .select(columns)
+      // new → in_progress → done → declined
+      .order("status", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
-  if (error || !data) return [];
-  return data as unknown as FeedbackRow[];
+  const { data, error } = await query(
+    "id, kind, message, page, email, status, admin_reply, replied_at, created_at, bands(name, slug)"
+  );
+  if (!error && data) return data as unknown as FeedbackRow[];
+
+  // До миграции 031 колонок ответа нет — показываем то, что есть
+  const { data: legacy } = await query("id, kind, message, page, email, status, created_at, bands(name, slug)");
+  return ((legacy ?? []) as unknown as FeedbackRow[]).map((f) => ({
+    ...f,
+    admin_reply: null,
+    replied_at: null,
+  }));
 }

@@ -8,6 +8,12 @@ import { notifyNewFeedback } from "@/lib/telegram/notify";
 
 const KINDS = new Set(["bug", "idea", "question", "other"]);
 
+/** Куда вернуть после отправки: страница обратной связи в группе или общая. */
+function feedbackBasePath(raw: FormDataEntryValue | null): string {
+  const path = sanitizeRedirectPath(raw as string | null);
+  return path && /^\/(?:[^/?]+\/)?feedback$/.test(path) ? path : "/feedback";
+}
+
 export async function submitFeedback(formData: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -18,13 +24,14 @@ export async function submitFeedback(formData: FormData) {
   const message = ((formData.get("message") as string) || "").trim();
   const page = sanitizeRedirectPath(formData.get("page") as string | null);
   const bandId = (formData.get("band_id") as string) || null;
+  const base = feedbackBasePath(formData.get("return_to"));
 
   const back = new URLSearchParams();
   if (page) back.set("from", page);
 
   if (!message) {
     back.set("error", "Напишите сообщение");
-    redirect(`/feedback?${back.toString()}`);
+    redirect(`${base}?${back.toString()}`);
   }
 
   // band_id из формы проверяет RPC: чужая группа обнуляется
@@ -43,7 +50,7 @@ export async function submitFeedback(formData: FormData) {
     // Тексты валидации и лимита задаёт RPC (коды 22023 / 54000) — их можно показать
     const userFacing = error && (error.code === "22023" || error.code === "54000");
     back.set("error", userFacing ? error.message : "Не удалось отправить — попробуйте позже");
-    redirect(`/feedback?${back.toString()}`);
+    redirect(`${base}?${back.toString()}`);
   }
 
   try {
@@ -53,5 +60,13 @@ export async function submitFeedback(formData: FormData) {
   }
 
   back.set("sent", "1");
-  redirect(`/feedback?${back.toString()}`);
+  redirect(`${base}?${back.toString()}`);
+}
+
+/** Автор открыл свои обращения — гасим индикатор «новое». */
+export async function markFeedbackSeen(): Promise<void> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.rpc("mark_my_feedback_seen");
 }

@@ -16,9 +16,11 @@ import {
   navItemHref,
 } from "@/components/layout/band-nav";
 import {
+  useUnreadFeedback,
   useUpcomingEvent,
   useUserBands,
 } from "@/components/layout/band-shell-context";
+import { feedbackHref, UnreadDot } from "@/components/layout/unread-dot";
 import { UpcomingEventChip } from "@/components/schedule/upcoming-event-chip";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { Band, BandMember } from "@/types/database";
@@ -39,6 +41,7 @@ export function Sidebar({
   const playHref = bandPath(band.slug, "play");
   const playActive = isNavItemActive(pathname, playHref, false);
   const accountHref = bandPath(band.slug, "account");
+  const unreadFeedback = useUnreadFeedback();
 
   return (
     <aside className="flex h-dvh w-[232px] shrink-0 flex-col border-r border-border bg-bg">
@@ -110,11 +113,12 @@ export function Sidebar({
             Создать группу
           </Link>
           <Link
-            href={`/feedback?from=${encodeURIComponent(pathname)}`}
+            href={feedbackHref(band.slug, pathname)}
             className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
           >
             <MessageSquare className="h-4 w-4 shrink-0" />
             Обратная связь
+            <UnreadDot count={unreadFeedback} />
           </Link>
         </div>
         {member && (

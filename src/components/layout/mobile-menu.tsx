@@ -10,7 +10,9 @@ import {
   isNavItemVisible,
   navItemHref,
 } from "@/components/layout/band-nav";
+import { useUnreadFeedback } from "@/components/layout/band-shell-context";
 import { BuildVersionLabel } from "@/components/layout/build-version-label";
+import { feedbackHref, UnreadDot } from "@/components/layout/unread-dot";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { cn } from "@/lib/utils";
@@ -29,6 +31,7 @@ export function MobileMenu({
   onClose: () => void;
 }) {
   const pathname = usePathname();
+  const unreadFeedback = useUnreadFeedback();
 
   useEffect(() => {
     if (!open) return;
@@ -110,12 +113,13 @@ export function MobileMenu({
             Создать группу
           </Link>
           <Link
-            href={`/feedback?from=${encodeURIComponent(pathname)}`}
+            href={feedbackHref(bandSlug, pathname)}
             onClick={onClose}
             className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
           >
             <MessageSquare className="h-4 w-4 shrink-0" />
             Обратная связь
+            <UnreadDot count={unreadFeedback} />
           </Link>
           <form action={signOut}>
             <SubmitButton

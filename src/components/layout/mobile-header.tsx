@@ -2,6 +2,7 @@
 
 import { BandSwitcher } from "@/components/layout/band-switcher";
 import {
+  useUnreadFeedback,
   useUpcomingEvent,
   useUserBands,
 } from "@/components/layout/band-shell-context";
@@ -22,6 +23,7 @@ export function MobileHeader({
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const userBands = useUserBands();
   const upcoming = useUpcomingEvent();
+  const unreadFeedback = useUnreadFeedback();
 
   return (
     <>
@@ -33,10 +35,13 @@ export function MobileHeader({
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-text-secondary hover:bg-bg-3"
-          aria-label="Открыть меню"
+          className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-text-secondary hover:bg-bg-3"
+          aria-label={unreadFeedback ? "Открыть меню — есть ответ на обращение" : "Открыть меню"}
         >
           <Menu className="h-5 w-5" />
+          {unreadFeedback > 0 && (
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" aria-hidden />
+          )}
         </button>
       </header>
       <MobileMenu

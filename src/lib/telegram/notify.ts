@@ -370,3 +370,43 @@ export async function notifyNewFeedback(feedbackId: string) {
 
   await Promise.all(chatIds.map((chatId) => sendTelegramMessage(chatId, html)));
 }
+
+const FEEDBACK_STATUS_TEXT: Record<string, string> = {
+  new: "🆕 Новое",
+  in_progress: "🛠 В работе",
+  done: "✅ Выполнено",
+  declined: "🚫 Отклонено",
+};
+
+/** Ответ или новый статус обращения — автору, если он подключил Telegram. */
+export async function notifyFeedbackUpdate(feedbackId: string): Promise<boolean> {
+  if (!isTelegramConfigured()) return false;
+  const db = createServiceSupabaseClient();
+  if (!db) return false;
+
+  const { data: f } = await db
+    .from("feedback")
+    .select("user_id, message, status, admin_reply")
+    .eq("id", feedbackId)
+    .maybeSingle();
+  if (!f?.user_id) return false;
+
+  const { data: account } = await db
+    .from("telegram_accounts")
+    .select("chat_id")
+    .eq("user_id", f.user_id)
+    .maybeSingle();
+  if (!account?.chat_id) return false;
+
+  const quote = f.message.length > 300 ? `${f.message.slice(0, 300)}…` : f.message;
+  const lines = [
+    `<b>Ваше обращение в BandOS</b> · ${FEEDBACK_STATUS_TEXT[f.status] ?? f.status}`,
+    "",
+    `<i>${escapeHtml(quote)}</i>`,
+  ];
+  if (f.admin_reply) lines.push("", `<b>Ответ:</b> ${escapeHtml(f.admin_reply.slice(0, 2500))}`);
+  lines.push("", `<a href="${link("/feedback")}">Открыть обращения</a>`);
+
+  const res = await sendTelegramMessage(account.chat_id as number, lines.join("\n"));
+  return res.ok;
+}
