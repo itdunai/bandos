@@ -89,7 +89,7 @@ PLATFORM_ADMIN_EMAILS=your@email.com
 
 ### Резервные копии
 
-Без платного тарифа Supabase: сервер сам делает `pg_dump` — ежедневно шифрованная копия админам в Telegram, вручную — скачать из `/admin/system`. Нужны `SUPABASE_DB_URL` и `BACKUP_PASSPHRASE`; настройка и восстановление — [docs/backups.md](docs/backups.md).
+Без платного тарифа Supabase: ежедневно GitHub Actions (`.github/workflows/db-backup.yml`) снимает `pg_dump`, шифрует и отправляет админам в Telegram; статус — в `/admin/system`. Если образ собран из `Dockerfile`, то же умеет и сам сервер. Настройка (секреты репозитория) и восстановление — [docs/backups.md](docs/backups.md).
 
 **Если `/admin` отдаёт 404 на Timeweb:**
 

@@ -1,0 +1,119 @@
+# Ежедневная резервная копия БД Supabase (бесплатный тариф бекапов не хранит).
+# pg_dump → шифрование → админам платформы в Telegram + артефакт на 14 дней.
+# Секреты репозитория: SUPABASE_DB_URL, BACKUP_PASSPHRASE, TELEGRAM_BOT_TOKEN;
+# для отметки в /admin — SITE_URL и CRON_SECRET. Подробно: docs/backups.md.
+name: DB backup
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 00:00 UTC = 03:00 МСК
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      SITE_URL: ${{ secrets.SITE_URL }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      BACKUP_SCHEMAS: ${{ vars.BACKUP_SCHEMAS || 'public,auth,storage' }}
+      PG_BIN: /usr/lib/postgresql/17/bin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check secrets
+        run: |
+          for v in SUPABASE_DB_URL BACKUP_PASSPHRASE TELEGRAM_BOT_TOKEN; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Не задан секрет $v (Settings → Secrets and variables → Actions)"
+              exit 1
+            fi
+          done
+
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Dump and encrypt
+        id: dump
+        run: |
+          FILE="bandos-$(date -u +%Y-%m-%d-%H%M).dump"
+          SCHEMAS=""
+          for s in $(echo "$BACKUP_SCHEMAS" | tr ',' ' '); do SCHEMAS="$SCHEMAS --schema=$s"; done
+          "$PG_BIN/pg_dump" --dbname="$SUPABASE_DB_URL" --format=custom --no-owner --no-privileges $SCHEMAS --file="$FILE"
+          node scripts/encrypt-backup.mjs "$FILE"
+          rm -f "$FILE"
+          echo "file=$FILE.enc" >> "$GITHUB_OUTPUT"
+          echo "bytes=$(stat -c%s "$FILE.enc")" >> "$GITHUB_OUTPUT"
+
+      # Только админам платформы с подключённым Telegram — чаты берём из БД
+      - name: Send to admins in Telegram
+        id: telegram
+        env:
+          FILE: ${{ steps.dump.outputs.file }}
+          BYTES: ${{ steps.dump.outputs.bytes }}
+        run: |
+          if [ "$BYTES" -gt 52428800 ]; then
+            echo "::warning::Копия больше 50 МБ — в Telegram не уйдёт, берите из артефакта"
+            echo "delivered=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          CHAT_IDS=$("$PG_BIN/psql" "$SUPABASE_DB_URL" -At -c \
+            "select t.chat_id from public.telegram_accounts t join public.profiles p on p.id = t.user_id where p.is_platform_admin")
+          if [ -z "$CHAT_IDS" ]; then
+            echo "::error::Ни у одного админа платформы не подключён Telegram"
+            exit 1
+          fi
+          SIZE=$(awk "BEGIN { printf \"%.1f\", $BYTES / 1048576 }")
+          CAPTION=$(printf '🗄 <b>Резервная копия BandOS</b>\n%s МБ · зашифрована' "$SIZE")
+          DELIVERED=0
+          for id in $CHAT_IDS; do
+            RES=$(curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument" \
+              -F chat_id="$id" -F document=@"$FILE" -F parse_mode=HTML -F caption="$CAPTION")
+            if echo "$RES" | grep -q '"ok":true'; then
+              DELIVERED=$((DELIVERED + 1))
+            else
+              echo "::warning::Telegram ответил: $(echo "$RES" | head -c 300)"
+            fi
+          done
+          echo "delivered=$DELIVERED" >> "$GITHUB_OUTPUT"
+          if [ "$DELIVERED" -eq 0 ]; then
+            echo "::error::Telegram не принял файл"
+            exit 1
+          fi
+
+      - name: Keep as artifact
+        if: always() && steps.dump.outputs.file != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.dump.outputs.file }}
+          path: ${{ steps.dump.outputs.file }}
+          retention-days: 14
+
+      - name: Report to BandOS
+        if: always() && env.SITE_URL != '' && env.CRON_SECRET != ''
+        env:
+          OK: ${{ steps.dump.outcome == 'success' && steps.telegram.outcome == 'success' }}
+          FILE: ${{ steps.dump.outputs.file }}
+          BYTES: ${{ steps.dump.outputs.bytes || 0 }}
+          DELIVERED: ${{ steps.telegram.outputs.delivered || 0 }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          BODY=$(printf '{"ok":%s,"file":"%s","bytes":%s,"delivered":%s,"runUrl":"%s"}' \
+            "$OK" "$FILE" "$BYTES" "$DELIVERED" "$RUN_URL")
+          curl -sS -X POST "${SITE_URL%/}/api/cron/backup-report" \
+            -H "Authorization: Bearer $CRON_SECRET" -H "Content-Type: application/json" \
+            -d "$BODY" || true

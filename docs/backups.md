@@ -1,38 +1,66 @@
 # Резервные копии без платного тарифа Supabase
 
-На бесплатном тарифе Supabase не хранит бекапы. Копии делает сам сервер BandOS:
-`pg_dump` → файл. Два способа, оба в **/admin → Система → Резервные копии**:
+На бесплатном тарифе Supabase не хранит бекапы. Копию снимает `pg_dump`,
+шифрует паролем и отправляет **админам платформы в Telegram** (лежит вне
+хостинга и вне Supabase; лимит Telegram — 50 МБ). Статус — в
+**/admin → Система → Резервные копии**.
 
-- **Автоматически раз в сутки** — зашифрованная копия приходит админам платформы
-  в Telegram (лежит вне сервера и вне Supabase; лимит Telegram — 50 МБ).
-- **Вручную** — «Скачать копию сейчас» (незашифрованный `.dump` по HTTPS) или
-  «Отправить копию в Telegram».
+Два способа — работает тот, что доступен:
+
+| | GitHub Actions (основной) | Сервер приложения |
+|---|---|---|
+| Когда | хостинг собирает не по `Dockerfile` (нет `pg_dump`) | образ собран из `Dockerfile` |
+| Расписание | ежедневно 03:00 МСК + кнопка «Run workflow» | раз в сутки + кнопки в админке |
+| Ещё копия | артефакт запуска на 14 дней | «Скачать копию сейчас» |
 
 В копии схемы `public` (все данные приложения), `auth` (аккаунты, хеши паролей)
 и `storage` (записи о файлах). **Сами файлы** (лого, фото, аватары в бакете
 `band-media`) не входят — их при необходимости скачивают из Supabase → Storage.
 
-## Настройка
+## Строка подключения к БД
 
-Runtime-переменные контейнера:
+Supabase → кнопка **Connect** в шапке проекта (или
+`https://supabase.com/dashboard/project/<ref>?showConnect=true`) →
+Connection String → Method **Session pooler** (порт 5432, пользователь
+`postgres.<ref>`). Вместо `[YOUR-PASSWORD]` — пароль БД (Project Settings →
+Database → Reset database password). Символы `@ : / ? # %` в пароле кодируются
+(`@` → `%40`) — проще задать пароль из букв и цифр.
+
+## Способ 1. GitHub Actions
+
+Workflow `.github/workflows/db-backup.yml`. GitHub → репозиторий → **Settings →
+Secrets and variables → Actions → New repository secret**:
+
+| Секрет | Значение |
+|---|---|
+| `SUPABASE_DB_URL` | строка Session pooler (см. выше) |
+| `BACKUP_PASSPHRASE` | пароль шифрования, от 12 символов. **Сохраните отдельно** — без него копию не расшифровать |
+| `TELEGRAM_BOT_TOKEN` | токен бота BandOS (тот же, что на сервере) |
+| `SITE_URL` | `https://<ваш-домен>` — чтобы в админке была видна последняя копия |
+| `CRON_SECRET` | тот же, что в переменных сервера |
+
+Получатели — админы платформы, у которых подключён Telegram («Аккаунт» →
+«Подключить Telegram»); чаты workflow берёт из БД.
+
+Проверка: GitHub → **Actions → DB backup → Run workflow**. Через 1–2 минуты в
+Telegram придёт `bandos-ГГГГ-ММ-ДД-ЧЧММ.dump.enc`, в админке обновится
+«Последняя копия». Если `pg_dump` ругается на права — переменная репозитория
+(вкладка Variables) `BACKUP_SCHEMAS=public`.
+
+## Способ 2. Сервер приложения
+
+Нужен образ из `Dockerfile` (в нём ставится `pg_dump` 17) и runtime-переменные:
 
 ```env
-# Supabase → Connect → «Session pooler» (IPv4). Пароль — пароль БД проекта.
 SUPABASE_DB_URL=postgresql://postgres.<ref>:<пароль>@aws-0-<регион>.pooler.supabase.com:5432/postgres
-# Пароль шифрования копий для Telegram, от 12 символов. Сохраните его отдельно
-# (менеджер паролей): без него копию не расшифровать.
 BACKUP_PASSPHRASE=...
-# BACKUP_SCHEMAS=public,auth,storage   # по умолчанию; если pg_dump ругается на права — оставьте public
-# BACKUP_SCHEDULER=off                 # выключить автокопию
+# BACKUP_SCHEMAS=public,auth,storage   # по умолчанию
+# BACKUP_SCHEDULER=off                 # выключить автокопию с сервера
+# PG_DUMP_PATH=/путь/к/pg_dump         # если стоит в нестандартном месте
 ```
 
-Ещё нужно: Telegram-бот настроен, у вашего аккаунта (админа платформы) подключён
-Telegram («Аккаунт» → «Подключить Telegram»). `pg_dump` ставится в Docker-образ
-(см. `Dockerfile`), после деплоя в админке должно быть «pg_dump (PostgreSQL) 17.x».
-
-Проверка: «Отправить копию в Telegram» → файл `bandos-ГГГГ-ММ-ДД-ЧЧММ.dump.enc`
-в чате с ботом; в журнале событий — `backup.created`. Ошибки — `backup.failed`
-(текст в журнале и Sentry).
+В админке появятся «Скачать копию сейчас» и «Отправить копию в Telegram».
+Результаты — в журнале событий: `backup.created` / `backup.failed`.
 
 ## Восстановление
 

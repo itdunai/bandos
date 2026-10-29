@@ -27,6 +27,9 @@ export function startBackupScheduler() {
         "@/lib/backup/job"
       );
       if (!isAutoBackupConfigured()) return;
+      // Нет pg_dump (хостинг собирает не по Dockerfile) — копии делает GitHub Actions
+      const { pgDumpVersion } = await import("@/lib/backup/pg-dump");
+      if ("error" in (await pgDumpVersion())) return;
       const last = await lastBackupAt();
       if (last && Date.now() - new Date(last).getTime() < MIN_GAP_MS) return;
 

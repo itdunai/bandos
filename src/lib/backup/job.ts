@@ -92,22 +92,33 @@ export async function runTelegramBackup(trigger: "schedule" | "manual") {
 }
 
 /** Последняя удачная копия (по журналу) — для админки и планировщика. */
-export async function lastBackupAt(): Promise<string | null> {
+async function lastBackupEvent() {
   const db = createServiceSupabaseClient();
   if (!db) return null;
   const { data } = await db
     .from("platform_audit_log")
-    .select("created_at")
+    .select("created_at, meta")
     .eq("event", "backup.created")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  return (data?.created_at as string | undefined) ?? null;
+  return data as { created_at: string; meta: Record<string, unknown> | null } | null;
 }
 
-/** Для админки: когда была копия и не пора ли беспокоиться (больше 26 ч). */
+export async function lastBackupAt(): Promise<string | null> {
+  return (await lastBackupEvent())?.created_at ?? null;
+}
+
+/**
+ * Для админки: когда была копия, не пора ли беспокоиться (больше 26 ч)
+ * и ссылка на workflow, если копии делает GitHub Actions.
+ */
 export async function backupStatus() {
-  const last = await lastBackupAt();
+  const event = await lastBackupEvent();
+  const last = event?.created_at ?? null;
   const stale = !last || Date.now() - new Date(last).getTime() > 26 * 60 * 60 * 1000;
-  return { last, stale };
+  const runUrl = typeof event?.meta?.runUrl === "string" ? event.meta.runUrl : null;
+  // https://github.com/<owner>/<repo>/actions/runs/<id> → страница workflow с кнопкой Run
+  const workflowUrl = runUrl?.replace(/\/runs\/\d+.*$/, "/workflows/db-backup.yml") ?? null;
+  return { last, stale, viaGithub: event?.meta?.trigger === "github", runUrl, workflowUrl };
 }
