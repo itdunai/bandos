@@ -2,6 +2,9 @@
 
 import { cn } from "@/lib/utils";
 import type { ToastType } from "@/lib/redirect-with-toast";
+
+// Не импортируем из redirect-with-toast: там next/headers (только сервер)
+const TOAST_COOKIE = "bandos_toast";
 import { X } from "lucide-react";
 import {
   createContext,
@@ -40,6 +43,8 @@ export function ToastProvider({
 
   useEffect(() => {
     setToast(initial);
+    // Показали — стираем, чтобы уведомление не повторилось при перезагрузке
+    if (initial) document.cookie = `${TOAST_COOKIE}=; Max-Age=0; path=/`;
   }, [initial]);
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 export type ToastType = "error" | "success";
 
+/** Стирает её ToastProvider в браузере после показа (имя продублировано там). */
 const TOAST_COOKIE = "bandos_toast";
 
 export async function redirectWithToast(
@@ -19,6 +20,11 @@ export async function redirectWithToast(
   redirect(path);
 }
 
+/**
+ * Уведомление после redirectWithToast — для корневого layout. Только читает:
+ * менять куки при отрисовке страницы Next.js запрещает (ошибка роняет весь
+ * layout), поэтому стирает её ToastProvider в браузере после показа.
+ */
 export async function consumeToast(): Promise<{
   type: ToastType;
   message: string;
@@ -26,7 +32,6 @@ export async function consumeToast(): Promise<{
   const cookieStore = await cookies();
   const raw = cookieStore.get(TOAST_COOKIE)?.value;
   if (!raw) return null;
-  cookieStore.delete(TOAST_COOKIE);
   try {
     const parsed = JSON.parse(raw) as { type: ToastType; message: string };
     if (parsed?.message) return parsed;
