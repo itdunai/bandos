@@ -27,21 +27,23 @@ export default async function SetlistsPage({
 
   const { data: setlists } = await supabase
     .from("setlists")
-    .select("*, setlist_items(count)")
+    .select("*")
     .eq("band_id", band.id)
     .order("created_at", { ascending: false });
 
   const setlistIds = setlists?.map((sl) => sl.id) ?? [];
   const durationBySetlist = new Map<string, number>();
+  const countBySetlist = new Map<string, number>();
 
   if (setlistIds.length > 0) {
     const { data: items } = await supabase
       .from("setlist_items")
-      .select("setlist_id, duration_sec, songs(duration_sec)")
+      .select("*, songs(duration_sec)")
       .in("setlist_id", setlistIds);
 
     const grouped = new Map<string, typeof items>();
-    for (const item of items ?? []) {
+    // Разделители блоков — не треки
+    for (const item of (items ?? []).filter((i) => i.is_section !== true)) {
       const list = grouped.get(item.setlist_id) ?? [];
       list.push(item);
       grouped.set(item.setlist_id, list);
@@ -49,6 +51,7 @@ export default async function SetlistsPage({
 
     for (const [id, list] of grouped) {
       durationBySetlist.set(id, sumSetlistDurationSec(list ?? []));
+      countBySetlist.set(id, list?.length ?? 0);
     }
   }
 
@@ -67,8 +70,7 @@ export default async function SetlistsPage({
         setlists={(setlists ?? []).map((sl) => ({
           id: sl.id,
           name: sl.name,
-          itemCount:
-            (sl.setlist_items as { count: number }[])?.[0]?.count ?? 0,
+          itemCount: countBySetlist.get(sl.id) ?? 0,
           durationSec: durationBySetlist.get(sl.id) ?? 0,
         }))}
       />

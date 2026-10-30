@@ -1,3 +1,4 @@
+import { CopySetlistButton } from "@/components/setlists/copy-setlist-button";
 import { bandPath } from "@/lib/paths";
 import { formatDuration } from "@/lib/utils";
 import { ListMusic, Plus } from "lucide-react";
@@ -44,16 +45,24 @@ export function SetlistList({
           </li>
         )}
         {setlists.map((sl) => (
-          <li key={sl.id}>
+          <li key={sl.id} className="relative">
             <Link
               href={bandPath(bandSlug, "setlists", sl.id)}
-              className="block rounded-xl border border-border bg-bg-2 p-4 transition-colors hover:border-accent"
+              className={`block rounded-xl border border-border bg-bg-2 p-4 transition-colors hover:border-accent ${canCreate ? "pr-14" : ""}`}
             >
               <div className="font-medium">{sl.name}</div>
               <div className="text-xs text-text-secondary">
                 {metaLine(sl.itemCount, sl.durationSec)}
               </div>
             </Link>
+            {canCreate && (
+              <CopySetlistButton
+                setlistId={sl.id}
+                setlistName={sl.name}
+                bandSlug={bandSlug}
+                className="absolute right-3 top-1/2 h-10 w-10 -translate-y-1/2"
+              />
+            )}
           </li>
         ))}
       </ul>
@@ -71,19 +80,28 @@ export function SetlistList({
           </Link>
         )}
         {setlists.map((sl) => (
-          <Link
-            key={sl.id}
-            href={bandPath(bandSlug, "setlists", sl.id)}
-            className="flex flex-col rounded-lg border border-border bg-bg-2 p-3 transition-colors hover:border-accent"
-          >
-            <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-bg-3 text-accent">
-              <ListMusic className="h-4 w-4" />
-            </div>
-            <div className="text-sm font-medium leading-snug line-clamp-2">{sl.name}</div>
-            <div className="mt-1 text-[11px] text-text-secondary">
-              {metaLine(sl.itemCount, sl.durationSec)}
-            </div>
-          </Link>
+          <div key={sl.id} className="relative">
+            <Link
+              href={bandPath(bandSlug, "setlists", sl.id)}
+              className="flex h-full flex-col rounded-lg border border-border bg-bg-2 p-3 transition-colors hover:border-accent"
+            >
+              <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-bg-3 text-accent">
+                <ListMusic className="h-4 w-4" />
+              </div>
+              <div className="text-sm font-medium leading-snug line-clamp-2">{sl.name}</div>
+              <div className="mt-1 text-[11px] text-text-secondary">
+                {metaLine(sl.itemCount, sl.durationSec)}
+              </div>
+            </Link>
+            {canCreate && (
+              <CopySetlistButton
+                setlistId={sl.id}
+                setlistName={sl.name}
+                bandSlug={bandSlug}
+                className="absolute right-2 top-2"
+              />
+            )}
+          </div>
         ))}
       </div>
     </>

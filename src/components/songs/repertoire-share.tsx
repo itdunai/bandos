@@ -44,7 +44,7 @@ export function RepertoireShare({
           }
           className="rounded border-border accent-accent"
         />
-        Публичный репертуар
+        Репертуар на странице группы
       </label>
       {isPublic && (
         <ShareLinkButton path={sharePath} label="Поделиться" />

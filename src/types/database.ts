@@ -60,6 +60,8 @@ export interface Band {
   rider_public: boolean;
   accept_bookings?: boolean;
   repertoire_public: boolean;
+  /** Показывать группу в каталоге на главной (миграция 032) */
+  catalog_listed?: boolean;
   social_links: SocialLinks;
   contacts?: BandContact[];
   finance_opening_balance?: number;
@@ -155,6 +157,8 @@ export interface SetlistItem {
   position: number;
   notes: string | null;
   duration_sec: number | null;
+  /** Разделитель блока («Блок 1», «Бис»), а не трек (миграция 032) */
+  is_section?: boolean;
 }
 
 export interface Todo {

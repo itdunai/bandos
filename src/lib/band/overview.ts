@@ -135,13 +135,13 @@ export async function getBandOverview(
         .maybeSingle(),
       supabase
         .from("setlist_items")
-        .select("id, title, duration_sec, songs(title, key, bpm, duration_sec, song_type)")
+        .select("*, songs(title, key, bpm, duration_sec, song_type)")
         .eq("setlist_id", nextWithSetlist.setlist_id)
         .order("position"),
     ]);
 
     if (setlistRow) {
-      const mapped = (items ?? []).map((item) => {
+      const mapped = (items ?? []).filter((item) => item.is_section !== true).map((item) => {
         const raw = item.songs as SongRef | SongRef[] | null;
         const song = Array.isArray(raw) ? raw[0] ?? null : raw;
         return {

@@ -36,6 +36,25 @@ export default async function SongsPage({
   const bandFull = band as Band;
   const canEditSongs = member ? hasPermission(member, "songs") : false;
   const canEditProfile = member ? hasPermission(member, "band_profile") : false;
+  const canEditSetlists = member ? hasPermission(member, "setlists") : false;
+
+  // Для меню «⋯ → Добавить в сет-лист»: какие треки уже в каком сет-листе
+  const { data: setlistRows } = canEditSetlists
+    ? await supabase
+        .from("setlists")
+        .select("id, name, setlist_items(song_id)")
+        .eq("band_id", band.id)
+        .order("created_at", { ascending: false })
+    : { data: null };
+  const menuSetlists = canEditSetlists
+    ? (setlistRows ?? []).map((sl) => ({
+        id: sl.id as string,
+        name: sl.name as string,
+        songIds: ((sl.setlist_items ?? []) as { song_id: string | null }[])
+          .map((i) => i.song_id)
+          .filter((id): id is string => !!id),
+      }))
+    : undefined;
 
   return (
     <AppShell
@@ -58,6 +77,7 @@ export default async function SongsPage({
         songs={(songs ?? []) as Song[]}
         bandSlug={band.slug}
         canCreate={canEditSongs}
+        setlists={menuSetlists}
       />
     </AppShell>
   );

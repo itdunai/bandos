@@ -41,13 +41,13 @@ export default async function PlaySetlistPage({
 
   if (!setlist) notFound();
 
-  const { data: items } = await supabase
+  const { data: allItems } = await supabase
     .from("setlist_items")
-    .select(
-      "id, title, notes, position, songs(id, title, bpm, time_signature, key, structure)"
-    )
+    .select("*, songs(id, title, bpm, time_signature, key, structure)")
     .eq("setlist_id", setlistId)
     .order("position");
+  // Разделители блоков («Бис») на сцене не листаются
+  const items = allItems?.filter((i) => i.is_section !== true);
 
   type SongRef = {
     id: string;

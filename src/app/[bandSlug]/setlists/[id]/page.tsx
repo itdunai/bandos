@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
-import { SetlistEditor } from "@/components/setlists/setlist-editor";
+import { SetlistEditor, type SetlistItemData } from "@/components/setlists/setlist-editor";
 import { Button } from "@/components/ui/button";
 import {
   getBandBySlug,
@@ -37,43 +37,56 @@ export default async function SetlistDetailPage({
 
   if (!setlist) notFound();
 
+  type SongRef = {
+    title: string;
+    key: string | null;
+    bpm: number | null;
+    duration_sec: number | null;
+  };
+
+  // select("*"): is_section появляется в миграции 032 — до неё страница работает
   const [{ data: items }, { data: songs }] = await Promise.all([
     supabase
       .from("setlist_items")
       .select("*, songs(title, key, bpm, duration_sec)")
       .eq("setlist_id", id)
       .order("position"),
-    supabase.from("songs").select("id, title").eq("band_id", band.id).order("title"),
+    supabase
+      .from("songs")
+      .select("id, title, key, bpm")
+      .eq("band_id", band.id)
+      .order("title"),
   ]);
 
-  const editorItems =
+  const editorItems: SetlistItemData[] =
     items?.map((item) => {
-      const raw = item.songs as
-        | { title: string; key: string | null; bpm: number | null; duration_sec: number | null }
-        | { title: string; key: string | null; bpm: number | null; duration_sec: number | null }[]
-        | null;
+      const raw = item.songs as SongRef | SongRef[] | null;
       const song = Array.isArray(raw) ? raw[0] : raw;
-      const title = song?.title ?? item.title ?? "—";
-      const subtitle = song
-        ? [song.key, song.bpm && `${song.bpm} BPM`, formatDuration(song.duration_sec)]
-            .filter(Boolean)
-            .join(" · ")
-        : undefined;
-
+      const isSection = item.is_section === true;
       return {
         id: item.id,
-        title,
-        subtitle,
+        title: song?.title ?? item.title ?? "—",
+        subtitle: song
+          ? [song.key, song.bpm && `${song.bpm} BPM`, formatDuration(song.duration_sec)]
+              .filter(Boolean)
+              .join(" · ")
+          : undefined,
         notes: item.notes,
+        songId: item.song_id,
+        isSection,
+        durationSec: isSection ? 0 : (item.duration_sec ?? song?.duration_sec ?? 0),
       };
     }) ?? [];
 
-  const totalSec =
-    items?.reduce((sum, item) => {
-      const raw = item.songs as { duration_sec: number | null } | { duration_sec: number | null }[] | null;
-      const song = Array.isArray(raw) ? raw[0] : raw;
-      return sum + (item.duration_sec ?? song?.duration_sec ?? 0);
-    }, 0) ?? 0;
+  const tracks = editorItems.filter((i) => !i.isSection);
+  const blocksCount = editorItems.length - tracks.length;
+  const totalSec = tracks.reduce((sum, i) => sum + (i.durationSec ?? 0), 0);
+
+  const songOptions = (songs ?? []).map((s) => ({
+    id: s.id,
+    title: s.title,
+    meta: [s.key, s.bpm && `${s.bpm} BPM`].filter(Boolean).join(" · ") || undefined,
+  }));
 
   return (
     <AppShell
@@ -93,12 +106,18 @@ export default async function SetlistDetailPage({
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
         <div className="rounded-xl border border-border bg-bg-2 p-3">
           <div className="text-xs uppercase text-text-muted">Треков</div>
-          <div className="text-xl font-medium">{items?.length ?? 0}</div>
+          <div className="text-xl font-medium">{tracks.length}</div>
         </div>
         <div className="rounded-xl border border-border bg-bg-2 p-3">
           <div className="text-xs uppercase text-text-muted">Длительность</div>
           <div className="text-xl font-medium">{formatDuration(totalSec)}</div>
         </div>
+        {blocksCount > 0 && (
+          <div className="rounded-xl border border-border bg-bg-2 p-3">
+            <div className="text-xs uppercase text-text-muted">Блоков</div>
+            <div className="text-xl font-medium">{blocksCount}</div>
+          </div>
+        )}
       </div>
 
       <SetlistEditor
@@ -106,7 +125,7 @@ export default async function SetlistDetailPage({
         setlistName={setlist.name}
         bandSlug={band.slug}
         initialItems={editorItems}
-        songs={songs ?? []}
+        songs={songOptions}
       />
     </AppShell>
   );

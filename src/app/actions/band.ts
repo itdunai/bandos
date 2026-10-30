@@ -26,6 +26,8 @@ export async function updateBandProfile(
   const techRider = (formData.get("tech_rider") as string).trim() || null;
   const riderPublic = formData.get("rider_public") === "on";
   const acceptBookings = formData.get("accept_bookings") === "on";
+  const repertoirePublic = formData.get("repertoire_public") === "on";
+  const catalogListed = formData.get("catalog_listed") === "on";
 
   const { error } = await supabase
     .from("bands")
@@ -36,6 +38,7 @@ export async function updateBandProfile(
       city,
       tech_rider: techRider,
       rider_public: riderPublic,
+      repertoire_public: repertoirePublic,
       social_links: parseSocialLinksForm(formData),
       contacts: parseContactsJson(formData.get("contacts_json")),
     })
@@ -46,10 +49,14 @@ export async function updateBandProfile(
     return;
   }
 
-  // Отдельно: колонка появляется в миграции 028 — до неё профиль должен сохраняться.
+  // Отдельно: колонки появляются в миграциях 028 и 032 — до них профиль должен сохраняться.
   await supabase
     .from("bands")
     .update({ accept_bookings: acceptBookings })
+    .eq("id", bandId);
+  await supabase
+    .from("bands")
+    .update({ catalog_listed: catalogListed })
     .eq("id", bandId);
 
   revalidatePublicBandAndCatalog(bandSlug);

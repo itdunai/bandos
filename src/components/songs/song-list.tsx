@@ -1,5 +1,6 @@
 "use client";
 
+import { SongActionsMenu, type SongMenuSetlist } from "@/components/songs/song-actions-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,11 +45,25 @@ export function SongList({
   songs,
   bandSlug,
   canCreate = false,
+  setlists,
 }: {
   songs: Song[];
   bandSlug: string;
   canCreate?: boolean;
+  /** Сет-листы для меню «⋯» — только если есть право их править */
+  setlists?: SongMenuSetlist[];
 }) {
+  const menu = (song: Song, className?: string) =>
+    setlists ? (
+      <SongActionsMenu
+        songId={song.id}
+        songTitle={song.title}
+        bandSlug={bandSlug}
+        setlists={setlists}
+        className={className}
+      />
+    ) : null;
+
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<SongStatus | "all">("all");
   const [typeFilter, setTypeFilter] = useState<SongType | "all">("all");
@@ -188,6 +203,7 @@ export function SongList({
               bandSlug={bandSlug}
               showAddCard={showAddCard}
               meta={meta}
+              menu={menu}
             />
           </div>
           <div className="hidden md:block">
@@ -195,6 +211,7 @@ export function SongList({
               songs={filtered}
               bandSlug={bandSlug}
               showAddRow={showAddCard}
+              menu={menu}
             />
           </div>
         </>
@@ -205,30 +222,36 @@ export function SongList({
             bandSlug={bandSlug}
             showAddCard={showAddCard}
             meta={meta}
+            menu={menu}
             className="md:hidden"
           />
 
           <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
             {showAddCard && <AddSongLink bandSlug={bandSlug} variant="tile" />}
             {filtered.map((song) => (
-              <Link
-                key={song.id}
-                href={bandPath(bandSlug, "songs", song.id)}
-                className="flex flex-col rounded-lg border border-border bg-bg-2 p-2.5 transition-colors hover:border-accent"
-              >
-                <div className="mb-2 flex items-start justify-between gap-1">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-bg-3 text-accent">
-                    <Music className="h-3.5 w-3.5" />
+              <div key={song.id} className="relative">
+                <Link
+                  href={bandPath(bandSlug, "songs", song.id)}
+                  className="flex h-full flex-col rounded-lg border border-border bg-bg-2 p-2.5 transition-colors hover:border-accent"
+                >
+                  <div className="mb-2 flex items-start justify-between gap-1">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-bg-3 text-accent">
+                      <Music className="h-3.5 w-3.5" />
+                    </div>
+                    <Badge
+                      variant={STATUS_VARIANT[song.status]}
+                      className={cn("text-[11px]", setlists && "mr-8")}
+                    >
+                      {SONG_STATUS_LABELS[song.status]}
+                    </Badge>
                   </div>
-                  <Badge variant={STATUS_VARIANT[song.status]} className="text-[11px]">
-                    {SONG_STATUS_LABELS[song.status]}
-                  </Badge>
-                </div>
-                <div className="text-sm font-medium leading-snug line-clamp-2">{song.title}</div>
-                {meta(song) && (
-                  <div className="mt-1 text-[11px] text-text-secondary line-clamp-1">{meta(song)}</div>
-                )}
-              </Link>
+                  <div className="text-sm font-medium leading-snug line-clamp-2">{song.title}</div>
+                  {meta(song) && (
+                    <div className="mt-1 text-[11px] text-text-secondary line-clamp-1">{meta(song)}</div>
+                  )}
+                </Link>
+                {menu(song, "absolute right-1.5 top-1.5")}
+              </div>
             ))}
           </div>
         </>
@@ -246,12 +269,14 @@ function SongMobileList({
   bandSlug,
   showAddCard,
   meta,
+  menu,
   className,
 }: {
   songs: Song[];
   bandSlug: string;
   showAddCard: boolean;
   meta: (song: Song) => string;
+  menu: (song: Song, className?: string) => React.ReactNode;
   className?: string;
 }) {
   return (
@@ -262,10 +287,10 @@ function SongMobileList({
         </li>
       )}
       {songs.map((song) => (
-        <li key={song.id}>
+        <li key={song.id} className="flex items-center gap-1">
           <Link
             href={bandPath(bandSlug, "songs", song.id)}
-            className="flex items-center gap-3 rounded-lg border border-border bg-bg-2 px-3 py-2.5 transition-colors hover:border-accent"
+            className="flex min-w-0 flex-1 items-center gap-3 rounded-lg border border-border bg-bg-2 px-3 py-2.5 transition-colors hover:border-accent"
           >
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-bg-3 text-accent">
               <Music className="h-4 w-4" />
@@ -280,6 +305,7 @@ function SongMobileList({
               {SONG_STATUS_LABELS[song.status]}
             </Badge>
           </Link>
+          {menu(song, "h-10 w-9")}
         </li>
       ))}
     </ul>
@@ -290,10 +316,12 @@ function SongTable({
   songs,
   bandSlug,
   showAddRow,
+  menu,
 }: {
   songs: Song[];
   bandSlug: string;
   showAddRow: boolean;
+  menu: (song: Song, className?: string) => React.ReactNode;
 }) {
   return (
     <div className="w-full min-w-0 max-w-full overflow-x-auto rounded-xl border border-border">
@@ -307,12 +335,15 @@ function SongTable({
             <th className="hidden px-4 py-3 font-medium md:table-cell">BPM</th>
             <th className="hidden px-4 py-3 font-medium lg:table-cell">Размер</th>
             <th className="px-4 py-3 text-right font-medium">Длительность</th>
+            <th className="w-10 px-2 py-3">
+              <span className="sr-only">Действия</span>
+            </th>
           </tr>
         </thead>
         <tbody>
           {showAddRow && (
             <tr className="border-b border-border/50">
-              <td colSpan={7} className="px-4 py-2">
+              <td colSpan={8} className="px-4 py-2">
                 <Link
                   href={bandPath(bandSlug, "songs", "new")}
                   className="inline-flex items-center gap-1.5 text-sm text-accent hover:underline"
@@ -357,6 +388,7 @@ function SongTable({
               <td className="px-4 py-3 text-right text-text-secondary">
                 {formatDuration(song.duration_sec)}
               </td>
+              <td className="px-2 py-1.5">{menu(song)}</td>
             </tr>
           ))}
         </tbody>

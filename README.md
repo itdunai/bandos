@@ -46,6 +46,7 @@
    - `supabase/migrations/029_security_hardening_2.sql`
    - `supabase/migrations/030_account_deletion_and_feedback.sql` — удаление аккаунта (`/account`), обратная связь (`/feedback`, список в `/admin`)
    - `supabase/migrations/031_feedback_tickets_and_metrics.sql` — обращения со статусом и ответом, учёт посещений и метрика `/admin`
+   - `supabase/migrations/032_setlist_blocks_and_catalog_flag.sql` — блоки в сет-листе, отдельный флаг «Отображать в каталоге групп»
 3. **Authentication → Providers → Email** — включите Email
 4. Для локальной разработки отключите «Confirm email» (или подтверждайте вручную)
 5. **Authentication → URL Configuration**:

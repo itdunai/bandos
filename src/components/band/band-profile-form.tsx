@@ -40,6 +40,26 @@ export function BandProfileForm({
 
       <form action={action} className="space-y-5">
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
+        <h2 className="text-xs font-bold uppercase tracking-wide">Публичность</h2>
+        <PublicToggle
+          name="catalog_listed"
+          defaultChecked={band.catalog_listed ?? false}
+          title="Отображать в каталоге групп"
+          hint="Группа появится в каталоге на главной BandOS: название, жанр, город и описание. Заказчики смогут найти вас без ссылки."
+        />
+        <PublicToggle
+          name="repertoire_public"
+          defaultChecked={band.repertoire_public ?? false}
+          title="Показывать репертуар на странице группы"
+          hint="Список готовых треков — только названия и длительность. Аккорды, тексты и табы остаются внутри группы."
+        />
+        <p className="text-xs text-text-muted">
+          Страница группы открывается по ссылке, если включено хотя бы что-то: каталог, репертуар
+          или техрайдер.
+        </p>
+      </section>
+
+      <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-3">
         <h2 className="text-xs font-bold uppercase tracking-wide">Основное</h2>
         <div>
           <Label>Название</Label>
@@ -87,15 +107,12 @@ export function BandProfileForm({
           defaultValue={band.tech_rider ?? ""}
           placeholder={"Барабанная установка: ...\nГитарный комбик: ...\nМониторы: 4 шт.\n..."}
         />
-        <label className="flex items-center gap-2 text-xs text-text-secondary">
-          <input
-            type="checkbox"
-            name="rider_public"
-            defaultChecked={band.rider_public ?? true}
-            className="rounded border-border accent-accent"
-          />
-          Публичная ссылка на техрайдер (без входа в BandOS)
-        </label>
+        <PublicToggle
+          name="rider_public"
+          defaultChecked={band.rider_public ?? true}
+          title="Показывать техрайдер на странице группы"
+          hint="Его увидят по ссылке без входа в BandOS — удобно отправлять площадкам."
+        />
       </section>
 
       <section className="rounded-xl border border-border bg-bg-2 p-4 space-y-2">
@@ -124,5 +141,32 @@ export function BandProfileForm({
       </SubmitButton>
     </form>
     </div>
+  );
+}
+
+function PublicToggle({
+  name,
+  defaultChecked,
+  title,
+  hint,
+}: {
+  name: string;
+  defaultChecked: boolean;
+  title: string;
+  hint: string;
+}) {
+  return (
+    <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+      <input
+        type="checkbox"
+        name={name}
+        defaultChecked={defaultChecked}
+        className="mt-0.5 rounded border-border accent-accent"
+      />
+      <span>
+        <span className="font-medium">{title}</span>
+        <span className="mt-0.5 block text-xs text-text-secondary">{hint}</span>
+      </span>
+    </label>
   );
 }

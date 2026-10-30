@@ -38,7 +38,7 @@ export default async function MetronomePage({
       .order("title"),
     supabase
       .from("setlists")
-      .select("id, name, setlist_items(position, title, song_id)")
+      .select("id, name, setlist_items(*)")
       .eq("band_id", band.id)
       .order("created_at", { ascending: false }),
   ]);
@@ -61,6 +61,7 @@ export default async function MetronomePage({
       id: sl.id,
       name: sl.name,
       items: [...(sl.setlist_items ?? [])]
+        .filter((item) => item.is_section !== true)
         .sort((a, b) => a.position - b.position)
         .map((item) => ({
           title: item.title ?? (item.song_id ? titleById.get(item.song_id) : null) ?? "Без названия",
