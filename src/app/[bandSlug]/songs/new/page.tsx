@@ -12,10 +12,10 @@ export default async function NewSongPage({
   searchParams,
 }: {
   params: Promise<{ bandSlug: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; title?: string }>;
 }) {
   const { bandSlug } = await params;
-  const { error } = await searchParams;
+  const { error, title } = await searchParams;
   const band = await getBandBySlug(bandSlug);
   if (!band) notFound();
 
@@ -31,7 +31,7 @@ export default async function NewSongPage({
           {decodeURIComponent(error)}
         </div>
       )}
-      <SongForm bandId={band.id} bandSlug={band.slug} />
+      <SongForm bandId={band.id} bandSlug={band.slug} initialTitle={title?.slice(0, 200)} />
     </AppShell>
   );
 }

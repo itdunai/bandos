@@ -15,6 +15,19 @@ export interface PlayTrack {
   structure: string | null;
   notes: string | null;
   contents: { content_type: string; instrument: string | null; body: string }[];
+  /** Блок сет-листа («Блок 2», «Бис»); нет — сет-лист без блоков */
+  block?: string | null;
+}
+
+/** Место трека в его блоке: «Блок 2 · 3 из 5». Блок — подряд идущие треки с одним названием. */
+function blockPosition(tracks: PlayTrack[], index: number) {
+  const name = tracks[index]?.block;
+  if (!name) return null;
+  let start = index;
+  while (start > 0 && tracks[start - 1].block === name) start--;
+  let end = index;
+  while (end < tracks.length - 1 && tracks[end + 1].block === name) end++;
+  return { name, number: index - start + 1, size: end - start + 1 };
 }
 
 const SWIPE_THRESHOLD = 50;
@@ -31,6 +44,7 @@ export function PlayMode({
   const [index, setIndex] = useState(0);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const track = tracks[index];
+  const block = blockPosition(tracks, index);
 
   function goPrev() {
     setIndex((i) => Math.max(0, i - 1));
@@ -85,9 +99,23 @@ export function PlayMode({
             <ChevronLeft className="h-5 w-5" />
           </Button>
           <div className="min-w-0 flex-1 text-center">
-            <div className="text-xs text-text-muted">
-              {index + 1} / {tracks.length}
-            </div>
+            {block ? (
+              <div className="flex items-center justify-center gap-1.5 text-xs">
+                <span className="truncate font-semibold uppercase tracking-wide text-accent">
+                  {block.name}
+                </span>
+                <span className="shrink-0 text-text-muted">
+                  · {block.number} из {block.size}
+                </span>
+                <span className="shrink-0 text-text-muted/70">
+                  ({index + 1}/{tracks.length})
+                </span>
+              </div>
+            ) : (
+              <div className="text-xs text-text-muted">
+                {index + 1} / {tracks.length}
+              </div>
+            )}
             <div className="heading-poster mt-0.5 truncate text-lg sm:text-xl">{track.title}</div>
           </div>
           <Button
@@ -121,8 +149,8 @@ export function PlayMode({
                 i === index
                   ? "w-6 bg-accent"
                   : "w-2 bg-bg-3 hover:bg-accent/40"
-              }`}
-              aria-label={`Трек ${i + 1}`}
+              } ${i > 0 && t.block !== tracks[i - 1].block ? "ml-2" : ""}`}
+              aria-label={t.block ? `${t.block}, трек ${i + 1}` : `Трек ${i + 1}`}
             />
           ))}
         </div>

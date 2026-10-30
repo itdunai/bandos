@@ -27,12 +27,14 @@ interface SongFormProps {
   bandId: string;
   bandSlug: string;
   song?: Song & { chords?: string; tabs?: string; lyrics?: string };
+  /** Название нового трека — из поиска в «Треках» */
+  initialTitle?: string;
 }
 
 const selectClass =
   "w-full rounded-lg border border-border bg-bg-3 px-3 py-2 text-sm outline-none focus:border-accent";
 
-export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
+export function SongForm({ bandId, bandSlug, song, initialTitle }: SongFormProps) {
   const [pending, startTransition] = useTransition();
   const isEdit = !!song;
 
@@ -46,7 +48,7 @@ export function SongForm({ bandId, bandSlug, song }: SongFormProps) {
         <h2 className="text-xs font-bold uppercase tracking-wide">Основное</h2>
         <div>
           <Label>Название *</Label>
-          <Input name="title" required defaultValue={song?.title} placeholder="Night Drive" />
+          <Input name="title" required defaultValue={song?.title ?? initialTitle} placeholder="Night Drive" />
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div>

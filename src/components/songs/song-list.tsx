@@ -14,7 +14,7 @@ import {
   type SongStatus,
   type SongType,
 } from "@/types/database";
-import { Download, LayoutGrid, Music, Plus, Search, Table2 } from "lucide-react";
+import { Download, LayoutGrid, Music, Plus, Search, Table2, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -114,9 +114,24 @@ export function SongList({
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setQuery("");
+            }}
             placeholder="Поиск по названию, тональности..."
-            className="pl-9"
+            aria-label="Поиск треков"
+            className={cn("pl-9", query && "pr-9")}
           />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label="Очистить поиск"
+              title="Очистить"
+              className="absolute right-1.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-text-muted hover:bg-bg-3 hover:text-text-primary"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
         <div className="flex shrink-0 gap-2">
           <Button
@@ -192,9 +207,37 @@ export function SongList({
       </div>
 
       {filtered.length === 0 && !showAddCard ? (
-        <p className="py-8 text-center text-sm text-text-secondary">
-          Ничего не найдено
-        </p>
+        <div className="flex flex-col items-center gap-3 py-8 text-center">
+          <p className="text-sm text-text-secondary">
+            {query.trim() ? <>По запросу «{query.trim()}» ничего не найдено</> : "Ничего не найдено"}
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {canCreate && (
+              <Link
+                href={`${bandPath(bandSlug, "songs", "new")}${
+                  query.trim() ? `?title=${encodeURIComponent(query.trim())}` : ""
+                }`}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-accent px-3.5 text-sm font-semibold text-accent-ink hover:bg-accent-dark"
+              >
+                <Plus className="h-4 w-4" />
+                {query.trim() ? `Добавить «${query.trim()}»` : "Добавить трек"}
+              </Link>
+            )}
+            <Button
+              type="button"
+              variant="default"
+              size="sm"
+              className="h-9"
+              onClick={() => {
+                setQuery("");
+                setStatusFilter("all");
+                setTypeFilter("all");
+              }}
+            >
+              Сбросить поиск и фильтры
+            </Button>
+          </div>
+        </div>
       ) : viewMode === "table" ? (
         <>
           <div className="md:hidden">

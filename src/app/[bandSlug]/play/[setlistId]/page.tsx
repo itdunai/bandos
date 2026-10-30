@@ -46,7 +46,13 @@ export default async function PlaySetlistPage({
     .select("*, songs(id, title, bpm, time_signature, key, structure)")
     .eq("setlist_id", setlistId)
     .order("position");
-  // Разделители блоков («Бис») на сцене не листаются
+  // Разделители блоков на сцене не листаются — их название становится подписью треков
+  const blockByItem = new Map<string, string>();
+  let currentBlock: string | null = null;
+  for (const i of allItems ?? []) {
+    if (i.is_section === true) currentBlock = i.title ?? null;
+    else if (currentBlock) blockByItem.set(i.id, currentBlock);
+  }
   const items = allItems?.filter((i) => i.is_section !== true);
 
   type SongRef = {
@@ -104,6 +110,7 @@ export default async function PlaySetlistPage({
           structure: song.structure,
           notes: item.notes,
           contents: contentsMap[song.id] ?? [],
+          block: blockByItem.get(item.id) ?? null,
         };
       }
 
@@ -116,6 +123,7 @@ export default async function PlaySetlistPage({
         structure: null,
         notes: item.notes,
         contents: [],
+        block: blockByItem.get(item.id) ?? null,
       };
     }) ?? [];
 
