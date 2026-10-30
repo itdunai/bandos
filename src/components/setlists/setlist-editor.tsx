@@ -15,6 +15,7 @@ import { SongPicker, type SongPickerOption } from "@/components/setlists/song-pi
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast-provider";
+import { setlistToText } from "@/lib/setlist-text";
 import { cn, formatDuration } from "@/lib/utils";
 import {
   DndContext,
@@ -33,7 +34,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Copy, GripVertical, Plus, Rows3, Trash2 } from "lucide-react";
+import { Check, Copy, GripVertical, Plus, Rows3, Share2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
@@ -177,6 +178,7 @@ export function SetlistEditor({
   const [items, setItems] = useState(initialItems);
   const [name, setName] = useState(setlistName);
   const [customTitle, setCustomTitle] = useState("");
+  const [copied, setCopied] = useState(false);
   const { numbers, blocks } = useBlocks(items);
 
   useEffect(() => {
@@ -264,6 +266,30 @@ export function SetlistEditor({
     startTransition(() => duplicateSetlist(setlistId, bandSlug));
   }
 
+  async function handleShare() {
+    const text = setlistToText(name, items);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Старый браузер или нет доступа к буферу — через временное поле
+      const area = document.createElement("textarea");
+      area.value = text;
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand("copy");
+      area.remove();
+      if (!ok) {
+        showToast("error", "Не удалось скопировать — браузер не дал доступ к буферу");
+        return;
+      }
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+    showToast("success", "Сет-лист скопирован — вставьте в сообщение");
+  }
+
   const hasSections = items.some((i) => i.isSection);
 
   return (
@@ -276,6 +302,17 @@ export function SetlistEditor({
           aria-label="Название сет-листа"
           className="flex-1 text-base font-medium"
         />
+        <Button
+          type="button"
+          variant={copied ? "accent" : "default"}
+          disabled={items.length === 0}
+          onClick={handleShare}
+          title="Скопировать сет-лист текстом — для Telegram или ВК"
+          className="shrink-0"
+        >
+          {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+          <span className="hidden sm:inline">{copied ? "Скопировано" : "Поделиться"}</span>
+        </Button>
         <Button
           type="button"
           variant="default"
