@@ -2,14 +2,21 @@
 
 import type { Instrument } from "@/types/database";
 import { Metronome } from "@/components/metronome/metronome";
+import { useTranspose } from "@/components/play/use-transpose";
+import {
+  detectNotation,
+  formatSemitones,
+  parseChordSheet,
+  transposeKey,
+} from "@/lib/chords";
 import {
   DEFAULT_PLAY_TEXT_PREFS,
   playFontClass,
   type PlayTextPrefs,
 } from "@/lib/play/text-prefs";
 import { cn } from "@/lib/utils";
-import { FileText } from "lucide-react";
-import { useState } from "react";
+import { FileText, Minus, Plus, RotateCcw } from "lucide-react";
+import { useMemo, useState } from "react";
 
 interface SongContent {
   content_type: string;
@@ -18,6 +25,8 @@ interface SongContent {
 }
 
 interface TrackData {
+  /** Пункт сет-листа — ключ сдвига тональности */
+  id: string;
   title: string;
   bpm: number | null;
   time_signature: string | null;
@@ -55,6 +64,15 @@ export function InstrumentView({
   );
   const lyrics = track.contents.find((c) => c.content_type === "lyrics");
 
+  const showChords = (instrument === "guitar" || instrument === "keys") && !!chords?.body;
+  const [semitones, setSemitones] = useTranspose(track.id);
+  const notation = useMemo(() => detectNotation(chords?.body ?? ""), [chords?.body]);
+  const chordLines = useMemo(
+    () => (showChords && chords ? parseChordSheet(chords.body, semitones, notation) : []),
+    [showChords, chords, semitones, notation]
+  );
+  const shownKey = showChords ? transposeKey(track.key, semitones, notation) : track.key;
+
   const canToggleLyrics =
     (instrument === "guitar" || instrument === "bass") && !!lyrics?.body;
   const [showLyrics, setShowLyrics] = useState(false);
@@ -62,10 +80,15 @@ export function InstrumentView({
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain p-4 pb-12">
       <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-text-secondary">
-        {track.key && (
+        {shownKey && (
           <span className="rounded-md bg-bg-3 px-3 py-1">
             <span className="text-text-muted">Тональность </span>
-            <span className="font-medium text-text-primary">{track.key}</span>
+            <span className={cn("font-medium", semitones ? "text-accent" : "text-text-primary")}>
+              {shownKey}
+            </span>
+            {semitones !== 0 && track.key && (
+              <span className="text-text-muted"> · было {track.key}</span>
+            )}
           </span>
         )}
         {track.bpm && (
@@ -111,11 +134,64 @@ export function InstrumentView({
         </section>
       )}
 
-      {(instrument === "guitar" || instrument === "keys") && chords?.body && (
+      {showChords && (
         <section className="flex-1">
-          <h3 className={heading}>Аккорды</h3>
-          <pre {...textBlock("chords", BASE_REM.chords, "text-accent")}>
-            {chords.body}
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h3 className={cn(heading, "mb-0")}>Аккорды</h3>
+            <div className="flex items-center gap-1" role="group" aria-label="Транспонирование">
+              <button
+                type="button"
+                onClick={() => setSemitones(semitones - 1)}
+                aria-label="Ниже на полутон"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-bg-3 text-text-secondary hover:text-text-primary"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <span
+                className={cn(
+                  "min-w-[64px] text-center text-xs tabular-nums",
+                  semitones ? "font-semibold text-accent" : "text-text-muted"
+                )}
+                aria-live="polite"
+              >
+                Тон {formatSemitones(semitones)}
+              </span>
+              <button
+                type="button"
+                onClick={() => setSemitones(semitones + 1)}
+                aria-label="Выше на полутон"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-bg-3 text-text-secondary hover:text-text-primary"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+              {semitones !== 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSemitones(0)}
+                  aria-label="Вернуть исходную тональность"
+                  title="Исходная тональность"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:text-text-primary"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+          <pre {...textBlock("chords", BASE_REM.chords, "text-text-primary")}>
+            {chordLines.map((line, i) => (
+              <span key={i}>
+                {line.segments.map((seg, j) =>
+                  seg.chord ? (
+                    <span key={j} className="font-semibold text-accent">
+                      {seg.text}
+                    </span>
+                  ) : (
+                    seg.text
+                  )
+                )}
+                {i < chordLines.length - 1 && "\n"}
+              </span>
+            ))}
           </pre>
         </section>
       )}
