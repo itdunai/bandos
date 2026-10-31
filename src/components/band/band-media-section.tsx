@@ -7,13 +7,13 @@ import {
 import { ImageUploadField } from "@/components/uploads/image-upload-field";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { SafeMediaImage } from "@/components/ui/safe-media-image";
-import {
-  clientUploadBandLogo,
-  clientUploadBandPhoto,
-} from "@/lib/upload/client-media";
+import { BandPhotosUploader } from "@/components/band/band-photos-uploader";
+import { clientUploadBandLogo } from "@/lib/upload/client-media";
 import { stripCacheParam } from "@/lib/upload/media-url";
 import { Trash2 } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
+
+const MAX_PHOTOS = 12;
 
 export function BandMediaSection({
   bandId,
@@ -66,7 +66,8 @@ export function BandMediaSection({
       <div className="space-y-2 border-t border-border pt-4">
         <div className="text-sm font-medium">Фото группы</div>
         <p className="text-xs text-text-secondary">
-          До 12 фото — показываются на публичной странице. Нажмите для просмотра.
+          До {MAX_PHOTOS} фото ({localPhotos.length} из {MAX_PHOTOS}) — показываются на публичной
+          странице. Нажмите для просмотра.
         </p>
 
         {localPhotos.length > 0 && (
@@ -113,23 +114,17 @@ export function BandMediaSection({
           </div>
         )}
 
-        <ImageUploadField
-          label=""
-          currentUrl={null}
-          onUpload={async (file) => {
-            const result = await clientUploadBandPhoto(bandId, bandSlug, file);
-            if (result.error || !result.publicUrl) {
-              return { error: result.error ?? "Ошибка загрузки" };
-            }
-            const url = result.publicUrl;
+        <BandPhotosUploader
+          bandId={bandId}
+          bandSlug={bandSlug}
+          freeSlots={MAX_PHOTOS - localPhotos.length}
+          onUploaded={(url) =>
             setLocalPhotos((prev) => {
               const clean = stripCacheParam(url);
               if (prev.some((item) => stripCacheParam(item) === clean)) return prev;
               return [...prev, url];
-            });
-            return { url };
-          }}
-          aspect="square"
+            })
+          }
         />
       </div>
 
