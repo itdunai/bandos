@@ -4,7 +4,7 @@ export type PlayTextAlign = "center" | "left";
 export type PlayTextFont = "auto" | "mono" | "sans" | "serif";
 
 export interface PlayTextPrefs {
-  /** Множитель размера шрифта, 0.7–2.5 */
+  /** Множитель размера шрифта, 0.4–2.5 */
   scale: number;
   align: PlayTextAlign;
   font: PlayTextFont;
@@ -12,7 +12,7 @@ export interface PlayTextPrefs {
   updatedAt: number;
 }
 
-export const PLAY_SCALE_MIN = 0.7;
+export const PLAY_SCALE_MIN = 0.4;
 export const PLAY_SCALE_MAX = 2.5;
 export const PLAY_SCALE_STEP = 0.1;
 

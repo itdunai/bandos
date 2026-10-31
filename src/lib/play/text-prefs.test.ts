@@ -27,7 +27,7 @@ describe("parsePlayTextPrefs", () => {
 describe("clampScale", () => {
   it("rounds to one decimal within range", () => {
     expect(clampScale(1.1 + 0.1)).toBe(1.2);
-    expect(clampScale(0.1)).toBe(0.7);
+    expect(clampScale(0.1)).toBe(0.4);
   });
 });
 
