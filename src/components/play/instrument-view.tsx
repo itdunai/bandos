@@ -27,8 +27,12 @@ interface TrackData {
   contents: SongContent[];
 }
 
-/** Базовый размер (rem) — умножается на «A−/A+» из настроек пользователя. */
-const BASE_REM = { chords: 1.75, tabs: 1.125, lyrics: 1.25, lyricsSecondary: 1.0625 };
+/**
+ * Базовый размер (rem) — умножается на «A−/A+» из настроек пользователя.
+ * Аккорды часто записаны вместе со словами — база как у текста, иначе при
+ * одном масштабе аккорды выходят заметно крупнее «Текста» под ними.
+ */
+const BASE_REM = { chords: 1.125, tabs: 1.125, lyrics: 1.25, lyricsSecondary: 1.0625 };
 
 export function InstrumentView({
   track,
