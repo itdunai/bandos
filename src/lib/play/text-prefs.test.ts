@@ -3,7 +3,7 @@ import {
   clampScale,
   DEFAULT_PLAY_TEXT_PREFS,
   parsePlayTextPrefs,
-  playFontClass,
+  resolvePlayFont,
 } from "@/lib/play/text-prefs";
 
 describe("parsePlayTextPrefs", () => {
@@ -15,12 +15,18 @@ describe("parsePlayTextPrefs", () => {
   });
 
   it("keeps valid values and clamps the scale", () => {
-    expect(parsePlayTextPrefs({ scale: 9, align: "left", font: "serif", updatedAt: 5 })).toEqual({
+    expect(parsePlayTextPrefs({ scale: 9, align: "left", font: "inter", updatedAt: 5 })).toEqual({
       scale: 2.5,
       align: "left",
-      font: "serif",
+      font: "inter",
       updatedAt: 5,
     });
+  });
+
+  it("maps fonts from the first version of the settings", () => {
+    expect(parsePlayTextPrefs({ font: "mono" }).font).toBe("jetbrains");
+    expect(parsePlayTextPrefs({ font: "sans" }).font).toBe("golos");
+    expect(parsePlayTextPrefs({ font: "serif" }).font).toBe("golos");
   });
 });
 
@@ -31,11 +37,12 @@ describe("clampScale", () => {
   });
 });
 
-describe("playFontClass", () => {
+describe("resolvePlayFont", () => {
   it("keeps tabs monospaced and auto-splits chords and lyrics", () => {
-    expect(playFontClass("serif", "tabs")).toBe("font-mono");
-    expect(playFontClass("auto", "chords")).toBe("font-mono");
-    expect(playFontClass("auto", "lyrics")).toBe("font-sans");
-    expect(playFontClass("serif", "lyrics")).toBe("font-serif");
+    expect(resolvePlayFont("nunito", "tabs")).toBe("site-mono");
+    expect(resolvePlayFont("jetbrains", "tabs")).toBe("jetbrains");
+    expect(resolvePlayFont("auto", "chords")).toBe("site-mono");
+    expect(resolvePlayFont("auto", "lyrics")).toBe("site-sans");
+    expect(resolvePlayFont("inter", "lyrics")).toBe("inter");
   });
 });

@@ -1,19 +1,24 @@
 "use client";
 
+import { PLAY_FONT_CLASS } from "@/lib/play/fonts";
 import {
   clampScale,
-  PLAY_FONT_LABELS,
-  PLAY_FONT_ORDER,
+  PLAY_FONTS,
   PLAY_SCALE_MAX,
   PLAY_SCALE_MIN,
   PLAY_SCALE_STEP,
+  playFontLabel,
+  resolvePlayFont,
   type PlayTextPrefs,
 } from "@/lib/play/text-prefs";
 import { cn } from "@/lib/utils";
-import { AArrowDown, AArrowUp, AlignCenter, AlignLeft, CaseSensitive } from "lucide-react";
+import { AArrowDown, AArrowUp, AlignCenter, AlignLeft, CaseSensitive, Check } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 const iconButton =
   "flex h-8 min-w-8 shrink-0 items-center justify-center gap-1 rounded-lg px-1.5 text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary disabled:opacity-40 disabled:hover:bg-transparent";
+
+type Patch = Partial<Omit<PlayTextPrefs, "updatedAt">>;
 
 /** Размер, выравнивание и шрифт текста в «Играем» — иконки в верхней плашке. */
 export function PlayTextToolbar({
@@ -21,10 +26,9 @@ export function PlayTextToolbar({
   onChange,
 }: {
   prefs: PlayTextPrefs;
-  onChange: (patch: Partial<Omit<PlayTextPrefs, "updatedAt">>) => void;
+  onChange: (patch: Patch) => void;
 }) {
   const percent = Math.round(prefs.scale * 100);
-  const nextFont = PLAY_FONT_ORDER[(PLAY_FONT_ORDER.indexOf(prefs.font) + 1) % PLAY_FONT_ORDER.length];
 
   return (
     <div className="flex shrink-0 items-center" role="toolbar" aria-label="Настройки текста">
@@ -70,16 +74,88 @@ export function PlayTextToolbar({
           <AlignLeft className="h-4 w-4" />
         )}
       </button>
+      <FontMenu prefs={prefs} onChange={onChange} />
+    </div>
+  );
+}
+
+/** Меню шрифтов: каждый вариант подписан своим же начертанием. */
+function FontMenu({ prefs, onChange }: { prefs: PlayTextPrefs; onChange: (patch: Patch) => void }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDown(e: PointerEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={rootRef} className="relative">
       <button
         type="button"
-        className={iconButton}
-        onClick={() => onChange({ font: nextFont })}
-        aria-label={`Шрифт: ${PLAY_FONT_LABELS[prefs.font]}. Переключить на «${PLAY_FONT_LABELS[nextFont]}»`}
-        title={`Шрифт: ${PLAY_FONT_LABELS[prefs.font]}`}
+        className={cn(iconButton, open && "bg-bg-3 text-text-primary")}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={`Шрифт: ${playFontLabel(prefs.font)}`}
+        title={`Шрифт: ${playFontLabel(prefs.font)}`}
       >
         <CaseSensitive className="h-4 w-4" />
-        <span className="hidden text-[11px] sm:inline">{PLAY_FONT_LABELS[prefs.font]}</span>
       </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 top-full z-50 mt-1 w-[min(280px,calc(100vw-16px))] rounded-lg border border-border-strong bg-bg-2 p-1 shadow-xl"
+        >
+          <div className="px-2.5 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">
+            Шрифт
+          </div>
+          {PLAY_FONTS.map((font) => {
+            const active = prefs.font === font.id;
+            return (
+              <button
+                key={font.id}
+                type="button"
+                role="menuitemradio"
+                aria-checked={active}
+                onClick={() => {
+                  onChange({ font: font.id });
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left hover:bg-bg-3",
+                  active && "bg-bg-3"
+                )}
+              >
+                <span className="min-w-0 flex-1">
+                  <span
+                    className={cn(
+                      "block text-[15px] leading-tight text-text-primary",
+                      PLAY_FONT_CLASS[resolvePlayFont(font.id, "lyrics")]
+                    )}
+                  >
+                    {font.label}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] text-text-muted">{font.hint}</span>
+                </span>
+                {active && <Check className="h-4 w-4 shrink-0 text-accent" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

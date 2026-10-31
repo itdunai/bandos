@@ -9,9 +9,10 @@ import {
   parseChordSheet,
   transposeKey,
 } from "@/lib/chords";
+import { PLAY_FONT_CLASS } from "@/lib/play/fonts";
 import {
   DEFAULT_PLAY_TEXT_PREFS,
-  playFontClass,
+  resolvePlayFont,
   type PlayTextPrefs,
 } from "@/lib/play/text-prefs";
 import { cn } from "@/lib/utils";
@@ -54,7 +55,7 @@ export function InstrumentView({
 }) {
   const align = textPrefs.align === "left" ? "text-left" : "text-center";
   const textBlock = (kind: "chords" | "tabs" | "lyrics", base: number, color: string) => ({
-    className: cn("leading-relaxed whitespace-pre-wrap", align, color, playFontClass(textPrefs.font, kind)),
+    className: cn("leading-relaxed whitespace-pre-wrap", align, color, PLAY_FONT_CLASS[resolvePlayFont(textPrefs.font, kind)]),
     style: { fontSize: `${(base * textPrefs.scale).toFixed(3)}rem` },
   });
   const heading = cn("mb-3 text-[11px] uppercase tracking-widest text-text-muted", align);
