@@ -1,3 +1,4 @@
+import { TELEGRAM_CHANNEL_URL } from "@/lib/links";
 import { createServiceSupabaseClient } from "@/lib/supabase/service";
 import { getSiteUrl } from "@/lib/site-url";
 import {
@@ -21,7 +22,8 @@ const OK = () => Response.json({ ok: true });
 
 const HELP =
   "Это бот BandOS: напоминания о репетициях и концертах, сроки по делам и новые заявки на выступления.\n\n" +
-  "Чтобы подключить уведомления, откройте BandOS → <b>Аккаунт</b> → «Подключить Telegram».";
+  "Чтобы подключить уведомления, откройте BandOS → <b>Аккаунт</b> → «Подключить Telegram».\n\n" +
+  `Новости и фишки проекта — в нашем канале: ${TELEGRAM_CHANNEL_URL}`;
 
 export async function POST(request: Request) {
   // Telegram передаёт секрет, заданный в setWebhook. Без него — не наш запрос.
@@ -83,6 +85,7 @@ export async function POST(request: Request) {
         : "✅ <b>Готово!</b> Уведомления BandOS подключены.\n\n" +
             "Буду напоминать о репетициях и концертах за сутки, о сроках по делам и присылать новые заявки на выступления.\n" +
             `Настроить, что присылать: ${escapeHtml(getSiteUrl())} → Аккаунт.\n\n` +
+            `Новости и фишки проекта — в канале: ${TELEGRAM_CHANNEL_URL}\n\n` +
             "Отключить: /stop"
     );
     return OK();

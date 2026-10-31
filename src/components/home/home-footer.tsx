@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteLogo } from "@/components/brand/site-logo";
+import { TELEGRAM_CHANNEL_URL } from "@/lib/links";
 import { bandPath } from "@/lib/paths";
 
 export function HomeFooter({
@@ -19,6 +20,14 @@ export function HomeFooter({
           <Link href="/#catalog" className="hover:text-text-primary">
             Каталог групп
           </Link>
+          <a
+            href={TELEGRAM_CHANNEL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-text-primary"
+          >
+            Канал в Telegram
+          </a>
           <Link href="/privacy" className="hover:text-text-primary">
             Политика конфиденциальности
           </Link>

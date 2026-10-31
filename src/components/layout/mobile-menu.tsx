@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, MessageSquare, Plus, ShieldCheck, X } from "lucide-react";
+import { LogOut, MessageSquare, Plus, Send, ShieldCheck, X } from "lucide-react";
+import { TELEGRAM_CHANNEL_URL } from "@/lib/links";
 import { signOut } from "@/app/actions/auth";
 import {
   BAND_NAV,
@@ -122,6 +123,15 @@ export function MobileMenu({
             Обратная связь
             <UnreadDot count={unreadFeedback} />
           </Link>
+          <a
+            href={TELEGRAM_CHANNEL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
+          >
+            <Send className="h-4 w-4 shrink-0" />
+            Канал в Telegram
+          </a>
           {isPlatformAdmin && (
             <Link
               href="/admin"
