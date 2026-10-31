@@ -57,6 +57,10 @@ export function EventForm({
   const errorRef = useRef<HTMLDivElement>(null);
   // Смена даты начала → дата окончания подтягивается (см. DateTimeField.follow)
   const [startChange, setStartChange] = useState({ date: "", prev: "", seq: 0 });
+  // «Учесть в финансах» включается, как только ввели сумму (пока галочку не трогали руками)
+  const [recordFee, setRecordFee] = useState(!!event?.fee);
+  const [recordRent, setRecordRent] = useState(!!event?.rent);
+  const [recordTouched, setRecordTouched] = useState(false);
 
   const action = isEdit
     ? updateEvent.bind(null, event.id, bandId, bandSlug)
@@ -171,7 +175,15 @@ export function EventForm({
             </div>
             <div>
               <Label>Гонорар (₽)</Label>
-              <Input name="fee" type="number" min={0} defaultValue={event?.fee ?? ""} />
+              <Input
+                name="fee"
+                type="number"
+                min={0}
+                defaultValue={event?.fee ?? ""}
+                onChange={(e) => {
+                  if (!recordTouched) setRecordFee(Number(e.target.value) > 0);
+                }}
+              />
             </div>
           </div>
           {isAdmin && !financeRecorded && (
@@ -179,7 +191,11 @@ export function EventForm({
               <input
                 type="checkbox"
                 name="record_in_finances"
-                defaultChecked={!!event?.fee}
+                checked={recordFee}
+                onChange={(e) => {
+                  setRecordTouched(true);
+                  setRecordFee(e.target.checked);
+                }}
                 className="accent-accent"
               />
               Учесть гонорар в финансах при сохранении
@@ -195,14 +211,26 @@ export function EventForm({
         <div className="space-y-3 rounded-xl border border-border bg-bg-2 p-4">
           <div>
             <Label>Аренда (₽)</Label>
-            <Input name="rent" type="number" min={0} defaultValue={event?.rent ?? ""} />
+            <Input
+              name="rent"
+              type="number"
+              min={0}
+              defaultValue={event?.rent ?? ""}
+              onChange={(e) => {
+                if (!recordTouched) setRecordRent(Number(e.target.value) > 0);
+              }}
+            />
           </div>
           {isAdmin && !financeRecorded && (
             <label className="flex items-center gap-2 text-sm text-text-secondary">
               <input
                 type="checkbox"
                 name="record_rent_in_finances"
-                defaultChecked={!!event?.rent}
+                checked={recordRent}
+                onChange={(e) => {
+                  setRecordTouched(true);
+                  setRecordRent(e.target.checked);
+                }}
                 className="accent-accent"
               />
               Учесть аренду в финансах как расход
