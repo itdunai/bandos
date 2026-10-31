@@ -4,7 +4,8 @@ import { signOut } from "@/app/actions/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { LogOut, MessageSquare, Play, Plus, Send, ShieldCheck } from "lucide-react";
+import { LogOut, MessageSquare, Play, Plus, ShieldCheck } from "lucide-react";
+import { TelegramIcon } from "@/components/brand/telegram-icon";
 import { TELEGRAM_CHANNEL_URL } from "@/lib/links";
 import { cn } from "@/lib/utils";
 import { bandPath } from "@/lib/paths";
@@ -129,8 +130,8 @@ export function Sidebar({
             rel="noopener noreferrer"
             className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
           >
-            <Send className="h-4 w-4 shrink-0" />
-            Канал в Telegram
+            <TelegramIcon className="h-4 w-4" />
+            Telegram
           </a>
           {isPlatformAdmin && (
             <Link

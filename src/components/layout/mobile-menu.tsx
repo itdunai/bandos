@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, MessageSquare, Plus, Send, ShieldCheck, X } from "lucide-react";
+import { LogOut, MessageSquare, Plus, ShieldCheck, X } from "lucide-react";
+import { TelegramIcon } from "@/components/brand/telegram-icon";
 import { TELEGRAM_CHANNEL_URL } from "@/lib/links";
 import { signOut } from "@/app/actions/auth";
 import {
@@ -129,8 +130,8 @@ export function MobileMenu({
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
           >
-            <Send className="h-4 w-4 shrink-0" />
-            Канал в Telegram
+            <TelegramIcon className="h-4 w-4" />
+            Telegram
           </a>
           {isPlatformAdmin && (
             <Link

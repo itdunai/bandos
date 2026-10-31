@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteLogo } from "@/components/brand/site-logo";
+import { TelegramIcon } from "@/components/brand/telegram-icon";
 import { TELEGRAM_CHANNEL_URL } from "@/lib/links";
 import { bandPath } from "@/lib/paths";
 
@@ -24,9 +25,10 @@ export function HomeFooter({
             href={TELEGRAM_CHANNEL_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-text-primary"
+            className="inline-flex items-center gap-1.5 hover:text-text-primary"
           >
-            Канал в Telegram
+            <TelegramIcon className="h-4 w-4" />
+            Telegram
           </a>
           <Link href="/privacy" className="hover:text-text-primary">
             Политика конфиденциальности
