@@ -1,3 +1,4 @@
+import { AttachmentThumbs } from "@/components/feedback/attachment-thumbs";
 import { MarkFeedbackSeen } from "@/components/feedback/mark-feedback-seen";
 import { Card } from "@/components/ui/card";
 import { LocalDateTime } from "@/components/ui/local-date-time";
@@ -48,6 +49,7 @@ export function MyFeedbackList({ items }: { items: MyFeedbackRow[] }) {
               </span>
             </div>
             <p className="mt-2 line-clamp-4 whitespace-pre-wrap text-sm">{f.message}</p>
+            <AttachmentThumbs urls={f.attachmentUrls} />
             {f.admin_reply && (
               <div className="mt-3 rounded-lg border border-border bg-bg-3 px-3 py-2">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-text-muted">

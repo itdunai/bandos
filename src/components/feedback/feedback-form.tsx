@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { submitFeedback } from "@/app/actions/feedback";
+import { FeedbackAttachmentsInput } from "@/components/feedback/feedback-attachments-input";
 import { Card } from "@/components/ui/card";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Textarea } from "@/components/ui/textarea";
@@ -92,6 +93,8 @@ export function FeedbackForm({
           aria-label="Сообщение"
           placeholder="Например: в режиме «Играем» не листается сет-лист на iPhone…"
         />
+
+        <FeedbackAttachmentsInput />
 
         {(band || from) && (
           <p className="text-xs text-text-muted">

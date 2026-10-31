@@ -1,3 +1,4 @@
+import { signFeedbackAttachments } from "@/lib/feedback/attachments";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type FeedbackKind = "bug" | "idea" | "question" | "other";
@@ -40,6 +41,8 @@ export interface MyFeedbackRow {
   created_at: string;
   updated_at: string;
   user_seen_at: string;
+  /** Временные ссылки на скриншоты */
+  attachmentUrls: string[];
 }
 
 /** Обращения текущего пользователя (RLS: только свои). До миграции 031 — пусто. */
@@ -47,14 +50,15 @@ export async function getMyFeedback(
   supabase: SupabaseClient,
   userId: string
 ): Promise<MyFeedbackRow[]> {
+  // select("*"): attachments появляется в миграции 034
   const { data, error } = await supabase
     .from("feedback")
-    .select("id, kind, message, status, admin_reply, created_at, updated_at, user_seen_at")
+    .select("*")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(50);
   if (error || !data) return [];
-  return data as MyFeedbackRow[];
+  return withAttachmentUrls(supabase, data) as Promise<MyFeedbackRow[]>;
 }
 
 export function isFeedbackUnread(row: Pick<MyFeedbackRow, "updated_at" | "user_seen_at">) {
@@ -66,4 +70,17 @@ export async function getUnreadFeedbackCount(supabase: SupabaseClient): Promise<
   const { data, error } = await supabase.rpc("my_unread_feedback_count");
   if (error || typeof data !== "number") return 0;
   return data;
+}
+
+/** Добавляет к строкам обращений временные ссылки на вложения (attachmentUrls). */
+export async function withAttachmentUrls<T extends { attachments?: string[] | null }>(
+  supabase: SupabaseClient,
+  rows: T[]
+): Promise<(T & { attachmentUrls: string[] })[]> {
+  const paths = rows.flatMap((r) => r.attachments ?? []);
+  const urls = await signFeedbackAttachments(supabase, paths);
+  return rows.map((r) => ({
+    ...r,
+    attachmentUrls: (r.attachments ?? []).map((p) => urls.get(p)).filter((u): u is string => !!u),
+  }));
 }

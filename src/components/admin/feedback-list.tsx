@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { updateFeedbackTicket } from "@/app/actions/platform-admin";
+import { AttachmentThumbs } from "@/components/feedback/attachment-thumbs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LocalDateTime } from "@/components/ui/local-date-time";
@@ -111,6 +112,7 @@ function Ticket({ item }: { item: FeedbackRow }) {
         </span>
       </div>
       <p className="mt-2 whitespace-pre-wrap text-sm">{item.message}</p>
+      <AttachmentThumbs urls={item.attachmentUrls} />
 
       <form action={onSubmit} className="mt-3 space-y-2 border-t border-border pt-3">
         <fieldset className="flex flex-wrap gap-1">

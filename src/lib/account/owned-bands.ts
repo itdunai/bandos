@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { removeUserFeedbackAttachments } from "@/lib/feedback/attachments";
 import { BAND_MEDIA_BUCKET } from "@/lib/storage";
 
 export interface OwnedBand {
@@ -59,7 +60,9 @@ export async function removeAccountMedia(
   bandIds: string[]
 ) {
   const folders = [`avatars/${userId}`, ...bandIds.map((id) => `bands/${id}`)];
-  await Promise.all(
-    folders.map((f) => removeFolder(supabase, f).catch(() => undefined))
-  );
+  await Promise.all([
+    ...folders.map((f) => removeFolder(supabase, f).catch(() => undefined)),
+    // Скриншоты из обращений — в отдельном закрытом bucket
+    removeUserFeedbackAttachments(supabase, userId).catch(() => undefined),
+  ]);
 }

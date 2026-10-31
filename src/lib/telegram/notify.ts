@@ -342,7 +342,7 @@ export async function notifyNewFeedback(feedbackId: string) {
 
   const { data: f } = await db
     .from("feedback")
-    .select("id, kind, message, page, email, bands(name)")
+    .select("*, bands(name)")
     .eq("id", feedbackId)
     .maybeSingle();
   if (!f) return;
@@ -365,6 +365,8 @@ export async function notifyNewFeedback(feedbackId: string) {
     `👤 ${escapeHtml(f.email ?? "—")}${band ? ` · ${escapeHtml(band.name)}` : ""}`,
   ];
   if (f.page) lines.push(`📄 ${escapeHtml(f.page)}`);
+  const attachments = Array.isArray(f.attachments) ? f.attachments.length : 0;
+  if (attachments) lines.push(`📎 Скриншотов: ${attachments} — смотреть в админке`);
   lines.push("", escapeHtml(f.message.slice(0, 2000)), "", `<a href="${link("/admin/feedback")}">Открыть в админке</a>`);
   const html = lines.join("\n");
 

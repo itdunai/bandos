@@ -1,4 +1,4 @@
-import type { FeedbackKind, FeedbackStatus } from "@/lib/feedback/tickets";
+import { withAttachmentUrls, type FeedbackKind, type FeedbackStatus } from "@/lib/feedback/tickets";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface PlatformStats {
@@ -105,6 +105,8 @@ export interface FeedbackRow {
   replied_at: string | null;
   created_at: string;
   bands: { name: string; slug: string } | null;
+  /** Временные ссылки на скриншоты */
+  attachmentUrls: string[];
 }
 
 export async function getPlatformFeedback(
@@ -120,10 +122,14 @@ export async function getPlatformFeedback(
       .order("created_at", { ascending: false })
       .limit(limit);
 
-  const { data, error } = await query(
-    "id, kind, message, page, email, status, admin_reply, replied_at, created_at, bands(name, slug)"
-  );
-  if (!error && data) return data as unknown as FeedbackRow[];
+  // "*": новые колонки (ответ — 031, вложения — 034) подхватываются без правок запроса
+  const { data, error } = await query("*, bands(name, slug)");
+  if (!error && data) {
+    return withAttachmentUrls(
+      supabase,
+      data as unknown as (Omit<FeedbackRow, "attachmentUrls"> & { attachments?: string[] })[]
+    );
+  }
 
   // До миграции 031 колонок ответа нет — показываем то, что есть
   const { data: legacy } = await query("id, kind, message, page, email, status, created_at, bands(name, slug)");
@@ -131,5 +137,6 @@ export async function getPlatformFeedback(
     ...f,
     admin_reply: null,
     replied_at: null,
+    attachmentUrls: [],
   }));
 }
