@@ -47,6 +47,7 @@
    - `supabase/migrations/030_account_deletion_and_feedback.sql` — удаление аккаунта (`/account`), обратная связь (`/feedback`, список в `/admin`)
    - `supabase/migrations/031_feedback_tickets_and_metrics.sql` — обращения со статусом и ответом, учёт посещений и метрика `/admin`
    - `supabase/migrations/032_setlist_blocks_and_catalog_flag.sql` — блоки в сет-листе, отдельный флаг «Отображать в каталоге групп»
+   - `supabase/migrations/033_play_text_prefs.sql` — размер, выравнивание и шрифт текста в «Играем» в профиле пользователя
 3. **Authentication → Providers → Email** — включите Email
 4. Для локальной разработки отключите «Confirm email» (или подтверждайте вручную)
 5. **Authentication → URL Configuration**:

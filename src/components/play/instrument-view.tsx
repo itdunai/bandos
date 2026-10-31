@@ -2,6 +2,11 @@
 
 import type { Instrument } from "@/types/database";
 import { Metronome } from "@/components/metronome/metronome";
+import {
+  DEFAULT_PLAY_TEXT_PREFS,
+  playFontClass,
+  type PlayTextPrefs,
+} from "@/lib/play/text-prefs";
 import { cn } from "@/lib/utils";
 import { FileText } from "lucide-react";
 import { useState } from "react";
@@ -22,13 +27,24 @@ interface TrackData {
   contents: SongContent[];
 }
 
+/** Базовый размер (rem) — умножается на «A−/A+» из настроек пользователя. */
+const BASE_REM = { chords: 1.75, tabs: 1.125, lyrics: 1.25, lyricsSecondary: 1.0625 };
+
 export function InstrumentView({
   track,
   instrument,
+  textPrefs = DEFAULT_PLAY_TEXT_PREFS,
 }: {
   track: TrackData;
   instrument: Instrument;
+  textPrefs?: PlayTextPrefs;
 }) {
+  const align = textPrefs.align === "left" ? "text-left" : "text-center";
+  const textBlock = (kind: "chords" | "tabs" | "lyrics", base: number, color: string) => ({
+    className: cn("leading-relaxed whitespace-pre-wrap", align, color, playFontClass(textPrefs.font, kind)),
+    style: { fontSize: `${(base * textPrefs.scale).toFixed(3)}rem` },
+  });
+  const heading = cn("mb-3 text-[11px] uppercase tracking-widest text-text-muted", align);
   const chords = track.contents.find((c) => c.content_type === "chords");
   const tabs = track.contents.find(
     (c) => c.content_type === "tabs" && (c.instrument === "bass" || !c.instrument)
@@ -93,10 +109,8 @@ export function InstrumentView({
 
       {(instrument === "guitar" || instrument === "keys") && chords?.body && (
         <section className="flex-1">
-          <h3 className="mb-3 text-center text-[11px] uppercase tracking-widest text-text-muted">
-            Аккорды
-          </h3>
-          <pre className="text-center font-mono text-2xl leading-relaxed text-accent whitespace-pre-wrap sm:text-3xl">
+          <h3 className={heading}>Аккорды</h3>
+          <pre {...textBlock("chords", BASE_REM.chords, "text-accent")}>
             {chords.body}
           </pre>
         </section>
@@ -104,10 +118,8 @@ export function InstrumentView({
 
       {instrument === "bass" && tabs?.body && (
         <section className="flex-1">
-          <h3 className="mb-3 text-center text-[11px] uppercase tracking-widest text-text-muted">
-            Табы
-          </h3>
-          <pre className="text-center font-mono text-lg leading-relaxed text-text-primary whitespace-pre-wrap">
+          <h3 className={heading}>Табы</h3>
+          <pre {...textBlock("tabs", BASE_REM.tabs, "text-text-primary")}>
             {tabs.body}
           </pre>
         </section>
@@ -115,10 +127,8 @@ export function InstrumentView({
 
       {instrument === "vocals" && lyrics?.body && (
         <section className="flex-1">
-          <h3 className="mb-3 text-center text-[11px] uppercase tracking-widest text-text-muted">
-            Текст
-          </h3>
-          <pre className="text-center text-lg leading-relaxed text-text-primary whitespace-pre-wrap sm:text-xl">
+          <h3 className={heading}>Текст</h3>
+          <pre {...textBlock("lyrics", BASE_REM.lyrics, "text-text-primary")}>
             {lyrics.body}
           </pre>
         </section>
@@ -126,10 +136,8 @@ export function InstrumentView({
 
       {showLyrics && canToggleLyrics && lyrics?.body && (
         <section className="flex-1 border-t border-border pt-4">
-          <h3 className="mb-3 text-center text-[11px] uppercase tracking-widest text-text-muted">
-            Текст
-          </h3>
-          <pre className="text-center text-base leading-relaxed text-text-primary whitespace-pre-wrap sm:text-lg">
+          <h3 className={heading}>Текст</h3>
+          <pre {...textBlock("lyrics", BASE_REM.lyricsSecondary, "text-text-primary")}>
             {lyrics.body}
           </pre>
         </section>

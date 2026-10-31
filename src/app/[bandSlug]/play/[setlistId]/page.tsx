@@ -41,6 +41,13 @@ export default async function PlaySetlistPage({
 
   if (!setlist) notFound();
 
+  // select("*"): play_prefs появляется в миграции 033
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", member.user_id)
+    .maybeSingle();
+
   const { data: allItems } = await supabase
     .from("setlist_items")
     .select("*, songs(id, title, bpm, time_signature, key, structure)")
@@ -135,6 +142,7 @@ export default async function PlaySetlistPage({
         setlistName={setlist.name}
         tracks={tracks}
         instrument={member.instrument as Instrument}
+        textPrefs={profile?.play_prefs ?? null}
       />
     </div>
   );

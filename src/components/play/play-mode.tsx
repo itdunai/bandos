@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InstrumentView } from "@/components/play/instrument-view";
+import type { PlayTextPrefs } from "@/lib/play/text-prefs";
 import type { Instrument } from "@/types/database";
 
 export interface PlayTrack {
@@ -36,10 +37,12 @@ export function PlayMode({
   setlistName,
   tracks,
   instrument,
+  textPrefs,
 }: {
   setlistName: string;
   tracks: PlayTrack[];
   instrument: Instrument;
+  textPrefs?: PlayTextPrefs;
 }) {
   const [index, setIndex] = useState(0);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
@@ -135,7 +138,7 @@ export function PlayMode({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <InstrumentView key={track.id} track={track} instrument={instrument} />
+        <InstrumentView key={track.id} track={track} instrument={instrument} textPrefs={textPrefs} />
       </div>
 
       <footer className="shrink-0 border-t border-border px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))]">

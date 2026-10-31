@@ -1,6 +1,8 @@
 "use client";
 
 import { PlayMode } from "@/components/play/play-mode";
+import { PlayTextToolbar } from "@/components/play/play-text-toolbar";
+import { usePlayTextPrefs } from "@/components/play/use-play-text-prefs";
 import type { PlayTrack } from "@/components/play/play-mode";
 import {
   formatPlayCachedAt,
@@ -20,13 +22,17 @@ export function PlaySetlistShell({
   setlistName,
   tracks,
   instrument,
+  textPrefs,
 }: {
   bandSlug: string;
   setlistId: string;
   setlistName: string;
   tracks: PlayTrack[];
   instrument: Instrument;
+  /** play_prefs из профиля; нет — офлайн, берём из браузера */
+  textPrefs?: unknown;
 }) {
+  const [prefs, updatePrefs] = usePlayTextPrefs(textPrefs);
   const [isOnline, setIsOnline] = useState(true);
   const [cachedAt, setCachedAt] = useState<string | null>(null);
   const screenAwake = useWakeLock();
@@ -108,13 +114,13 @@ export function PlaySetlistShell({
           )}
           {screenAwake && <ScreenAwakeHint />}
         </span>
-        {/* Противовес кнопке «Назад», чтобы статус оставался по центру */}
-        <span className="w-[76px] shrink-0" aria-hidden />
+        <PlayTextToolbar prefs={prefs} onChange={updatePrefs} />
       </div>
       <PlayMode
         setlistName={setlistName}
         tracks={tracks}
         instrument={instrument}
+        textPrefs={prefs}
       />
     </div>
   );
