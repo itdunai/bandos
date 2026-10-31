@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogOut, MessageSquare, Plus, X } from "lucide-react";
+import { LogOut, MessageSquare, Plus, ShieldCheck, X } from "lucide-react";
 import { signOut } from "@/app/actions/auth";
 import {
   BAND_NAV,
@@ -10,7 +10,7 @@ import {
   isNavItemVisible,
   navItemHref,
 } from "@/components/layout/band-nav";
-import { useUnreadFeedback } from "@/components/layout/band-shell-context";
+import { useIsPlatformAdmin, useUnreadFeedback } from "@/components/layout/band-shell-context";
 import { BuildVersionLabel } from "@/components/layout/build-version-label";
 import { feedbackHref, UnreadDot } from "@/components/layout/unread-dot";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -32,6 +32,7 @@ export function MobileMenu({
 }) {
   const pathname = usePathname();
   const unreadFeedback = useUnreadFeedback();
+  const isPlatformAdmin = useIsPlatformAdmin();
 
   useEffect(() => {
     if (!open) return;
@@ -121,6 +122,16 @@ export function MobileMenu({
             Обратная связь
             <UnreadDot count={unreadFeedback} />
           </Link>
+          {isPlatformAdmin && (
+            <Link
+              href="/admin"
+              onClick={onClose}
+              className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
+            >
+              <ShieldCheck className="h-4 w-4 shrink-0" />
+              Админ-панель
+            </Link>
+          )}
           <form action={signOut}>
             <SubmitButton
               type="submit"

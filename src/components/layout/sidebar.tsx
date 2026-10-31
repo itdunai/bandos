@@ -4,7 +4,7 @@ import { signOut } from "@/app/actions/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SubmitButton } from "@/components/ui/submit-button";
-import { LogOut, MessageSquare, Play, Plus } from "lucide-react";
+import { LogOut, MessageSquare, Play, Plus, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { bandPath } from "@/lib/paths";
 import { Avatar } from "@/components/ui/avatar";
@@ -16,6 +16,7 @@ import {
   navItemHref,
 } from "@/components/layout/band-nav";
 import {
+  useIsPlatformAdmin,
   useUnreadFeedback,
   useUpcomingEvent,
   useUserBands,
@@ -42,6 +43,7 @@ export function Sidebar({
   const playActive = isNavItemActive(pathname, playHref, false);
   const accountHref = bandPath(band.slug, "account");
   const unreadFeedback = useUnreadFeedback();
+  const isPlatformAdmin = useIsPlatformAdmin();
 
   return (
     <aside className="flex h-dvh w-[232px] shrink-0 flex-col border-r border-border bg-bg">
@@ -120,6 +122,15 @@ export function Sidebar({
             Обратная связь
             <UnreadDot count={unreadFeedback} />
           </Link>
+          {isPlatformAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm text-text-secondary transition-colors hover:bg-bg-3 hover:text-text-primary"
+            >
+              <ShieldCheck className="h-4 w-4 shrink-0" />
+              Админ-панель
+            </Link>
+          )}
         </div>
         {member && (
           <div className="flex items-center gap-2 px-1">

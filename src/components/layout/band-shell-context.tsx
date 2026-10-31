@@ -5,6 +5,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 
 const BandShellContext = createContext<Band[]>([]);
 const UpcomingEventContext = createContext<Event | null>(null);
+const PlatformAdminContext = createContext(false);
 const UnreadFeedbackContext = createContext<{ count: number; clear: () => void }>({
   count: 0,
   clear: () => {},
@@ -14,12 +15,15 @@ export function BandShellProvider({
   userBands,
   upcomingEvent,
   unreadFeedback = 0,
+  isPlatformAdmin = false,
   children,
 }: {
   userBands: Band[];
   upcomingEvent?: Event | null;
   /** Обращения с ответом, которые пользователь ещё не видел */
   unreadFeedback?: number;
+  /** Владелец платформы — в меню ссылка на /admin */
+  isPlatformAdmin?: boolean;
   children: React.ReactNode;
 }) {
   // Сброс помним для конкретного значения с сервера: появится новый ответ — индикатор вернётся
@@ -33,7 +37,9 @@ export function BandShellProvider({
   return (
     <BandShellContext.Provider value={userBands}>
       <UpcomingEventContext.Provider value={upcomingEvent ?? null}>
-        <UnreadFeedbackContext.Provider value={unread}>{children}</UnreadFeedbackContext.Provider>
+        <UnreadFeedbackContext.Provider value={unread}>
+          <PlatformAdminContext.Provider value={isPlatformAdmin}>{children}</PlatformAdminContext.Provider>
+        </UnreadFeedbackContext.Provider>
       </UpcomingEventContext.Provider>
     </BandShellContext.Provider>
   );
@@ -53,4 +59,8 @@ export function useUnreadFeedback() {
 
 export function useClearUnreadFeedback() {
   return useContext(UnreadFeedbackContext).clear;
+}
+
+export function useIsPlatformAdmin() {
+  return useContext(PlatformAdminContext);
 }

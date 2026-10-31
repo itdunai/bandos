@@ -8,6 +8,7 @@ import {
 } from "@/lib/band/queries";
 import { getUnreadFeedbackCount } from "@/lib/feedback/tickets";
 import { redirectForbidden } from "@/lib/forbidden";
+import { isPlatformAdminUser } from "@/lib/platform/admin";
 import { isReservedBandSlug } from "@/lib/paths";
 import { createClient } from "@/lib/supabase/server";
 import { notFound, redirect } from "next/navigation";
@@ -48,10 +49,11 @@ export default async function BandLayout({
   ]);
   if (!band) notFound();
 
-  const [member, upcoming, unreadFeedback] = await Promise.all([
+  const [member, upcoming, unreadFeedback, platformAdmin] = await Promise.all([
     getCurrentMember(band.id),
     getUpcomingEvent(band.id),
     getUnreadFeedbackCount(supabase),
+    isPlatformAdminUser(user),
   ]);
   if (!member) {
     redirectForbidden({ reason: "not_member", bandSlug });
@@ -62,6 +64,7 @@ export default async function BandLayout({
       userBands={userBands}
       upcomingEvent={upcoming}
       unreadFeedback={unreadFeedback}
+      isPlatformAdmin={platformAdmin}
     >
       {children}
     </BandShellProvider>
