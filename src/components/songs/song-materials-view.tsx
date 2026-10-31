@@ -1,6 +1,9 @@
 "use client";
 
+import { ChordSheetLines } from "@/components/songs/chord-sheet-lines";
 import { Tabs } from "@/components/ui/tabs";
+import { parseChordSheet } from "@/lib/chords";
+import { useMemo } from "react";
 
 export function SongMaterialsView({
   chords,
@@ -11,14 +14,15 @@ export function SongMaterialsView({
   tabs?: string;
   lyrics?: string;
 }) {
+  const chordLines = useMemo(() => (chords ? parseChordSheet(chords) : []), [chords]);
   const tabsList = [
     chords
       ? {
           id: "chords",
           label: "Аккорды",
           content: (
-            <pre className="font-mono text-sm text-accent whitespace-pre-wrap">
-              {chords}
+            <pre className="font-mono text-sm text-text-primary whitespace-pre-wrap">
+              <ChordSheetLines lines={chordLines} />
             </pre>
           ),
         }

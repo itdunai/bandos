@@ -3,6 +3,7 @@
 import type { Instrument } from "@/types/database";
 import { Metronome } from "@/components/metronome/metronome";
 import { useTranspose } from "@/components/play/use-transpose";
+import { ChordSheetLines } from "@/components/songs/chord-sheet-lines";
 import {
   detectNotation,
   formatSemitones,
@@ -179,20 +180,7 @@ export function InstrumentView({
             </div>
           </div>
           <pre {...textBlock("chords", BASE_REM.chords, "text-text-primary")}>
-            {chordLines.map((line, i) => (
-              <span key={i}>
-                {line.segments.map((seg, j) =>
-                  seg.chord ? (
-                    <span key={j} className="font-semibold text-accent">
-                      {seg.text}
-                    </span>
-                  ) : (
-                    seg.text
-                  )
-                )}
-                {i < chordLines.length - 1 && "\n"}
-              </span>
-            ))}
+            <ChordSheetLines lines={chordLines} />
           </pre>
         </section>
       )}
